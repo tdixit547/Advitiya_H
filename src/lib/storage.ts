@@ -1,8 +1,10 @@
 import fs from 'fs/promises';
 import path from 'path';
+import os from 'os';
 import { Link, LinkWithRules, LinkRule } from '@/types';
 
-const DATA_DIR = path.join(process.cwd(), 'data');
+// Store data in OS temp directory to avoid triggering HMR
+const DATA_DIR = path.join(os.tmpdir(), 'smart-link-hub-data');
 const LINKS_FILE = path.join(DATA_DIR, 'links.json');
 const RULES_FILE = path.join(DATA_DIR, 'rules.json');
 
