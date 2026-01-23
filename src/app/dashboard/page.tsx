@@ -1,271 +1,383 @@
+// ============================================
+// SMART LINK HUB - Dashboard Page
+// Main management interface (protected)
+// ============================================
+
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
-import { useRouter } from 'next/navigation';
-import { LinkWithRules, LinkRule } from '@/types';
-import RuleConfigurator from '@/components/RuleConfigurator';
-import LinkListReorder from '@/components/LinkListReorder';
+import { useState, useEffect, useRef, useCallback } from 'react';
+import type { LinkHub, Variant, HubStats } from '@/types';
+import { 
+  getHubs, 
+  createHub, 
+  getVariants, 
+  createVariant,
+  deleteVariant,
+  getHubStats,
+  ApiError 
+} from '@/lib/api-client';
+import { useAuth } from '@/contexts/auth-context';
+import ProtectedRoute from '@/components/ProtectedRoute';
+import HubSelector from '@/components/HubSelector';
+import CreateHubModal from '@/components/CreateHubModal';
+import VariantList from '@/components/VariantList';
+import VariantEditor from '@/components/VariantEditor';
+import RuleTreeBuilder from '@/components/RuleTreeBuilder';
 import AnalyticsPanel from '@/components/AnalyticsPanel';
 import { SettingsPanel, OnboardingModal } from '@/components/SettingsPanel';
+import ThemeToggle from '@/components/ThemeToggle';
 
 export default function DashboardPage() {
-  const router = useRouter();
-  const [links, setLinks] = useState<LinkWithRules[]>([]);
-  const [selectedLink, setSelectedLink] = useState<LinkWithRules | null>(null);
-  const [isAddingLink, setIsAddingLink] = useState(false);
-  const [showOnboarding, setShowOnboarding] = useState(false); // Set to true for demo if needed
-  const [newLink, setNewLink] = useState({ title: '', url: '' });
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  return (
+    <ProtectedRoute>
+      <DashboardContent />
+    </ProtectedRoute>
+  );
+}
 
+function DashboardContent() {
+  const { user, logout } = useAuth();
+  
+  // Hub state
+  const [hubs, setHubs] = useState<LinkHub[]>([]);
+  const [selectedHub, setSelectedHub] = useState<LinkHub | null>(null);
+  const [isLoadingHubs, setIsLoadingHubs] = useState(true);
+  const [showCreateHub, setShowCreateHub] = useState(false);
+  
+  // Variant state
+  const [variants, setVariants] = useState<Variant[]>([]);
+  const [selectedVariant, setSelectedVariant] = useState<Variant | null>(null);
+  const [isLoadingVariants, setIsLoadingVariants] = useState(false);
+  const [isAddingVariant, setIsAddingVariant] = useState(false);
+  
+  // Stats state
+  const [stats, setStats] = useState<HubStats | null>(null);
+  
+  // UI state
+  const [showOnboarding, setShowOnboarding] = useState(false);
+  const [activeTab, setActiveTab] = useState<'variants' | 'rules' | 'analytics'>('variants');
+  const [error, setError] = useState<string | null>(null);
+  
   const hasFetched = useRef(false);
 
-  const fetchLinks = async () => {
+  // Fetch hubs on mount
+  const fetchHubs = useCallback(async () => {
+    setIsLoadingHubs(true);
     try {
-      const res = await fetch('/api/links?hub_id=1');
-      if (!res.ok) throw new Error('Failed to fetch links');
-      const data = await res.json();
-      if (data.success) setLinks(data.data);
+      const hubList = await getHubs();
+      setHubs(hubList);
+      
+      // Auto-select first hub if available
+      if (hubList.length > 0 && !selectedHub) {
+        setSelectedHub(hubList[0]);
+      }
     } catch (err) {
-      console.error(err);
-      setError('Failed to load links');
+      console.error('Failed to fetch hubs:', err);
+      setError('Failed to load hubs');
     } finally {
-      setIsLoading(false);
+      setIsLoadingHubs(false);
     }
-  };
+  }, [selectedHub]);
 
-  // Initial Fetch
+  // Fetch variants when hub changes
+  const fetchVariants = useCallback(async (hubId: string) => {
+    setIsLoadingVariants(true);
+    try {
+      const variantList = await getVariants(hubId);
+      setVariants(variantList);
+    } catch (err) {
+      console.error('Failed to fetch variants:', err);
+    } finally {
+      setIsLoadingVariants(false);
+    }
+  }, []);
+
+  // Fetch stats when hub changes
+  const fetchStats = useCallback(async (hubId: string) => {
+    try {
+      const hubStats = await getHubStats(hubId);
+      setStats(hubStats);
+    } catch (err) {
+      console.error('Failed to fetch stats:', err);
+    }
+  }, []);
+
+  // Initial fetch
   useEffect(() => {
     if (hasFetched.current) return;
     hasFetched.current = true;
     
-    fetchLinks();
-    // Check if first time user (simple mock check)
-    if (!localStorage.getItem('hasSeenOnboarding')) {
+    fetchHubs();
+    
+    // Check onboarding
+    if (typeof window !== 'undefined' && !localStorage.getItem('hasSeenOnboarding')) {
       setShowOnboarding(true);
       localStorage.setItem('hasSeenOnboarding', 'true');
     }
-  }, []);
+  }, [fetchHubs]);
 
-  // CRUD Handlers
-  const handleAddLink = async () => {
-    if (!newLink.title || !newLink.url) return;
+  // Fetch data when hub changes
+  useEffect(() => {
+    if (selectedHub) {
+      fetchVariants(selectedHub.hub_id);
+      fetchStats(selectedHub.hub_id);
+      setSelectedVariant(null);
+    }
+  }, [selectedHub, fetchVariants, fetchStats]);
+
+  // Hub handlers
+  const handleCreateHub = async (input: Parameters<typeof createHub>[0]) => {
+    const newHub = await createHub(input);
+    setHubs([...hubs, newHub]);
+    setSelectedHub(newHub);
+  };
+
+  // Variant handlers
+  const handleAddVariant = async (input: Parameters<typeof createVariant>[1]) => {
+    if (!selectedHub) return;
+    
     try {
-      const formattedUrl = newLink.url.startsWith('http') ? newLink.url : `https://${newLink.url}`;
-      const res = await fetch('/api/links', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ hub_id: 1, title: newLink.title, url: formattedUrl }),
-      });
-      const data = await res.json();
-      if (data.success) {
-        setLinks([...links, data.data]);
-        setNewLink({ title: '', url: '' });
-        setIsAddingLink(false);
+      const newVariant = await createVariant(selectedHub.hub_id, input);
+      setVariants([...variants, newVariant]);
+      setIsAddingVariant(false);
+    } catch (err) {
+      if (err instanceof ApiError) {
+        alert(err.message);
       }
-    } catch (err) { alert('Failed to add link'); }
+    }
   };
 
-  const handleReorder = (newOrder: LinkWithRules[]) => {
-    setLinks(newOrder);
-    // TODO: Sync order to backend via API (PUT /api/links/reorder)
-  };
-
-  const handleDeleteLink = async (id: number) => {
-    if(!confirm("Delete link?")) return;
+  const handleDeleteVariant = async (variantId: string) => {
+    if (!selectedHub || !confirm('Delete this variant?')) return;
+    
     try {
-      await fetch(`/api/links?id=${id}`, { method: 'DELETE' });
-      setLinks(prev => prev.filter(l => l.id !== id));
-      if(selectedLink?.id === id) setSelectedLink(null);
-    } catch(e) { alert("Error deleting"); }
-  };
-
-  const handleAddRule = async (linkId: number, rule: any) => {
-    // Reuse existing logic from previous implementation...
-     try {
-      const res = await fetch('/api/rules', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ link_id: linkId, ...rule }),
-      });
-      const data = await res.json();
-      if (data.success) {
-        setLinks(links.map(l => l.id === linkId ? { ...l, rules: [...l.rules, data.data] } : l));
-        // Refresh selected link if needed
-        if (selectedLink?.id === linkId) {
-             setSelectedLink(prev => prev ? { ...prev, rules: [...prev.rules, data.data]} : null);
-        }
+      await deleteVariant(selectedHub.hub_id, variantId);
+      setVariants(variants.filter(v => v.variant_id !== variantId));
+      if (selectedVariant?.variant_id === variantId) {
+        setSelectedVariant(null);
       }
-    } catch (err) { alert('Failed to add rule'); }
+    } catch (err) {
+      console.error('Failed to delete variant:', err);
+    }
   };
 
-   const handleDeleteRule = async (linkId: number, ruleId: number) => {
-    try {
-      await fetch(`/api/rules?id=${ruleId}`, { method: 'DELETE' });
-      setLinks(links.map(l => l.id === linkId ? { ...l, rules: l.rules.filter(r => r.id !== ruleId) } : l));
-       if (selectedLink?.id === linkId) {
-             setSelectedLink(prev => prev ? { ...prev, rules: prev.rules.filter(r => r.id !== ruleId)} : null);
-        }
-    } catch (err) { alert('Failed to delete rule'); }
+  const handleVariantUpdate = (updatedVariant: Variant) => {
+    setVariants(variants.map(v => 
+      v.variant_id === updatedVariant.variant_id ? updatedVariant : v
+    ));
+    setSelectedVariant(updatedVariant);
   };
 
   return (
-    <div className="min-h-screen bg-black">
-      {/* Main Container with proper max-width */}
+    <div className="min-h-screen page-bg">
       <div className="max-w-7xl mx-auto p-6 lg:p-8">
         
-        {/* Header Section */}
-        <div className="flex items-center justify-between mb-8">
+        {/* Header */}
+        <header className="flex items-center justify-between mb-8">
           <div className="flex items-center gap-4">
-            <div className="w-12 h-12 bg-[#00C853] rounded-xl flex items-center justify-center font-bold text-black text-2xl shadow-lg shadow-[#00C853]/20">T</div>
-            <div>
-              <h1 className="font-bold text-2xl text-white">Tannupai Hub</h1>
-              <p className="text-[#9A9A9A] text-sm">Manage your smart links</p>
-            </div>
+            <HubSelector
+              hubs={hubs}
+              selectedHub={selectedHub}
+              onSelect={setSelectedHub}
+              onCreateNew={() => setShowCreateHub(true)}
+              isLoading={isLoadingHubs}
+            />
           </div>
-          <div className="flex items-center gap-3">
-            <code className="text-[#00C853] bg-[#00C853]/10 px-3 py-2 rounded-lg border border-[#00C853]/20 text-sm">domain.com/demo</code>
-            <button 
-              className="btn btn-secondary text-sm py-2 px-4" 
-              onClick={() => window.open('/demo', '_blank')}
+          
+          <div className="flex items-center gap-4">
+            {selectedHub && (
+              <code className="text-[#00C853] bg-[#00C853]/10 px-3 py-2 rounded-lg border border-[#00C853]/20 text-sm">
+                /{selectedHub.slug}
+              </code>
+            )}
+            <button
+              onClick={() => selectedHub && window.open(`/${selectedHub.slug}`, '_blank')}
+              disabled={!selectedHub}
+              className="btn btn-secondary text-sm py-2 px-4 disabled:opacity-50"
             >
               View Live →
             </button>
-          </div>
-        </div>
-
-        {/* Stats Row */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-          <StatCard label="Total Views" value="1245" change="+12%" />
-          <StatCard label="Total Clicks" value="854" change="+8%" />
-          <StatCard label="CTR" value="68.5%" change="+2%" />
-          <StatCard label="Unique Visitors" value="950" change="+15%" />
-        </div>
-
-        {/* Main Two Column Layout */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          
-          {/* LEFT: Links Management */}
-          <div className="space-y-6">
-            <div className="flex items-center justify-between">
-              <h2 className="text-xl font-bold text-white">Your Links</h2>
-              <button 
-                onClick={() => setIsAddingLink(true)}
-                className="btn btn-primary text-sm py-2 px-4"
+            <div className="flex items-center gap-3">
+              <ThemeToggle />
+            </div>
+            <div className="flex items-center gap-2 ml-4 border-l pl-4" style={{ borderColor: 'var(--border-secondary)' }}>
+              <span className="text-sm" style={{ color: 'var(--foreground-secondary)' }}>{user?.email}</span>
+              <button
+                onClick={logout}
+                className="text-red-400 hover:text-red-300 text-sm"
               >
-                + Add Link
+                Logout
               </button>
             </div>
+          </div>
+        </header>
 
-            {/* Add Link Form */}
-            {isAddingLink && (
-              <div className="bg-[#111] rounded-xl p-6 border border-[#00C853]/30">
-                <h3 className="text-lg font-bold text-white mb-4">Create New Link</h3>
-                <div className="space-y-4">
-                  <input 
-                    className="input-field" 
-                    placeholder="Link Title (e.g., My Portfolio)"
-                    value={newLink.title}
-                    onChange={e => setNewLink({...newLink, title: e.target.value})}
-                  />
-                  <input 
-                    className="input-field" 
-                    placeholder="URL (e.g., https://example.com)"
-                    value={newLink.url}
-                    onChange={e => setNewLink({...newLink, url: e.target.value})}
-                  />
-                  <div className="flex gap-3 justify-end">
-                    <button className="btn btn-secondary text-sm py-2 px-4" onClick={() => setIsAddingLink(false)}>Cancel</button>
-                    <button className="btn btn-primary text-sm py-2 px-4" onClick={handleAddLink}>Create Link</button>
-                  </div>
-                </div>
-              </div>
-            )}
+        {/* Error Display */}
+        {error && (
+          <div className="mb-6 p-4 bg-red-500/10 border border-red-500/30 rounded-xl text-red-400">
+            {error}
+            <button onClick={() => setError(null)} className="ml-4 underline">Dismiss</button>
+          </div>
+        )}
 
-            {/* Links List */}
-            <div className="bg-[#0a0a0a] rounded-xl border border-[#222] overflow-hidden">
-              <LinkListReorder 
-                links={links} 
-                onReorder={handleReorder}
-                onEdit={(l) => setSelectedLink(l)}
-                onDelete={handleDeleteLink}
-                onSelect={(l) => setSelectedLink(l)}
-                selectedId={selectedLink?.id}
+        {/* No Hub State */}
+        {!isLoadingHubs && hubs.length === 0 && (
+          <div className="text-center py-20">
+            <div className="w-20 h-20 bg-[#111] rounded-2xl flex items-center justify-center mx-auto mb-6">
+              <span className="text-4xl">🔗</span>
+            </div>
+            <h2 className="text-2xl font-bold text-white mb-2">Create Your First Hub</h2>
+            <p className="text-[#9A9A9A] mb-6 max-w-md mx-auto">
+              A hub is a smart link that routes visitors to different URLs based on rules you define.
+            </p>
+            <button
+              onClick={() => setShowCreateHub(true)}
+              className="btn btn-primary py-3 px-8"
+            >
+              + Create Hub
+            </button>
+          </div>
+        )}
+
+        {/* Main Content */}
+        {selectedHub && (
+          <>
+            {/* Stats Row */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+              <StatCard 
+                label="Total Impressions" 
+                value={stats?.aggregated.total_impressions ?? '-'} 
               />
-              {links.length === 0 && (
-                <div className="p-8 text-center text-[#666]">
-                  <p className="text-4xl mb-3">🔗</p>
-                  <p>No links yet. Add your first link!</p>
+              <StatCard 
+                label="Total Clicks" 
+                value={stats?.aggregated.total_clicks ?? '-'} 
+              />
+              <StatCard 
+                label="Average CTR" 
+                value={stats?.aggregated.average_ctr != null 
+                  ? `${(stats.aggregated.average_ctr * 100).toFixed(1)}%` 
+                  : '-'} 
+              />
+              <StatCard 
+                label="Variants" 
+                value={stats?.aggregated.variant_count ?? variants.length} 
+              />
+            </div>
+
+            {/* Tab Navigation */}
+            <div className="flex gap-1 mb-6 bg-[#111] rounded-xl p-1 w-fit">
+              {(['variants', 'rules', 'analytics'] as const).map((tab) => (
+                <button
+                  key={tab}
+                  onClick={() => setActiveTab(tab)}
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                    activeTab === tab
+                      ? 'bg-[#00C853] text-black'
+                      : 'text-[#9A9A9A] hover:text-white'
+                  }`}
+                >
+                  {tab.charAt(0).toUpperCase() + tab.slice(1)}
+                </button>
+              ))}
+            </div>
+
+            {/* Tab Content */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+              {activeTab === 'variants' && (
+                <>
+                  {/* Left: Variant List */}
+                  <div className="space-y-6">
+                    <div className="flex items-center justify-between">
+                      <h2 className="text-xl font-bold text-white">Variants</h2>
+                      <button
+                        onClick={() => setIsAddingVariant(true)}
+                        className="btn btn-primary text-sm py-2 px-4"
+                      >
+                        + Add Variant
+                      </button>
+                    </div>
+                    
+                    <VariantList
+                      variants={variants}
+                      selectedId={selectedVariant?.variant_id}
+                      onSelect={setSelectedVariant}
+                      onDelete={handleDeleteVariant}
+                      isLoading={isLoadingVariants}
+                      stats={stats?.variants}
+                    />
+                  </div>
+
+                  {/* Right: Variant Editor */}
+                  <div>
+                    {isAddingVariant ? (
+                      <VariantEditor
+                        hubId={selectedHub.hub_id}
+                        onSave={handleAddVariant}
+                        onCancel={() => setIsAddingVariant(false)}
+                        existingVariantIds={variants.map(v => v.variant_id)}
+                      />
+                    ) : selectedVariant ? (
+                      <VariantEditor
+                        hubId={selectedHub.hub_id}
+                        variant={selectedVariant}
+                        onUpdate={handleVariantUpdate}
+                        onCancel={() => setSelectedVariant(null)}
+                      />
+                    ) : (
+                      <div className="bg-[#111] rounded-xl border border-[#222] p-8 text-center">
+                        <div className="text-5xl mb-4 opacity-30">🔗</div>
+                        <h3 className="text-lg font-bold text-[#E6E6E6] mb-2">
+                          Select a variant to edit
+                        </h3>
+                        <p className="text-[#9A9A9A] text-sm">
+                          Click on a variant from the list or add a new one
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                </>
+              )}
+
+              {activeTab === 'rules' && (
+                <div className="lg:col-span-2">
+                  <RuleTreeBuilder
+                    hubId={selectedHub.hub_id}
+                    variants={variants}
+                  />
+                </div>
+              )}
+
+              {activeTab === 'analytics' && (
+                <div className="lg:col-span-2">
+                  <AnalyticsPanel
+                    hubId={selectedHub.hub_id}
+                    stats={stats}
+                  />
                 </div>
               )}
             </div>
-          </div>
-
-          {/* RIGHT: Rule Editor & Analytics */}
-          <div className="space-y-6">
-            {/* Rule Configurator */}
-            {selectedLink ? (
-              <RuleConfigurator 
-                link={selectedLink}
-                onAddRule={(r) => handleAddRule(selectedLink.id, r)}
-                onDeleteRule={(rid) => handleDeleteRule(selectedLink.id, rid)}
-              />
-            ) : (
-              !isAddingLink && (
-                <div className="bg-[#111] rounded-xl border border-[#222] p-8 text-center">
-                  <div className="text-5xl mb-4 opacity-30">⚙️</div>
-                  <h3 className="text-lg font-bold text-[#E6E6E6] mb-2">Select a link to configure</h3>
-                  <p className="text-[#9A9A9A] text-sm">Click on a link from the list to add smart rules</p>
-                </div>
-              )
-            )}
-
-            {/* Mini Analytics */}
-            <div className="bg-[#111] rounded-xl border border-[#222] p-6">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="font-bold text-white">Top Performing Links</h3>
-                <button className="text-xs text-[#00C853] hover:underline">View All</button>
-              </div>
-              <div className="space-y-3">
-                <TopLinkRow title="🌐 My Portfolio" clicks={452} ctr="12%" />
-                <TopLinkRow title="💻 GitHub" clicks={320} ctr="8%" />
-                <TopLinkRow title="💼 LinkedIn" clicks={180} ctr="5%" />
-              </div>
-            </div>
-
-            {/* Quick Settings */}
-            <SettingsPanel />
-          </div>
-        </div>
+          </>
+        )}
       </div>
 
       {/* Modals */}
+      <CreateHubModal
+        isOpen={showCreateHub}
+        onClose={() => setShowCreateHub(false)}
+        onCreate={handleCreateHub}
+      />
+      
       {showOnboarding && <OnboardingModal onClose={() => setShowOnboarding(false)} />}
     </div>
   );
 }
 
 // Helper Components
-function StatCard({ label, value, change }: { label: string; value: string; change: string }) {
+function StatCard({ label, value }: { label: string; value: string | number }) {
   return (
     <div className="bg-[#111] rounded-xl border border-[#222] p-4">
       <p className="text-[#9A9A9A] text-xs mb-1">{label}</p>
-      <div className="flex items-end justify-between">
-        <span className="text-2xl font-bold text-white">{value}</span>
-        <span className="text-xs text-[#00C853] bg-[#00C853]/10 px-2 py-0.5 rounded">{change}</span>
-      </div>
-    </div>
-  );
-}
-
-function TopLinkRow({ title, clicks, ctr }: { title: string; clicks: number; ctr: string }) {
-  return (
-    <div className="flex items-center justify-between py-2 border-b border-[#222] last:border-0">
-      <span className="text-[#E6E6E6] text-sm">{title}</span>
-      <div className="flex gap-4 text-sm">
-        <span className="text-[#9A9A9A]">{clicks} clicks</span>
-        <span className="text-[#00C853]">{ctr}</span>
-      </div>
+      <span className="text-2xl font-bold text-white">{value}</span>
     </div>
   );
 }

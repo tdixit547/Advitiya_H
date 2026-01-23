@@ -1,131 +1,232 @@
+// ============================================
+// SMART LINK HUB - Analytics Panel
+// Real analytics from backend stats
+// ============================================
+
 'use client';
 
+import { useState } from 'react';
 import { 
-  LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer 
+  LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
+  BarChart, Bar
 } from 'recharts';
-import { AnalyticsStats } from '@/types';
-
-// Mock data integration
-const EMPTY_STATS: AnalyticsStats = {
-  totalViews: 0,
-  totalClicks: 0,
-  uniqueVisitors: 0,
-  topLinks: [],
-  viewsByDay: [],
-  viewsByCountry: [],
-  viewsByDevice: []
-};
+import type { HubStats } from '@/types';
+import { forceAggregateStats, ApiError } from '@/lib/api-client';
 
 interface AnalyticsPanelProps {
-  stats?: AnalyticsStats;
+  hubId: string;
+  stats: HubStats | null;
 }
 
-export default function AnalyticsPanel({ stats = EMPTY_STATS }: AnalyticsPanelProps) {
-  // Use mock data if empty for visualization in dev
-  const chartData = stats.viewsByDay.length > 0 ? stats.viewsByDay : [
-    { date: 'Mon', views: 45, clicks: 20 },
-    { date: 'Tue', views: 65, clicks: 35 },
-    { date: 'Wed', views: 85, clicks: 45 },
-    { date: 'Thu', views: 120, clicks: 80 },
-    { date: 'Fri', views: 95, clicks: 60 },
-    { date: 'Sat', views: 150, clicks: 90 },
-    { date: 'Sun', views: 180, clicks: 110 },
-  ];
+export default function AnalyticsPanel({ hubId, stats }: AnalyticsPanelProps) {
+  const [isAggregating, setIsAggregating] = useState(false);
+  const [aggregateMessage, setAggregateMessage] = useState<string | null>(null);
+
+  // Force aggregation
+  const handleForceAggregate = async () => {
+    setIsAggregating(true);
+    setAggregateMessage(null);
+    
+    try {
+      await forceAggregateStats(hubId);
+      setAggregateMessage('Stats aggregated! Refresh to see updated data.');
+      setTimeout(() => setAggregateMessage(null), 5000);
+    } catch (err) {
+      if (err instanceof ApiError) {
+        setAggregateMessage(`Error: ${err.message}`);
+      }
+    } finally {
+      setIsAggregating(false);
+    }
+  };
+
+  // Prepare chart data from variant stats
+  const chartData = stats?.variants.map(v => ({
+    name: v.variant_id.substring(0, 12),
+    clicks: v.clicks,
+    impressions: v.impressions,
+    ctr: Math.round(v.ctr * 100),
+  })) || [];
 
   return (
-    <div className="space-y-6" aria-label="Analytics Dashboard">
-      {/* KPI Cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <KpiCard label="Total Views" value={stats.totalViews || 1245} change="+12%" />
-        <KpiCard label="Total Clicks" value={stats.totalClicks || 854} change="+8%" />
-        <KpiCard label="CTR" value="68.5%" change="+2%" />
-        <KpiCard label="Unique Visitors" value={stats.uniqueVisitors || 950} change="+15%" />
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <h2 className="text-xl font-bold text-white">Analytics</h2>
+        <button
+          onClick={handleForceAggregate}
+          disabled={isAggregating}
+          className="btn btn-secondary text-sm py-2 px-4 disabled:opacity-50"
+        >
+          {isAggregating ? 'Aggregating...' : '🔄 Force Aggregate'}
+        </button>
       </div>
 
-      {/* Main Chart */}
-      <div className="dashboard-card p-6 h-80">
-        <h3 className="text-lg font-bold mb-4 text-[#E6E6E6]">Traffic Overview</h3>
-        <div className="h-64 w-full" role="img" aria-label="Line chart showing visits over the last 7 days">
-          <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={chartData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#333" />
-              <XAxis dataKey="date" stroke="#9A9A9A" />
-              <YAxis stroke="#9A9A9A" />
-              <Tooltip 
-                contentStyle={{ backgroundColor: '#111', border: '1px solid #333' }}
-                itemStyle={{ color: '#E6E6E6' }}
-              />
-              <Line 
-                type="monotone" 
-                dataKey="views" 
-                stroke="#00C853" 
-                strokeWidth={3} 
-                dot={{ r: 4, fill: '#00C853' }} 
-                activeDot={{ r: 6 }} 
-              />
-              <Line 
-                type="monotone" 
-                dataKey="clicks" 
-                stroke="#E6E6E6" 
-                strokeWidth={2} 
-                strokeDasharray="5 5" 
-              />
-            </LineChart>
-          </ResponsiveContainer>
+      {aggregateMessage && (
+        <div className={`p-3 rounded-lg text-sm ${
+          aggregateMessage.startsWith('Error') 
+            ? 'bg-red-500/10 border border-red-500/30 text-red-400'
+            : 'bg-green-500/10 border border-green-500/30 text-green-400'
+        }`}>
+          {aggregateMessage}
         </div>
-      </div>
+      )}
 
-      {/* Top Links Table */}
-      <div className="dashboard-card p-6">
-        <div className="flex justify-between items-center mb-4">
-          <h3 className="text-lg font-bold text-[#E6E6E6]">Top Performing Links</h3>
-          <button className="text-sm text-[#00C853] hover:underline">Export CSV</button>
+      {/* No Data State */}
+      {!stats && (
+        <div className="bg-[#111] rounded-xl border border-[#222] p-12 text-center">
+          <div className="text-5xl mb-4 opacity-30">📊</div>
+          <h3 className="text-lg font-bold text-[#E6E6E6] mb-2">No Analytics Yet</h3>
+          <p className="text-[#9A9A9A] text-sm max-w-md mx-auto">
+            Analytics will appear after visitors access your hub. 
+            Stats are aggregated every 5 minutes.
+          </p>
         </div>
-        <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse">
-            <thead>
-              <tr className="border-b border-[#333] text-[#9A9A9A] text-sm">
-                <th className="py-2">Link Title</th>
-                <th className="py-2 text-right">Clicks</th>
-                <th className="py-2 text-right">CTR</th>
-              </tr>
-            </thead>
-            <tbody className="text-[#E6E6E6]">
-              <tr className="border-b border-[#222] hover:bg-[#1a1a1a]">
-                <td className="py-3">🌐 My Portfolio</td>
-                <td className="py-3 text-right">452</td>
-                <td className="py-3 text-right">12%</td>
-              </tr>
-              <tr className="border-b border-[#222] hover:bg-[#1a1a1a]">
-                <td className="py-3">💻 GitHub</td>
-                <td className="py-3 text-right">320</td>
-                <td className="py-3 text-right">8%</td>
-              </tr>
-              {stats.topLinks.map(link => (
-                <tr key={link.id} className="border-b border-[#222] hover:bg-[#1a1a1a]">
-                  <td className="py-3">{link.title}</td>
-                  <td className="py-3 text-right">{link.clicks}</td>
-                  <td className="py-3 text-right">{link.ctr}%</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
+      )}
+
+      {stats && (
+        <>
+          {/* KPI Cards */}
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            <KpiCard 
+              label="Total Impressions" 
+              value={stats.aggregated.total_impressions.toLocaleString()} 
+              icon="👁️"
+            />
+            <KpiCard 
+              label="Total Clicks" 
+              value={stats.aggregated.total_clicks.toLocaleString()} 
+              icon="🖱️"
+            />
+            <KpiCard 
+              label="Average CTR" 
+              value={`${(stats.aggregated.average_ctr * 100).toFixed(1)}%`} 
+              icon="📈"
+            />
+            <KpiCard 
+              label="Active Variants" 
+              value={stats.aggregated.variant_count.toString()} 
+              icon="🎯"
+            />
+          </div>
+
+          {/* Charts */}
+          {chartData.length > 0 && (
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* Clicks & Impressions Bar Chart */}
+              <div className="bg-[#111] rounded-xl border border-[#222] p-6">
+                <h3 className="text-lg font-bold text-[#E6E6E6] mb-4">
+                  Performance by Variant
+                </h3>
+                <div className="h-64">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={chartData}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#333" />
+                      <XAxis dataKey="name" stroke="#9A9A9A" fontSize={12} />
+                      <YAxis stroke="#9A9A9A" fontSize={12} />
+                      <Tooltip 
+                        contentStyle={{ backgroundColor: '#111', border: '1px solid #333' }}
+                        itemStyle={{ color: '#E6E6E6' }}
+                      />
+                      <Bar dataKey="impressions" fill="#666" name="Impressions" />
+                      <Bar dataKey="clicks" fill="#00C853" name="Clicks" />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+              </div>
+
+              {/* CTR Chart */}
+              <div className="bg-[#111] rounded-xl border border-[#222] p-6">
+                <h3 className="text-lg font-bold text-[#E6E6E6] mb-4">
+                  CTR by Variant (%)
+                </h3>
+                <div className="h-64">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <LineChart data={chartData}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#333" />
+                      <XAxis dataKey="name" stroke="#9A9A9A" fontSize={12} />
+                      <YAxis stroke="#9A9A9A" fontSize={12} domain={[0, 100]} />
+                      <Tooltip 
+                        contentStyle={{ backgroundColor: '#111', border: '1px solid #333' }}
+                        itemStyle={{ color: '#E6E6E6' }}
+                        formatter={(value) => [`${value}%`, 'CTR']}
+                      />
+                      <Line 
+                        type="monotone" 
+                        dataKey="ctr" 
+                        stroke="#00C853" 
+                        strokeWidth={3}
+                        dot={{ r: 4, fill: '#00C853' }}
+                      />
+                    </LineChart>
+                  </ResponsiveContainer>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Variant Stats Table */}
+          <div className="bg-[#111] rounded-xl border border-[#222] p-6">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-lg font-bold text-[#E6E6E6]">Variant Performance</h3>
+            </div>
+            <div className="overflow-x-auto">
+              <table className="w-full text-left border-collapse">
+                <thead>
+                  <tr className="border-b border-[#333] text-[#9A9A9A] text-sm">
+                    <th className="py-3">Variant ID</th>
+                    <th className="py-3 text-right">Impressions</th>
+                    <th className="py-3 text-right">Clicks</th>
+                    <th className="py-3 text-right">CTR</th>
+                    <th className="py-3 text-right">Score</th>
+                    <th className="py-3 text-right">Recent (1h)</th>
+                  </tr>
+                </thead>
+                <tbody className="text-[#E6E6E6]">
+                  {stats.variants.length === 0 && (
+                    <tr>
+                      <td colSpan={6} className="py-8 text-center text-[#666]">
+                        No variant stats yet
+                      </td>
+                    </tr>
+                  )}
+                  {stats.variants.map((variant) => (
+                    <tr key={variant.variant_id} className="border-b border-[#222] hover:bg-[#1a1a1a]">
+                      <td className="py-3 font-medium">{variant.variant_id}</td>
+                      <td className="py-3 text-right">{variant.impressions.toLocaleString()}</td>
+                      <td className="py-3 text-right">{variant.clicks.toLocaleString()}</td>
+                      <td className="py-3 text-right">
+                        <span className={variant.ctr > 0.1 ? 'text-[#00C853]' : 'text-[#9A9A9A]'}>
+                          {(variant.ctr * 100).toFixed(1)}%
+                        </span>
+                      </td>
+                      <td className="py-3 text-right">{variant.score.toFixed(2)}</td>
+                      <td className="py-3 text-right">
+                        <span className="text-xs bg-[#222] px-2 py-1 rounded">
+                          {variant.recent_clicks_hour} clicks
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </>
+      )}
     </div>
   );
 }
 
-function KpiCard({ label, value, change }: { label: string, value: string | number, change: string }) {
+// Helper Component
+function KpiCard({ label, value, icon }: { label: string; value: string; icon: string }) {
   return (
-    <div className="dashboard-card p-4">
-      <p className="text-[#9A9A9A] text-sm mb-1">{label}</p>
-      <div className="flex items-end justify-between">
-        <span className="text-2xl font-bold text-white">{value}</span>
-        <span className="text-xs text-[#00C853] bg-[#00C853]/10 px-2 py-1 rounded">
-          {change}
-        </span>
+    <div className="bg-[#111] rounded-xl border border-[#222] p-4">
+      <div className="flex items-center gap-2 mb-2">
+        <span className="text-xl">{icon}</span>
+        <p className="text-[#9A9A9A] text-sm">{label}</p>
       </div>
+      <span className="text-2xl font-bold text-white">{value}</span>
     </div>
   );
 }

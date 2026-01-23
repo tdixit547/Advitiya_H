@@ -2,17 +2,26 @@
 // SMART LINK HUB - Home Page
 // ============================================
 
+'use client';
+
 import Link from 'next/link';
+import ThemeToggle from '@/components/ThemeToggle';
 
 export default function HomePage() {
   return (
-    <main className="min-h-screen bg-black text-white">
+    <main className="min-h-screen page-bg">
+      {/* Theme Toggle - Fixed Position */}
+      <div className="fixed top-6 right-6 z-50">
+        <ThemeToggle />
+      </div>
+
       {/* Hero Section */}
       <div className="max-w-4xl mx-auto px-4 py-20 text-center">
         <h1 className="text-5xl md:text-7xl font-bold mb-6">
-          <span className="text-[#00FF00]">Smart</span> Link Hub
+          <span className="text-[var(--accent)]">Smart</span>
+          <span style={{ color: 'var(--foreground)' }}> Link Hub</span>
         </h1>
-        <p className="text-xl md:text-2xl text-gray-400 mb-8 max-w-2xl mx-auto">
+        <p className="text-xl md:text-2xl mb-8 max-w-2xl mx-auto" style={{ color: 'var(--foreground-secondary)' }}>
           One link to rule them all. Show the right links to the right people at
           the right time.
         </p>
@@ -20,16 +29,26 @@ export default function HomePage() {
         {/* CTA Buttons */}
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <Link
-            href="/demo"
-            className="px-8 py-4 bg-[#00FF00] text-black font-bold rounded-xl hover:bg-[#00CC00] transition-all hover:scale-105 hover:shadow-[0_0_30px_rgba(0,255,0,0.5)]"
+            href="/login"
+            className="px-8 py-4 font-bold rounded-xl transition-all hover:scale-105"
+            style={{
+              backgroundColor: 'var(--accent)',
+              color: '#000',
+              boxShadow: '0 0 30px var(--focus-ring)'
+            }}
           >
-            View Demo Hub →
+            Get Started →
           </Link>
           <Link
-            href="/dashboard"
-            className="px-8 py-4 border-2 border-[#00FF00] text-[#00FF00] font-bold rounded-xl hover:bg-[#00FF00]/10 transition-all"
+            href="/register"
+            className="px-8 py-4 border-2 font-bold rounded-xl transition-all hover:opacity-80"
+            style={{
+              borderColor: 'var(--accent)',
+              color: 'var(--accent)',
+              backgroundColor: 'rgba(0, 200, 83, 0.05)'
+            }}
           >
-            Open Dashboard
+            Create Account
           </Link>
         </div>
       </div>
@@ -37,7 +56,8 @@ export default function HomePage() {
       {/* Features Section */}
       <div className="max-w-6xl mx-auto px-4 py-16">
         <h2 className="text-3xl font-bold text-center mb-12">
-          <span className="text-[#00FF00]">Smart</span> Features
+          <span className="text-[var(--accent)]">Smart</span>
+          <span style={{ color: 'var(--foreground)' }}> Features</span>
         </h2>
 
         <div className="grid md:grid-cols-3 gap-8">
@@ -75,10 +95,10 @@ export default function HomePage() {
       </div>
 
       {/* Footer */}
-      <footer className="border-t border-gray-800 py-8 text-center text-gray-500">
+      <footer className="border-t py-8 text-center" style={{ borderColor: 'var(--border)', color: 'var(--foreground-secondary)' }}>
         <p>
           Built for{' '}
-          <span className="text-[#00FF00] font-semibold">Advitiya 2026</span> Hackathon
+          <span className="font-semibold" style={{ color: 'var(--accent)' }}>Advitiya 2026</span> Hackathon
         </p>
       </footer>
     </main>
@@ -95,12 +115,18 @@ function FeatureCard({
   description: string;
 }) {
   return (
-    <div className="p-6 rounded-xl bg-gray-900/50 border border-gray-800 hover:border-[#00FF00]/50 transition-all group">
+    <div 
+      className="p-6 rounded-xl transition-all group panel"
+      style={{ 
+        borderColor: 'var(--border)',
+      }}
+    >
       <span className="text-4xl mb-4 block group-hover:scale-110 transition-transform">
         {icon}
       </span>
-      <h3 className="text-xl font-semibold mb-2 text-white">{title}</h3>
-      <p className="text-gray-400">{description}</p>
+      <h3 className="text-xl font-semibold mb-2" style={{ color: 'var(--foreground)' }}>{title}</h3>
+      <p style={{ color: 'var(--foreground-secondary)' }}>{description}</p>
     </div>
   );
 }
+

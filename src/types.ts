@@ -1,180 +1,244 @@
 // ============================================
 // SMART LINK HUB - TypeScript Type Definitions
+// Backend-aligned data models
 // ============================================
 
-// ==================== Database Models ====================
+// ==================== API Configuration ====================
+
+export const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
+
+// ==================== User Model ====================
 
 export interface User {
-  id: number;
+  user_id: string;
   email: string;
-  password_hash?: string;
-  name: string | null;
-  created_at: Date;
-  updated_at: Date;
+  name?: string;
+  role: 'user' | 'admin';
+  created_at?: string;
+  updated_at?: string;
 }
 
-export interface ThemeConfig {
+export interface AuthResponse {
+  user: User;
+  token: string;
+  expires_in: string;
+}
+
+export interface LoginCredentials {
+  email: string;
+  password: string;
+}
+
+export interface RegisterCredentials extends LoginCredentials {
+  name?: string;
+}
+
+// ==================== Hub Model ====================
+
+export interface Theme {
   bg: string;
   accent: string;
-  textColor: string;
 }
 
-export interface Hub {
-  id: number;
-  user_id: number;
+export interface LinkHub {
+  hub_id: string;
   slug: string;
-  title: string;
-  bio: string | null;
-  avatar_url: string | null;
-  theme_config: ThemeConfig;
-  is_active: boolean;
-  created_at: Date;
-  updated_at: Date;
+  default_url: string;
+  theme: Theme;
+  rule_tree_id?: string;
+  owner_user_id?: string;
+  created_at?: string;
+  updated_at?: string;
 }
 
-export interface Link {
-  id: number;
-  hub_id: number;
-  title: string;
-  url: string;
-  icon: string | null;
+export interface CreateHubInput {
+  hub_id: string;
+  slug: string;
+  default_url: string;
+  theme: Theme;
+}
+
+export interface UpdateHubInput {
+  slug?: string;
+  default_url?: string;
+  theme?: Theme;
+}
+
+// ==================== Variant Model ====================
+
+export interface TimeWindow {
+  branch_id: string;
+  recurring?: {
+    days: number[]; // 0 = Sunday, 6 = Saturday
+    start_time: string; // "HH:mm"
+    end_time: string; // "HH:mm"
+    timezone: string; // e.g., "America/New_York"
+  };
+}
+
+export interface VariantConditions {
+  device_types?: ('mobile' | 'desktop' | 'tablet')[];
+  countries?: string[]; // ISO 2-letter codes
+  time_windows?: TimeWindow[];
+}
+
+export interface Variant {
+  variant_id: string;
+  hub_id: string;
+  target_url: string;
   priority: number;
-  click_count: number;
-  is_active: boolean;
-  created_at: Date;
-  updated_at: Date;
+  weight: number;
+  enabled: boolean;
+  conditions?: VariantConditions;
+  created_at?: string;
+  updated_at?: string;
 }
 
-// ==================== Rule Types ====================
-
-export type RuleType = 'TIME' | 'DEVICE' | 'LOCATION';
-export type RuleAction = 'SHOW' | 'HIDE';
-
-export interface TimeConditions {
-  startHour: number; // 0-23
-  endHour: number;   // 0-23
-  timezone?: string; // e.g., "Asia/Kolkata"
-  days?: number[];   // 0 = Sunday, 6 = Saturday
+export interface CreateVariantInput {
+  variant_id: string;
+  target_url: string;
+  priority?: number;
+  weight?: number;
+  enabled?: boolean;
+  conditions?: VariantConditions;
 }
 
-export interface DeviceConditions {
-  device: 'mobile' | 'desktop' | 'tablet';
-  os?: 'ios' | 'android' | 'windows' | 'macos' | 'linux';
+export interface UpdateVariantInput {
+  target_url?: string;
+  priority?: number;
+  weight?: number;
+  enabled?: boolean;
+  conditions?: VariantConditions;
 }
 
-export interface LocationConditions {
-  country?: string;    // Single country code (e.g., "IN")
-  countries?: string[]; // Multiple country codes (e.g., ["US", "UK"])
+// ==================== Rule Tree Model ====================
+
+export type DecisionNodeType = 'device' | 'location' | 'time' | 'leaf';
+
+export interface LeafNode {
+  type: 'leaf';
+  variant_ids: string[];
 }
 
-export type RuleConditions = TimeConditions | DeviceConditions | LocationConditions;
-
-export interface LinkRule {
-  id: number;
-  link_id: number;
-  rule_type: RuleType;
-  conditions: RuleConditions;
-  action: RuleAction;
-  is_active: boolean;
-  created_at: Date;
+export interface DeviceNode {
+  type: 'device';
+  device_branches: {
+    mobile?: DecisionNode;
+    desktop?: DecisionNode;
+    tablet?: DecisionNode;
+    default?: DecisionNode;
+  };
 }
 
-// Combined link with its rules
-export interface LinkWithRules extends Link {
-  rules: LinkRule[];
+export interface LocationNode {
+  type: 'location';
+  country_branches: Record<string, DecisionNode>;
+  default_node?: DecisionNode;
 }
 
-// ==================== Visitor Context ====================
-
-export interface VisitorContext {
-  ip: string;
-  userAgent: string;
-  device: 'mobile' | 'desktop' | 'tablet';
-  os: 'ios' | 'android' | 'windows' | 'macos' | 'linux' | 'unknown';
-  country: string | null; // ISO 2-letter country code
-  currentHour: number;    // 0-23 in visitor's timezone
-  currentDay: number;     // 0 = Sunday, 6 = Saturday
-  timezone: string;
-  referrer: string | null;
-}
-
-// ==================== Analytics ====================
-
-export type EventType = 'VIEW' | 'CLICK';
-
-export interface AnalyticsEvent {
-  id?: number;
-  hub_id: number;
-  link_id: number | null; // NULL for page views
-  event_type: EventType;
-  visitor_ip: string | null;
-  visitor_country: string | null;
-  visitor_device: string | null;
-  visitor_user_agent: string | null;
-  referrer: string | null;
-  created_at?: Date;
-}
-
-export interface AnalyticsStats {
-  totalViews: number;
-  totalClicks: number;
-  uniqueVisitors: number;
-  topLinks: {
-    id: number;
-    title: string;
-    clicks: number;
-    ctr: number; // Click-through rate
+export interface TimeNode {
+  type: 'time';
+  time_windows: {
+    branch_id: string;
+    node: DecisionNode;
+    recurring?: {
+      days: number[];
+      start_time: string;
+      end_time: string;
+      timezone: string;
+    };
   }[];
-  viewsByDay: {
-    date: string;
-    views: number;
-    clicks: number;
-  }[];
-  viewsByCountry: {
+  time_default_node?: DecisionNode;
+}
+
+export type DecisionNode = LeafNode | DeviceNode | LocationNode | TimeNode;
+
+export interface RuleTree {
+  _id?: string;
+  name: string;
+  hub_id: string;
+  root: DecisionNode;
+  version: number;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export interface CreateRuleTreeInput {
+  name: string;
+  root: DecisionNode;
+}
+
+// ==================== Analytics Model ====================
+
+export type EventType = 'impression' | 'click';
+
+export interface VariantStats {
+  variant_id: string;
+  hub_id: string;
+  clicks: number;
+  impressions: number;
+  ctr: number;
+  score: number;
+  recent_clicks_hour: number;
+  last_updated: string;
+}
+
+export interface HubStats {
+  aggregated: {
+    total_clicks: number;
+    total_impressions: number;
+    average_ctr: number;
+    variant_count: number;
+  };
+  variants: VariantStats[];
+}
+
+// ==================== Debug/Resolution Types ====================
+
+export interface DebugResponse {
+  hub: LinkHub;
+  context: {
+    userAgent: string;
     country: string;
-    count: number;
-  }[];
-  viewsByDevice: {
-    device: string;
-    count: number;
-  }[];
+    lat: number;
+    lon: number;
+    timestamp: string;
+    device: {
+      type: string;
+      browser: string;
+      os: string;
+    };
+  };
+  cache: {
+    cached: boolean;
+    ttl_seconds: number;
+  };
+  resolution: {
+    tree_found: boolean;
+    leaf_variant_ids: string[];
+    resolved_variant: Variant | null;
+    final_url: string;
+  };
 }
 
-// ==================== API Types ====================
+// ==================== API Response Types ====================
 
-export interface CreateLinkInput {
-  hub_id: number;
-  title: string;
-  url: string;
-  icon?: string;
-  priority?: number;
+export interface ApiError {
+  error: string;
+  details?: Record<string, string>;
 }
 
-export interface UpdateLinkInput {
-  title?: string;
-  url?: string;
-  icon?: string;
-  priority?: number;
-  is_active?: boolean;
+export interface HealthResponse {
+  status: 'ok';
+  timestamp: string;
+  uptime: number;
 }
 
-export interface CreateRuleInput {
-  link_id: number;
-  rule_type: RuleType;
-  conditions: RuleConditions;
-  action?: RuleAction;
-}
+// ==================== Auth State Types ====================
 
-export interface ApiResponse<T> {
-  success: boolean;
-  data?: T;
-  error?: string;
-}
-
-// ==================== Hub Page Props ====================
-
-export interface HubPageData {
-  hub: Hub;
-  links: LinkWithRules[];
-  filteredLinks: Link[]; // After rule evaluation
+export interface AuthState {
+  user: User | null;
+  token: string | null;
+  isAuthenticated: boolean;
+  isLoading: boolean;
 }
