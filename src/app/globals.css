@@ -1,0 +1,129 @@
+@import "tailwindcss";
+
+/* ============================================
+   SMART LINK HUB - Global Styles
+   Theme: Strict Black + Green Accent
+   ============================================ */
+
+:root {
+  --background: #000000;
+  --foreground: #E6E6E6; /* Neutral Text */
+  --foreground-secondary: #9A9A9A;
+  --accent: #00C853; /* Strict Green Accent */
+  --accent-dim: #009624;
+  --focus-ring: rgba(0, 200, 83, 0.35);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-accent: var(--accent);
+  --color-accent-dim: var(--accent-dim);
+  --color-ring: var(--focus-ring);
+  --font-sans: var(--font-geist-sans), 'Inter', sans-serif;
+  --font-mono: var(--font-geist-mono), monospace;
+}
+
+@media (prefers-color-scheme: light) {
+  :root {
+    /* Enforce Dark Mode as per "Primary background must be black" rule */
+    --background: #000000;
+    --foreground: #E6E6E6;
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: 'Inter', sans-serif;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ====================
+   Strict Component Styles
+   ==================== */
+
+/* Focus States */
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 4px;
+  box-shadow: 0 0 0 4px var(--focus-ring);
+}
+
+/* Buttons */
+.btn {
+  @apply px-6 py-3 rounded-lg font-bold transition-all duration-200 cursor-pointer flex items-center justify-center gap-2;
+  font-size: 1rem;
+}
+
+.btn-primary {
+  background-color: var(--accent);
+  color: #000000;
+  border: none;
+}
+
+.btn-primary:hover {
+  background-color: #00E676; /* Slightly lighter for hover */
+  transform: scale(0.98);
+}
+
+.btn-primary:active {
+  transform: scale(0.95);
+}
+
+.btn-secondary {
+  background-color: transparent;
+  border: 1px solid var(--accent);
+  color: var(--accent);
+}
+
+.btn-secondary:hover {
+  background-color: rgba(0, 200, 83, 0.1);
+}
+
+/* Dashboard Cards */
+.dashboard-card {
+  @apply bg-[#111111] border border-[#222222] rounded-xl p-4 transition-all duration-300;
+}
+
+.dashboard-card:hover {
+  border-color: var(--accent);
+  box-shadow: 0 4px 20px rgba(0, 200, 83, 0.1);
+}
+
+/* Inputs */
+.input-field {
+  @apply w-full bg-[#111111] border border-[#333333] rounded-lg px-4 py-3 text-white placeholder-[#666666] transition-all;
+}
+
+.input-field:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 4px var(--focus-ring);
+  outline: none;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #000;
+}
+::-webkit-scrollbar-thumb {
+  background: #333;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--accent);
+}
+
+/* Animations */
+.animate-in {
+  animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
