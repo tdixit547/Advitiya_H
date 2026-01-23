@@ -1,6 +1,6 @@
 var R=require("../../chunks/ssr/[turbopack]_runtime.js")("server/app/[slug]/page.js")
 R.c("server/chunks/ssr/493dc_next_ac92f67f._.js")
-R.c("server/chunks/ssr/[root-of-the-server]__f6ff0291._.js")
+R.c("server/chunks/ssr/[root-of-the-server]__956d385f._.js")
 R.c("server/chunks/ssr/493dc_393cb02a._.js")
 R.c("server/chunks/ssr/[externals]__e8a2741f._.js")
 R.c("server/chunks/ssr/Documents_GitHub_Advitiya_H_src_app_228345a4._.js")

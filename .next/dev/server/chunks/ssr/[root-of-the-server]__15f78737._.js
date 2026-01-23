@@ -1707,7 +1707,15 @@ function DashboardPage() {
     });
     const [isLoading, setIsLoading] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$Documents$2f$GitHub$2f$Advitiya_H$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(true);
     const [error, setError] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$Documents$2f$GitHub$2f$Advitiya_H$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(null);
-    const hasFetched = (0, __TURBOPACK__imported__module__$5b$project$5d2f$Documents$2f$GitHub$2f$Advitiya_H$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useRef"])(false);
+    // Initial Fetch
+    (0, __TURBOPACK__imported__module__$5b$project$5d2f$Documents$2f$GitHub$2f$Advitiya_H$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useEffect"])(()=>{
+        fetchLinks();
+        // Check if first time user (simple mock check)
+        if (!localStorage.getItem('hasSeenOnboarding')) {
+            setShowOnboarding(true);
+            localStorage.setItem('hasSeenOnboarding', 'true');
+        }
+    }, []);
     const fetchLinks = async ()=>{
         try {
             const res = await fetch('/api/links?hub_id=1');
@@ -1721,17 +1729,6 @@ function DashboardPage() {
             setIsLoading(false);
         }
     };
-    // Initial Fetch
-    (0, __TURBOPACK__imported__module__$5b$project$5d2f$Documents$2f$GitHub$2f$Advitiya_H$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useEffect"])(()=>{
-        if (hasFetched.current) return;
-        hasFetched.current = true;
-        fetchLinks();
-        // Check if first time user (simple mock check)
-        if (!localStorage.getItem('hasSeenOnboarding')) {
-            setShowOnboarding(true);
-            localStorage.setItem('hasSeenOnboarding', 'true');
-        }
-    }, []);
     // CRUD Handlers
     const handleAddLink = async ()=>{
         if (!newLink.title || !newLink.url) return;
@@ -1850,7 +1847,7 @@ function DashboardPage() {
                                 children: "T"
                             }, void 0, false, {
                                 fileName: "[project]/Documents/GitHub/Advitiya_H/src/app/dashboard/page.tsx",
-                                lineNumber: 118,
+                                lineNumber: 113,
                                 columnNumber: 13
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$Documents$2f$GitHub$2f$Advitiya_H$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("h1", {
@@ -1858,13 +1855,13 @@ function DashboardPage() {
                                 children: "Tannupai Hub"
                             }, void 0, false, {
                                 fileName: "[project]/Documents/GitHub/Advitiya_H/src/app/dashboard/page.tsx",
-                                lineNumber: 119,
+                                lineNumber: 114,
                                 columnNumber: 13
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/Documents/GitHub/Advitiya_H/src/app/dashboard/page.tsx",
-                        lineNumber: 117,
+                        lineNumber: 112,
                         columnNumber: 10
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$Documents$2f$GitHub$2f$Advitiya_H$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -1873,7 +1870,7 @@ function DashboardPage() {
                         children: "+ Add New Link"
                     }, void 0, false, {
                         fileName: "[project]/Documents/GitHub/Advitiya_H/src/app/dashboard/page.tsx",
-                        lineNumber: 123,
+                        lineNumber: 118,
                         columnNumber: 10
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$Documents$2f$GitHub$2f$Advitiya_H$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1884,7 +1881,7 @@ function DashboardPage() {
                                 children: "Your Links"
                             }, void 0, false, {
                                 fileName: "[project]/Documents/GitHub/Advitiya_H/src/app/dashboard/page.tsx",
-                                lineNumber: 132,
+                                lineNumber: 127,
                                 columnNumber: 12
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$Documents$2f$GitHub$2f$Advitiya_H$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$Documents$2f$GitHub$2f$Advitiya_H$2f$src$2f$components$2f$LinkListReorder$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"], {
@@ -1896,19 +1893,19 @@ function DashboardPage() {
                                 selectedId: selectedLink?.id
                             }, void 0, false, {
                                 fileName: "[project]/Documents/GitHub/Advitiya_H/src/app/dashboard/page.tsx",
-                                lineNumber: 133,
+                                lineNumber: 128,
                                 columnNumber: 12
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/Documents/GitHub/Advitiya_H/src/app/dashboard/page.tsx",
-                        lineNumber: 131,
+                        lineNumber: 126,
                         columnNumber: 10
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/Documents/GitHub/Advitiya_H/src/app/dashboard/page.tsx",
-                lineNumber: 116,
+                lineNumber: 111,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$Documents$2f$GitHub$2f$Advitiya_H$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1922,7 +1919,7 @@ function DashboardPage() {
                                 children: "Public URL:"
                             }, void 0, false, {
                                 fileName: "[project]/Documents/GitHub/Advitiya_H/src/app/dashboard/page.tsx",
-                                lineNumber: 148,
+                                lineNumber: 143,
                                 columnNumber: 12
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$Documents$2f$GitHub$2f$Advitiya_H$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("code", {
@@ -1930,7 +1927,7 @@ function DashboardPage() {
                                 children: "domain.com/demo"
                             }, void 0, false, {
                                 fileName: "[project]/Documents/GitHub/Advitiya_H/src/app/dashboard/page.tsx",
-                                lineNumber: 149,
+                                lineNumber: 144,
                                 columnNumber: 12
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$Documents$2f$GitHub$2f$Advitiya_H$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -1939,13 +1936,13 @@ function DashboardPage() {
                                 children: "Open"
                             }, void 0, false, {
                                 fileName: "[project]/Documents/GitHub/Advitiya_H/src/app/dashboard/page.tsx",
-                                lineNumber: 150,
+                                lineNumber: 145,
                                 columnNumber: 12
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/Documents/GitHub/Advitiya_H/src/app/dashboard/page.tsx",
-                        lineNumber: 147,
+                        lineNumber: 142,
                         columnNumber: 9
                     }, this),
                     isAddingLink && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$Documents$2f$GitHub$2f$Advitiya_H$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1956,7 +1953,7 @@ function DashboardPage() {
                                 children: "Create New Link"
                             }, void 0, false, {
                                 fileName: "[project]/Documents/GitHub/Advitiya_H/src/app/dashboard/page.tsx",
-                                lineNumber: 156,
+                                lineNumber: 151,
                                 columnNumber: 14
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$Documents$2f$GitHub$2f$Advitiya_H$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1972,7 +1969,7 @@ function DashboardPage() {
                                             })
                                     }, void 0, false, {
                                         fileName: "[project]/Documents/GitHub/Advitiya_H/src/app/dashboard/page.tsx",
-                                        lineNumber: 158,
+                                        lineNumber: 153,
                                         columnNumber: 16
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$Documents$2f$GitHub$2f$Advitiya_H$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -1985,7 +1982,7 @@ function DashboardPage() {
                                             })
                                     }, void 0, false, {
                                         fileName: "[project]/Documents/GitHub/Advitiya_H/src/app/dashboard/page.tsx",
-                                        lineNumber: 164,
+                                        lineNumber: 159,
                                         columnNumber: 16
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$Documents$2f$GitHub$2f$Advitiya_H$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1997,7 +1994,7 @@ function DashboardPage() {
                                                 children: "Cancel"
                                             }, void 0, false, {
                                                 fileName: "[project]/Documents/GitHub/Advitiya_H/src/app/dashboard/page.tsx",
-                                                lineNumber: 171,
+                                                lineNumber: 166,
                                                 columnNumber: 18
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$Documents$2f$GitHub$2f$Advitiya_H$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -2006,25 +2003,25 @@ function DashboardPage() {
                                                 children: "Create"
                                             }, void 0, false, {
                                                 fileName: "[project]/Documents/GitHub/Advitiya_H/src/app/dashboard/page.tsx",
-                                                lineNumber: 172,
+                                                lineNumber: 167,
                                                 columnNumber: 18
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/Documents/GitHub/Advitiya_H/src/app/dashboard/page.tsx",
-                                        lineNumber: 170,
+                                        lineNumber: 165,
                                         columnNumber: 16
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/Documents/GitHub/Advitiya_H/src/app/dashboard/page.tsx",
-                                lineNumber: 157,
+                                lineNumber: 152,
                                 columnNumber: 14
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/Documents/GitHub/Advitiya_H/src/app/dashboard/page.tsx",
-                        lineNumber: 155,
+                        lineNumber: 150,
                         columnNumber: 12
                     }, this),
                     selectedLink ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$Documents$2f$GitHub$2f$Advitiya_H$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$Documents$2f$GitHub$2f$Advitiya_H$2f$src$2f$components$2f$RuleConfigurator$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"], {
@@ -2033,7 +2030,7 @@ function DashboardPage() {
                         onDeleteRule: (rid)=>handleDeleteRule(selectedLink.id, rid)
                     }, void 0, false, {
                         fileName: "[project]/Documents/GitHub/Advitiya_H/src/app/dashboard/page.tsx",
-                        lineNumber: 180,
+                        lineNumber: 175,
                         columnNumber: 11
                     }, this) : !isAddingLink && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$Documents$2f$GitHub$2f$Advitiya_H$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                         className: "dashboard-card p-12 text-center flex flex-col items-center justify-center min-h-[400px]",
@@ -2043,7 +2040,7 @@ function DashboardPage() {
                                 children: "⚡"
                             }, void 0, false, {
                                 fileName: "[project]/Documents/GitHub/Advitiya_H/src/app/dashboard/page.tsx",
-                                lineNumber: 188,
+                                lineNumber: 183,
                                 columnNumber: 16
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$Documents$2f$GitHub$2f$Advitiya_H$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("h3", {
@@ -2051,7 +2048,7 @@ function DashboardPage() {
                                 children: "Select a link to configure"
                             }, void 0, false, {
                                 fileName: "[project]/Documents/GitHub/Advitiya_H/src/app/dashboard/page.tsx",
-                                lineNumber: 189,
+                                lineNumber: 184,
                                 columnNumber: 16
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$Documents$2f$GitHub$2f$Advitiya_H$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -2059,19 +2056,19 @@ function DashboardPage() {
                                 children: "Add smart rules, schedule availability, or target specific devices."
                             }, void 0, false, {
                                 fileName: "[project]/Documents/GitHub/Advitiya_H/src/app/dashboard/page.tsx",
-                                lineNumber: 190,
+                                lineNumber: 185,
                                 columnNumber: 16
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/Documents/GitHub/Advitiya_H/src/app/dashboard/page.tsx",
-                        lineNumber: 187,
+                        lineNumber: 182,
                         columnNumber: 14
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/Documents/GitHub/Advitiya_H/src/app/dashboard/page.tsx",
-                lineNumber: 145,
+                lineNumber: 140,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$Documents$2f$GitHub$2f$Advitiya_H$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2079,31 +2076,31 @@ function DashboardPage() {
                 children: [
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$Documents$2f$GitHub$2f$Advitiya_H$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$Documents$2f$GitHub$2f$Advitiya_H$2f$src$2f$components$2f$AnalyticsPanel$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"], {}, void 0, false, {
                         fileName: "[project]/Documents/GitHub/Advitiya_H/src/app/dashboard/page.tsx",
-                        lineNumber: 198,
+                        lineNumber: 193,
                         columnNumber: 10
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$Documents$2f$GitHub$2f$Advitiya_H$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$Documents$2f$GitHub$2f$Advitiya_H$2f$src$2f$components$2f$SettingsPanel$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["SettingsPanel"], {}, void 0, false, {
                         fileName: "[project]/Documents/GitHub/Advitiya_H/src/app/dashboard/page.tsx",
-                        lineNumber: 199,
+                        lineNumber: 194,
                         columnNumber: 10
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/Documents/GitHub/Advitiya_H/src/app/dashboard/page.tsx",
-                lineNumber: 197,
+                lineNumber: 192,
                 columnNumber: 7
             }, this),
             showOnboarding && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$Documents$2f$GitHub$2f$Advitiya_H$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$Documents$2f$GitHub$2f$Advitiya_H$2f$src$2f$components$2f$SettingsPanel$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["OnboardingModal"], {
                 onClose: ()=>setShowOnboarding(false)
             }, void 0, false, {
                 fileName: "[project]/Documents/GitHub/Advitiya_H/src/app/dashboard/page.tsx",
-                lineNumber: 203,
+                lineNumber: 198,
                 columnNumber: 26
             }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/Documents/GitHub/Advitiya_H/src/app/dashboard/page.tsx",
-        lineNumber: 113,
+        lineNumber: 108,
         columnNumber: 5
     }, this);
 }

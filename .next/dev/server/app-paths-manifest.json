@@ -1,14 +1,9 @@
 {
   "/[slug]/page": "app/[slug]/page.js",
-  "/_not-found/page": "app/_not-found/page.js",
   "/api/analytics/stats/route": "app/api/analytics/stats/route.js",
   "/api/analytics/track/route": "app/api/analytics/track/route.js",
   "/api/links/route": "app/api/links/route.js",
-  "/api/rules/route": "app/api/rules/route.js",
-  "/api/shorten/route": "app/api/shorten/route.js",
   "/dashboard/analytics/page": "app/dashboard/analytics/page.js",
   "/dashboard/page": "app/dashboard/page.js",
-  "/dashboard/qr/page": "app/dashboard/qr/page.js",
-  "/dashboard/shorten/page": "app/dashboard/shorten/page.js",
   "/page": "app/page.js"
 }
