@@ -1,0 +1,12 @@
+{
+  "/[slug]/page": "/[slug]",
+  "/_global-error/page": "/_global-error",
+  "/_not-found/page": "/_not-found",
+  "/api/analytics/stats/route": "/api/analytics/stats",
+  "/api/analytics/track/route": "/api/analytics/track",
+  "/api/links/route": "/api/links",
+  "/api/rules/route": "/api/rules",
+  "/dashboard/page": "/dashboard",
+  "/favicon.ico/route": "/favicon.ico",
+  "/page": "/"
+}
