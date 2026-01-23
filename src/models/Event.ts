@@ -61,7 +61,7 @@ const EventSchema = new Schema<IEvent>({
     timestamp: {
         type: Date,
         default: Date.now,
-        index: true
+        // Note: Don't add index: true here - TTL index below creates the index
     },
     chosen_variant_id: {
         type: String,
