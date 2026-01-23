@@ -11,10 +11,12 @@ import { RuleTree } from '../../models/RuleTree';
 
 let mongoServer: MongoMemoryServer | null = null;
 let isInitialized = false;
+let usingExternalDb = false;
 
 /**
  * Test Database Setup
  * Uses in-memory MongoDB for complete isolation
+ * Falls back to external test database if MongoMemoryServer fails (e.g., EPERM on macOS)
  * Uses a single connection for all tests to avoid index conflicts
  */
 export async function setupTestDatabase(): Promise<string> {
@@ -28,12 +30,29 @@ export async function setupTestDatabase(): Promise<string> {
         await mongoose.connection.close();
     }
 
-    // Create new memory server if needed
-    if (!mongoServer) {
-        mongoServer = await MongoMemoryServer.create();
-    }
+    let uri: string;
 
-    const uri = mongoServer.getUri();
+    // Try to create in-memory MongoDB server, fallback to external if it fails
+    try {
+        if (!mongoServer) {
+            mongoServer = await MongoMemoryServer.create();
+        }
+        uri = mongoServer.getUri();
+        console.log('✓ Using in-memory MongoDB');
+    } catch (error: any) {
+        // Fallback to external test database
+        console.warn('⚠ MongoMemoryServer failed, using external test database');
+        console.warn(`  Error: ${error.message}`);
+
+        uri = process.env.MONGODB_URI || 'mongodb://localhost:27017/smart-link-hub-test';
+        usingExternalDb = true;
+
+        // Ensure we're using test database, not production
+        if (!uri.includes('test')) {
+            uri = uri.replace(/\/([^/?]+)(\?|$)/, '/smart-link-hub-test$2');
+        }
+        console.log(`✓ Using external MongoDB: ${uri}`);
+    }
 
     await mongoose.connect(uri);
 
@@ -45,7 +64,7 @@ export async function setupTestDatabase(): Promise<string> {
         isInitialized = true;
     }
 
-    console.log('✓ Test database connected (in-memory)');
+    console.log('✓ Test database connected');
 
     return uri;
 }
@@ -132,7 +151,13 @@ export async function cleanupTestDatabase(): Promise<void> {
  */
 export async function finalCleanup(): Promise<void> {
     if (mongoose.connection.readyState !== 0) {
-        await mongoose.connection.dropDatabase();
+        // Only drop database if using in-memory server (safe to drop)
+        // For external databases, we just clear collections to preserve structure
+        if (!usingExternalDb) {
+            await mongoose.connection.dropDatabase();
+        } else {
+            await clearCollections();
+        }
         await mongoose.connection.close();
     }
     if (mongoServer) {
@@ -140,6 +165,7 @@ export async function finalCleanup(): Promise<void> {
         mongoServer = null;
     }
     isInitialized = false;
+    usingExternalDb = false;
 }
 
 /**
