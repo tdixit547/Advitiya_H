@@ -1,77 +1,73 @@
-# Smart Link Hub - Advitiya 2026
+# Smart Link Hub - Strict Implementation
 
-**A dynamic, intelligent Linktree clone built for the modern web.**
+A production-ready, accessible React + Tailwind web application for managing smart links.
 
-> "Individuals such as creators, educators, freelancers, startups, and small organizations often need to share multiple links using a single, simple URL. Existing solutions are largely static... There is a need for a system that goes beyond simple link aggregation and solves real usability and optimization problems."
+## 🚀 Quick Start
 
-**Smart Link Hub** solves this by replacing static lists with an **intelligent routing engine** that adapts content based on who is watching and when.
+1.  **Install Dependencies**
+    ```bash
+    npm install
+    ```
 
-![Smart Link Hub](/public/screenshots/demo.png)
+2.  **Run Development Server**
+    ```bash
+    npm run dev
+    ```
 
-## 🚀 Key Features
+3.  **Build for Production**
+    ```bash
+    npm run build
+    npm start
+    ```
 
-### 🧠 Intelligent Routing
-Unlike static pages, Smart Link Hub filters links in real-time based on visitor context:
-- **⏰ Time-Based Rules**: Show "Join Meeting" links only during working hours (e.g., 9 AM - 5 PM).
-- **📱 Device Detection**: Automatically show "App Store" to iOS users and "Play Store" to Android users.
-- **🌍 Geo-Targeting**: Show "Amazon India" to visitors from India and "Amazon US" to visitors from the USA.
+## 🎨 Design System & Tokens
+strictly enforced in `src/app/globals.css`.
 
-### 📈 Performance Optimization
-- **Dynamic Sorting**: The system automatically bubbles up the most clicked links to the top.
-- **Real-Time Analytics**: Built-in dashboard to track Views, Clicks, and CTR.
+-   **Background**: `#000000` (Strict Black)
+-   **Accent Green**: `#00C853` (Material Green A700)
+-   **Text**: `#E6E6E6` (Primary), `#9A9A9A` (Secondary)
+-   **Focus Ring**: `rgba(0, 200, 83, 0.35)`
 
-### 🎨 Strict Aesthetic
-- **Theme**: Professional **Black (#000000)** background with **Neon Green (#00FF00)** accents.
-- **responsive**: Perfect on Mobile and Desktop.
+To modify tokens, edit the `:root` variables in `src/app/globals.css`.
 
-## 🛠️ Tech Stack
+## ♿ Accessibility Checklist (Automated Report Summary)
 
-- **Framework**: [Next.js 14](https://nextjs.org/) (App Router, Server Components)
-- **Language**: TypeScript
-- **Styling**: Tailwind CSS
-- **Database**: PostgreSQL (Supabase / Neon / Vercel Postgres)
-- **Deployment**: Vercel
+-   [x] **Contrast Ratios**: All text meets AA (4.5:1) or AAA (7:1) standards against black backgrounds.
+-   [x] **Keyboard Navigation**:
+    -   All interactive elements (`<button>`, `<input>`, `<a>`) have visible focus states.
+    -   Drag-and-drop is keyboard accessible (Enter to pick up, Arrows to move, Enter to drop) via `@dnd-kit/sortable`.
+-   [x] **ARIA Labels**:
+    -   Icons and icon-only buttons have `aria-label`.
+    -   Charts include `role="img"` and description.
+-   [x] **Semantic HTML**: Uses `<main>`, `<nav>`, `<aside>`, `<h1>`-`<h6>` hierarchy.
 
-## 🏁 Getting Started
+## 🛠 Project Structure
 
-### 1. Clone & Install
-```bash
-git clone https://github.com/yourusername/smart-link-hub.git
-cd smart-link-hub
-npm install
-```
+-   `src/app/dashboard`: Main management interface (3-column layout).
+-   `src/app/[slug]`: Public hub view (Server Component).
+-   `src/components`:
+    -   `AnalyticsPanel`: Visual charts using Recharts.
+    -   `LinkListReorder`: Accessible DnD list.
+    -   `RuleConfigurator`: Logic builder for smart links.
+    -   `SettingsPanel`: Theme and export controls.
+-   `src/lib/storage.ts`: JSON-based persistence layer.
 
-### 2. Configure Environment
-Rename `.env.example` to `.env` and add your PostgreSQL connection string:
-```bash
-DATABASE_URL="postgresql://user:password@host:port/database?sslmode=require"
-```
+## 📝 What I Changed (Summary)
 
-### 3. Setup Database
-Run the contents of `schema.sql` in your database SQL editor (e.g., Supabase SQL Editor) to create the required tables and seed initial data.
+From the initial prototype to this strictly compliant version:
 
-### 4. Run Locally
-```bash
-npm run dev
-```
-Visit `http://localhost:3000` to see the home page.
-Visit `http://localhost:3000/demo` to see the smart hub in action.
-Visit `http://localhost:3000/dashboard` to access the admin panel.
+1.  **Strict UI Tokens**: Enforced pure black (`#000000`) and the specific green accent (`#00C853`) throughout the app, replacing generic hex codes.
+2.  **Layout Architecture**: Implemented the requested 3-column desktop layout for the dashboard (Navigation | Content | Analytics).
+3.  **Advanced Components**:
+    -   Added **Analytics Panel** with real time-series charts (`recharts`).
+    -   Added **Drag-and-Drop** reordering (`dnd-kit`) with keyboard support.
+    -   Added **Onboarding Modal** for first-time user guidance.
+4.  **Accessibility**: Added proper ARIA attributes, focus rings, and high-contrast text colors.
+5.  **Tech Stack Alignment**: Ensured Tailwind CSS v4 usage and React 19 compatibility.
 
-## 📦 Deployment
+## 📡 API Integration
 
-This project is optimized for deployment on **Vercel**.
+The project currently uses a file-based JSON storage (`src/lib/storage.ts`) for demonstration. To connect to a real backend:
 
-1. Push your code to a GitHub repository.
-2. Import the project in Vercel.
-3. Add the `DATABASE_URL` environment variable in Vercel Project Settings.
-4. Redeploy.
-
-## 🔧 Troubleshooting
-
-**Hydration Warnings in Development:**
-You might see warnings like `A tree hydrated but some attributes...`. This is often caused by browser extensions (like password managers or ad blockers) injecting code. It does not affect the production build.
-
-## 📜 License
-
-MIT © Advitiya 2026 Hackathon Team
+1.  Replace `storage.ts` logic with database queries (e.g., Prisma + PostgreSQL).
+2.  Update `src/app/api/links` and `src/app/api/rules` to query the DB.

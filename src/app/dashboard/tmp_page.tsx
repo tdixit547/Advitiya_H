@@ -4,146 +4,208 @@
 
 'use client';
 
-import { useState } from 'react';
-import { Link, LinkWithRules, LinkRule, RuleType } from '@/types';
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { LinkWithRules, LinkRule, RuleType } from '@/types';
 import RuleConfigurator from '@/components/RuleConfigurator';
 
-// Demo links data
-const INITIAL_LINKS: LinkWithRules[] = [
-  {
-    id: 1,
-    hub_id: 1,
-    title: '🌐 My Website',
-    url: 'https://example.com',
-    icon: null,
-    priority: 100,
-    click_count: 150,
-    is_active: true,
-    rules: [],
-    created_at: new Date(),
-    updated_at: new Date(),
-  },
-  {
-    id: 2,
-    hub_id: 1,
-    title: '💻 GitHub',
-    url: 'https://github.com',
-    icon: null,
-    priority: 90,
-    click_count: 120,
-    is_active: true,
-    rules: [],
-    created_at: new Date(),
-    updated_at: new Date(),
-  },
-  {
-    id: 3,
-    hub_id: 1,
-    title: '💼 LinkedIn',
-    url: 'https://linkedin.com',
-    icon: null,
-    priority: 80,
-    click_count: 100,
-    is_active: true,
-    rules: [],
-    created_at: new Date(),
-    updated_at: new Date(),
-  },
-  {
-    id: 4,
-    hub_id: 1,
-    title: '📅 Join Meeting (9AM-5PM)',
-    url: 'https://meet.google.com',
-    icon: null,
-    priority: 70,
-    click_count: 50,
-    is_active: true,
-    rules: [
-      {
-        id: 1,
-        link_id: 4,
-        rule_type: 'TIME',
-        conditions: { startHour: 9, endHour: 17 },
-        action: 'SHOW',
-        is_active: true,
-        created_at: new Date(),
-      },
-    ],
-    created_at: new Date(),
-    updated_at: new Date(),
-  },
-];
-
 export default function LinksPage() {
-  const [links, setLinks] = useState<LinkWithRules[]>(INITIAL_LINKS);
+  const router = useRouter();
+  const [links, setLinks] = useState<LinkWithRules[]>([]);
   const [selectedLink, setSelectedLink] = useState<LinkWithRules | null>(null);
   const [isAddingLink, setIsAddingLink] = useState(false);
   const [newLink, setNewLink] = useState({ title: '', url: '' });
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const handleAddLink = () => {
-    if (!newLink.title || !newLink.url) return;
-
-    const link: LinkWithRules = {
-      id: Date.now(),
-      hub_id: 1,
-      title: newLink.title,
-      url: newLink.url.startsWith('http') ? newLink.url : `https://${newLink.url}`,
-      icon: null,
-      priority: 0,
-      click_count: 0,
-      is_active: true,
-      rules: [],
-      created_at: new Date(),
-      updated_at: new Date(),
-    };
-
-    setLinks([...links, link]);
-    setNewLink({ title: '', url: '' });
-    setIsAddingLink(false);
-  };
-
-  const handleDeleteLink = (id: number) => {
-    setLinks(links.filter((l) => l.id !== id));
-    if (selectedLink?.id === id) {
-      setSelectedLink(null);
+  const fetchLinks = async () => {
+    try {
+      const res = await fetch('/api/links?hub_id=1');
+      if (!res.ok) throw new Error('Failed to fetch links');
+      const data = await res.json();
+      if (data.success) {
+        setLinks(data.data);
+      } else {
+        setError(data.error || 'Failed to load links');
+      }
+    } catch (err) {
+      console.error('Error loading links:', err);
+      setError('Failed to load links');
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  const handleToggleActive = (id: number) => {
-    setLinks(
-      links.map((l) =>
-        l.id === id ? { ...l, is_active: !l.is_active } : l
-      )
-    );
+  useEffect(() => {
+    fetchLinks();
+  }, []);
+
+  const handleAddLink = async () => {
+    if (!newLink.title || !newLink.url) return;
+
+    try {
+      const formattedUrl = newLink.url.startsWith('http') ? newLink.url : `https://${newLink.url}`;
+      const res = await fetch('/api/links', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          hub_id: 1,
+          title: newLink.title,
+          url: formattedUrl,
+          priority: 0,
+        }),
+      });
+
+      if (!res.ok) throw new Error('Failed to create link');
+      const data = await res.json();
+      
+      if (data.success) {
+        setLinks([...links, data.data]);
+        setNewLink({ title: '', url: '' });
+        setIsAddingLink(false);
+        router.refresh(); // Sync server components
+      }
+    } catch (err) {
+      console.error('Error adding link:', err);
+      alert('Failed to add link');
+    }
   };
 
-  const handleAddRule = (linkId: number, rule: Omit<LinkRule, 'id' | 'link_id' | 'created_at'>) => {
-    setLinks(
-      links.map((l) => {
-        if (l.id === linkId) {
-          const newRule: LinkRule = {
-            ...rule,
-            id: Date.now(),
-            link_id: linkId,
-            created_at: new Date(),
-          };
-          return { ...l, rules: [...l.rules, newRule] };
+  const handleDeleteLink = async (id: number) => {
+    if (!confirm('Are you sure you want to delete this link?')) return;
+
+    try {
+      const res = await fetch(`/api/links?id=${id}`, {
+        method: 'DELETE',
+      });
+
+      if (!res.ok) throw new Error('Failed to delete link');
+      const data = await res.json();
+
+      if (data.success) {
+        setLinks(links.filter((l) => l.id !== id));
+        if (selectedLink?.id === id) {
+          setSelectedLink(null);
         }
-        return l;
-      })
-    );
+        router.refresh();
+      }
+    } catch (err) {
+      console.error('Error deleting link:', err);
+      alert('Failed to delete link');
+    }
   };
 
-  const handleDeleteRule = (linkId: number, ruleId: number) => {
-    setLinks(
-      links.map((l) => {
-        if (l.id === linkId) {
-          return { ...l, rules: l.rules.filter((r) => r.id !== ruleId) };
-        }
-        return l;
-      })
-    );
+  const handleToggleActive = async (id: number) => {
+    const link = links.find((l) => l.id === id);
+    if (!link) return;
+
+    try {
+      // Optimistic update
+      setLinks(
+        links.map((l) =>
+          l.id === id ? { ...l, is_active: !l.is_active } : l
+        )
+      );
+
+      const res = await fetch('/api/links', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          id,
+          is_active: !link.is_active,
+        }),
+      });
+
+      if (!res.ok) {
+        // Revert on failure
+        setLinks(
+          links.map((l) =>
+            l.id === id ? { ...l, is_active: link.is_active } : l
+          )
+        );
+        throw new Error('Failed to update link');
+      }
+      
+      router.refresh();
+    } catch (err) {
+      console.error('Error updating link:', err);
+    }
   };
+
+  const handleAddRule = async (linkId: number, rule: Omit<LinkRule, 'id' | 'link_id' | 'created_at'>) => {
+    try {
+      const res = await fetch('/api/rules', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          link_id: linkId,
+          ...rule,
+        }),
+      });
+
+      if (!res.ok) throw new Error('Failed to add rule');
+      const data = await res.json();
+
+      if (data.success) {
+        const newRule = data.data;
+        setLinks(
+          links.map((l) => {
+            if (l.id === linkId) {
+              const updatedLink = { ...l, rules: [...l.rules, newRule] };
+              // Update selected link if it's the one we modified
+              if (selectedLink?.id === linkId) {
+                setSelectedLink(updatedLink);
+              }
+              return updatedLink;
+            }
+            return l;
+          })
+        );
+        router.refresh();
+      }
+    } catch (err) {
+      console.error('Error adding rule:', err);
+      alert('Failed to add rule');
+    }
+  };
+
+  const handleDeleteRule = async (linkId: number, ruleId: number) => {
+    try {
+      const res = await fetch(`/api/rules?id=${ruleId}`, {
+        method: 'DELETE',
+      });
+
+      if (!res.ok) throw new Error('Failed to delete rule');
+      const data = await res.json();
+
+      if (data.success) {
+        setLinks(
+          links.map((l) => {
+            if (l.id === linkId) {
+              const updatedLink = { ...l, rules: l.rules.filter((r) => r.id !== ruleId) };
+              if (selectedLink?.id === linkId) {
+                setSelectedLink(updatedLink);
+              }
+              return updatedLink;
+            }
+            return l;
+          })
+        );
+        router.refresh();
+      }
+    } catch (err) {
+      console.error('Error deleting rule:', err);
+      alert('Failed to delete rule');
+    }
+  };
+
+  if (isLoading) {
+    return <div className="p-8 text-center text-gray-400">Loading links...</div>;
+  }
+
+  if (error) {
+    return <div className="p-8 text-center text-red-500">{error}</div>;
+  }
 
   return (
     <div className="space-y-8">

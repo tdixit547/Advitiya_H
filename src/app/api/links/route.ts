@@ -4,52 +4,8 @@
 // ============================================
 
 import { NextRequest, NextResponse } from 'next/server';
-import { Link, CreateLinkInput, UpdateLinkInput, LinkWithRules, LinkRule } from '@/types';
-
-// In-memory storage for demo (replace with database in production)
-let links: LinkWithRules[] = [
-  {
-    id: 1,
-    hub_id: 1,
-    title: '🌐 My Website',
-    url: 'https://example.com',
-    icon: null,
-    priority: 100,
-    click_count: 150,
-    is_active: true,
-    rules: [],
-    created_at: new Date(),
-    updated_at: new Date(),
-  },
-  {
-    id: 2,
-    hub_id: 1,
-    title: '💻 GitHub',
-    url: 'https://github.com',
-    icon: null,
-    priority: 90,
-    click_count: 120,
-    is_active: true,
-    rules: [],
-    created_at: new Date(),
-    updated_at: new Date(),
-  },
-  {
-    id: 3,
-    hub_id: 1,
-    title: '💼 LinkedIn',
-    url: 'https://linkedin.com',
-    icon: null,
-    priority: 80,
-    click_count: 100,
-    is_active: true,
-    rules: [],
-    created_at: new Date(),
-    updated_at: new Date(),
-  },
-];
-
-let nextId = 4;
+import { Link, CreateLinkInput, UpdateLinkInput } from '@/types';
+import { readLinks, writeLinks, getLinksWithRules, readRules, writeRules } from '@/lib/storage';
 
 // GET - Fetch all links for a hub
 export async function GET(request: NextRequest) {
@@ -63,7 +19,8 @@ export async function GET(request: NextRequest) {
     );
   }
 
-  const hubLinks = links.filter((l) => l.hub_id === parseInt(hubId));
+  const linksWithRules = await getLinksWithRules();
+  const hubLinks = linksWithRules.filter((l) => l.hub_id === parseInt(hubId));
   
   return NextResponse.json({
     success: true,
@@ -85,8 +42,13 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const newLink: LinkWithRules = {
-      id: nextId++,
+    const links = await readLinks();
+    
+    // Calculate next ID
+    const nextId = links.length > 0 ? Math.max(...links.map(l => l.id)) + 1 : 1;
+
+    const newLink: Link = {
+      id: nextId,
       hub_id,
       title,
       url,
@@ -94,16 +56,16 @@ export async function POST(request: NextRequest) {
       priority: priority || 0,
       click_count: 0,
       is_active: true,
-      rules: [],
       created_at: new Date(),
       updated_at: new Date(),
     };
 
     links.push(newLink);
+    await writeLinks(links);
 
     return NextResponse.json({
       success: true,
-      data: newLink,
+      data: { ...newLink, rules: [] },
     });
   } catch (error) {
     console.error('[Links API] Error creating link:', error);
@@ -127,7 +89,9 @@ export async function PUT(request: NextRequest) {
       );
     }
 
+    const links = await readLinks();
     const linkIndex = links.findIndex((l) => l.id === id);
+    
     if (linkIndex === -1) {
       return NextResponse.json(
         { success: false, error: 'Link not found' },
@@ -142,9 +106,15 @@ export async function PUT(request: NextRequest) {
       updated_at: new Date(),
     };
 
+    await writeLinks(links);
+
+    // Fetch rules to return complete object
+    const rules = await readRules();
+    const linkRules = rules.filter(r => r.link_id === id);
+
     return NextResponse.json({
       success: true,
-      data: links[linkIndex],
+      data: { ...links[linkIndex], rules: linkRules },
     });
   } catch (error) {
     console.error('[Links API] Error updating link:', error);
@@ -167,7 +137,10 @@ export async function DELETE(request: NextRequest) {
     );
   }
 
-  const linkIndex = links.findIndex((l) => l.id === parseInt(id));
+  const linkId = parseInt(id);
+  const links = await readLinks();
+  const linkIndex = links.findIndex((l) => l.id === linkId);
+  
   if (linkIndex === -1) {
     return NextResponse.json(
       { success: false, error: 'Link not found' },
@@ -175,7 +148,16 @@ export async function DELETE(request: NextRequest) {
     );
   }
 
+  // Remove link
   links.splice(linkIndex, 1);
+  await writeLinks(links);
+
+  // Cascade delete rules
+  const rules = await readRules();
+  const rulesToKeep = rules.filter(r => r.link_id !== linkId);
+  if (rulesToKeep.length !== rules.length) {
+    await writeRules(rulesToKeep);
+  }
 
   return NextResponse.json({
     success: true,

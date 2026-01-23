@@ -6,9 +6,10 @@
 import { headers } from 'next/headers';
 import { notFound } from 'next/navigation';
 import { Metadata } from 'next';
-import { Hub, Link, LinkWithRules, LinkRule } from '@/types';
+import { Hub, Link, LinkWithRules } from '@/types';
 import { evaluateRules } from '@/lib/rule-engine';
 import { getVisitorContext } from '@/lib/visitor-context';
+import { getLinksWithRules as fetchLinksFromStorage } from '@/lib/storage';
 import LinkButton from '@/components/LinkButton';
 
 // Demo data for initial testing (replace with DB queries later)
@@ -28,163 +29,6 @@ const DEMO_HUB: Hub = {
   created_at: new Date(),
   updated_at: new Date(),
 };
-
-const DEMO_LINKS: LinkWithRules[] = [
-  {
-    id: 1,
-    hub_id: 1,
-    title: '🌐 My Website',
-    url: 'https://example.com',
-    icon: null,
-    priority: 100,
-    click_count: 150,
-    is_active: true,
-    rules: [],
-    created_at: new Date(),
-    updated_at: new Date(),
-  },
-  {
-    id: 2,
-    hub_id: 1,
-    title: '💻 GitHub',
-    url: 'https://github.com',
-    icon: null,
-    priority: 90,
-    click_count: 120,
-    is_active: true,
-    rules: [],
-    created_at: new Date(),
-    updated_at: new Date(),
-  },
-  {
-    id: 3,
-    hub_id: 1,
-    title: '💼 LinkedIn',
-    url: 'https://linkedin.com',
-    icon: null,
-    priority: 80,
-    click_count: 100,
-    is_active: true,
-    rules: [],
-    created_at: new Date(),
-    updated_at: new Date(),
-  },
-  {
-    id: 4,
-    hub_id: 1,
-    title: '📅 Join Meeting (9AM-5PM)',
-    url: 'https://meet.google.com',
-    icon: null,
-    priority: 70,
-    click_count: 50,
-    is_active: true,
-    rules: [
-      {
-        id: 1,
-        link_id: 4,
-        rule_type: 'TIME',
-        conditions: { startHour: 9, endHour: 17 },
-        action: 'SHOW',
-        is_active: true,
-        created_at: new Date(),
-      },
-    ],
-    created_at: new Date(),
-    updated_at: new Date(),
-  },
-  {
-    id: 5,
-    hub_id: 1,
-    title: '📱 Download iOS App',
-    url: 'https://apps.apple.com',
-    icon: null,
-    priority: 60,
-    click_count: 40,
-    is_active: true,
-    rules: [
-      {
-        id: 2,
-        link_id: 5,
-        rule_type: 'DEVICE',
-        conditions: { device: 'mobile', os: 'ios' },
-        action: 'SHOW',
-        is_active: true,
-        created_at: new Date(),
-      },
-    ],
-    created_at: new Date(),
-    updated_at: new Date(),
-  },
-  {
-    id: 6,
-    hub_id: 1,
-    title: '🤖 Download Android App',
-    url: 'https://play.google.com',
-    icon: null,
-    priority: 60,
-    click_count: 35,
-    is_active: true,
-    rules: [
-      {
-        id: 3,
-        link_id: 6,
-        rule_type: 'DEVICE',
-        conditions: { device: 'mobile', os: 'android' },
-        action: 'SHOW',
-        is_active: true,
-        created_at: new Date(),
-      },
-    ],
-    created_at: new Date(),
-    updated_at: new Date(),
-  },
-  {
-    id: 7,
-    hub_id: 1,
-    title: '🇮🇳 Amazon India',
-    url: 'https://amazon.in',
-    icon: null,
-    priority: 50,
-    click_count: 25,
-    is_active: true,
-    rules: [
-      {
-        id: 4,
-        link_id: 7,
-        rule_type: 'LOCATION',
-        conditions: { country: 'IN' },
-        action: 'SHOW',
-        is_active: true,
-        created_at: new Date(),
-      },
-    ],
-    created_at: new Date(),
-    updated_at: new Date(),
-  },
-  {
-    id: 8,
-    hub_id: 1,
-    title: '🇺🇸 Amazon US',
-    url: 'https://amazon.com',
-    icon: null,
-    priority: 50,
-    click_count: 20,
-    is_active: true,
-    rules: [
-      {
-        id: 5,
-        link_id: 8,
-        rule_type: 'LOCATION',
-        conditions: { country: 'US' },
-        action: 'SHOW',
-        is_active: true,
-        created_at: new Date(),
-      },
-    ],
-    created_at: new Date(),
-    updated_at: new Date(),
-  },
-];
 
 interface PageProps {
   params: Promise<{ slug: string }>;
@@ -216,20 +60,24 @@ export async function generateMetadata({
 
 // Fetch hub data (demo implementation)
 async function getHub(slug: string): Promise<Hub | null> {
-  // TODO: Replace with actual database query
-  if (slug === 'demo') {
+  // Allow accessing the demo hub via 'demo' or '1'
+  if (slug === 'demo' || slug === '1') {
     return DEMO_HUB;
   }
   return null;
 }
 
-// Fetch links with rules (demo implementation)
+// Fetch links with rules (using file storage)
 async function getLinksWithRules(hubId: number): Promise<LinkWithRules[]> {
-  // TODO: Replace with actual database query
-  if (hubId === 1) {
-    return DEMO_LINKS;
+  try {
+    const allLinks = await fetchLinksFromStorage();
+    return allLinks
+      .filter((l) => l.hub_id === hubId)
+      .sort((a, b) => b.priority - a.priority);
+  } catch (error) {
+    console.error('Error fetching links:', error);
+    return [];
   }
-  return [];
 }
 
 // Track page view (demo implementation)
@@ -241,13 +89,7 @@ async function trackPageView(
   referrer: string | null
 ): Promise<void> {
   // TODO: Replace with actual database insert
-  console.log('Page View:', {
-    hubId,
-    visitorCountry,
-    visitorDevice,
-    userAgent: userAgent.substring(0, 50),
-    referrer,
-  });
+  // console.log('Page View:', { hubId, visitorCountry, ... }); 
 }
 
 export default async function HubPage({ params }: PageProps) {

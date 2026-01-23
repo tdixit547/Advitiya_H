@@ -5,10 +5,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { LinkRule, CreateRuleInput, RuleType, RuleAction } from '@/types';
-
-// In-memory storage for demo (replace with database in production)
-let rules: LinkRule[] = [];
-let nextId = 1;
+import { readRules, writeRules } from '@/lib/storage';
 
 // GET - Fetch all rules for a link
 export async function GET(request: NextRequest) {
@@ -16,12 +13,14 @@ export async function GET(request: NextRequest) {
   const linkId = searchParams.get('link_id');
 
   if (!linkId) {
+    const rules = await readRules();
     return NextResponse.json({
       success: true,
       data: rules,
     });
   }
 
+  const rules = await readRules();
   const linkRules = rules.filter((r) => r.link_id === parseInt(linkId));
   
   return NextResponse.json({
@@ -52,8 +51,13 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    const rules = await readRules();
+    
+    // Calculate next ID
+    const nextId = rules.length > 0 ? Math.max(...rules.map(r => r.id)) + 1 : 1;
+
     const newRule: LinkRule = {
-      id: nextId++,
+      id: nextId,
       link_id,
       rule_type: rule_type as RuleType,
       conditions,
@@ -63,6 +67,7 @@ export async function POST(request: NextRequest) {
     };
 
     rules.push(newRule);
+    await writeRules(rules);
 
     return NextResponse.json({
       success: true,
@@ -90,7 +95,9 @@ export async function PUT(request: NextRequest) {
       );
     }
 
+    const rules = await readRules();
     const ruleIndex = rules.findIndex((r) => r.id === id);
+    
     if (ruleIndex === -1) {
       return NextResponse.json(
         { success: false, error: 'Rule not found' },
@@ -103,6 +110,8 @@ export async function PUT(request: NextRequest) {
       ...rules[ruleIndex],
       ...updates,
     };
+
+    await writeRules(rules);
 
     return NextResponse.json({
       success: true,
@@ -129,7 +138,10 @@ export async function DELETE(request: NextRequest) {
     );
   }
 
-  const ruleIndex = rules.findIndex((r) => r.id === parseInt(id));
+  const ruleId = parseInt(id);
+  const rules = await readRules();
+  const ruleIndex = rules.findIndex((r) => r.id === ruleId);
+  
   if (ruleIndex === -1) {
     return NextResponse.json(
       { success: false, error: 'Rule not found' },
@@ -138,6 +150,7 @@ export async function DELETE(request: NextRequest) {
   }
 
   rules.splice(ruleIndex, 1);
+  await writeRules(rules);
 
   return NextResponse.json({
     success: true,
