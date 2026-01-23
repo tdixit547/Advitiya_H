@@ -110,97 +110,162 @@ export default function DashboardPage() {
   };
 
   return (
-    <div className="min-h-screen grid grid-cols-1 lg:grid-cols-12 gap-6 p-6">
-      
-      {/* LEFT COLUMN: Navigation (Simulated) & Link Management */}
-      <div className="lg:col-span-3 space-y-6">
-         <div className="flex items-center gap-3 mb-8">
-            <div className="w-10 h-10 bg-[#00C853] rounded-lg flex items-center justify-center font-bold text-black text-xl">T</div>
-            <h1 className="font-bold text-xl text-white">Tannupai Hub</h1>
-         </div>
-
-         {/* Add Link Button */}
-         <button 
-           onClick={() => setIsAddingLink(true)}
-           className="btn btn-primary w-full"
-         >
-           + Add New Link
-         </button>
-
-         {/* Link List */}
-         <div className="bg-[#111] rounded-xl p-4 min-h-[500px]">
-           <h2 className="text-[#9A9A9A] text-sm font-bold mb-4 uppercase tracking-wider">Your Links</h2>
-           <LinkListReorder 
-             links={links} 
-             onReorder={handleReorder}
-             onEdit={(l) => setSelectedLink(l)}
-             onDelete={handleDeleteLink}
-             onSelect={(l) => setSelectedLink(l)}
-             selectedId={selectedLink?.id}
-           />
-         </div>
-      </div>
-
-      {/* CENTER COLUMN: Main Content / Rule Editor / Preview */}
-      <div className="lg:col-span-5 space-y-6">
-        {/* Mobile Onboarding or Context Header */}
-        <div className="flex justify-between items-center bg-[#111] p-4 rounded-xl border border-[#222]">
-           <span className="text-white font-bold">Public URL:</span>
-           <code className="text-[#00C853] bg-[#00C853]/10 px-2 py-1 rounded">domain.com/demo</code>
-           <button className="text-sm text-[#9A9A9A] hover:text-white" onClick={() => window.open('/demo', '_blank')}>Open</button>
+    <div className="min-h-screen bg-black">
+      {/* Main Container with proper max-width */}
+      <div className="max-w-7xl mx-auto p-6 lg:p-8">
+        
+        {/* Header Section */}
+        <div className="flex items-center justify-between mb-8">
+          <div className="flex items-center gap-4">
+            <div className="w-12 h-12 bg-[#00C853] rounded-xl flex items-center justify-center font-bold text-black text-2xl shadow-lg shadow-[#00C853]/20">T</div>
+            <div>
+              <h1 className="font-bold text-2xl text-white">Tannupai Hub</h1>
+              <p className="text-[#9A9A9A] text-sm">Manage your smart links</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-3">
+            <code className="text-[#00C853] bg-[#00C853]/10 px-3 py-2 rounded-lg border border-[#00C853]/20 text-sm">domain.com/demo</code>
+            <button 
+              className="btn btn-secondary text-sm py-2 px-4" 
+              onClick={() => window.open('/demo', '_blank')}
+            >
+              View Live →
+            </button>
+          </div>
         </div>
 
-        {/* Add Link Form */}
-        {isAddingLink && (
-           <div className="dashboard-card p-6 animate-in slide-down">
-             <h3 className="text-lg font-bold text-white mb-4">Create New Link</h3>
-             <div className="space-y-4">
-               <input 
-                 className="input-field" 
-                 placeholder="Title"
-                 value={newLink.title}
-                 onChange={e => setNewLink({...newLink, title: e.target.value})}
-               />
-               <input 
-                 className="input-field" 
-                 placeholder="URL"
-                 value={newLink.url}
-                 onChange={e => setNewLink({...newLink, url: e.target.value})}
-               />
-               <div className="flex gap-2 justify-end">
-                 <button className="btn btn-secondary" onClick={() => setIsAddingLink(false)}>Cancel</button>
-                 <button className="btn btn-primary" onClick={handleAddLink}>Create</button>
-               </div>
-             </div>
-           </div>
-        )}
+        {/* Stats Row */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+          <StatCard label="Total Views" value="1245" change="+12%" />
+          <StatCard label="Total Clicks" value="854" change="+8%" />
+          <StatCard label="CTR" value="68.5%" change="+2%" />
+          <StatCard label="Unique Visitors" value="950" change="+15%" />
+        </div>
 
-        {/* Rule Editor */}
-        {selectedLink ? (
-          <RuleConfigurator 
-             link={selectedLink}
-             onAddRule={(r) => handleAddRule(selectedLink.id, r)}
-             onDeleteRule={(rid) => handleDeleteRule(selectedLink.id, rid)}
-          />
-        ) : (
-           !isAddingLink && (
-             <div className="dashboard-card p-12 text-center flex flex-col items-center justify-center min-h-[400px]">
-               <div className="text-6xl mb-4 opacity-20">⚡</div>
-               <h3 className="text-xl font-bold text-[#E6E6E6] mb-2">Select a link to configure</h3>
-               <p className="text-[#9A9A9A]">Add smart rules, schedule availability, or target specific devices.</p>
-             </div>
-           )
-        )}
-      </div>
+        {/* Main Two Column Layout */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          
+          {/* LEFT: Links Management */}
+          <div className="space-y-6">
+            <div className="flex items-center justify-between">
+              <h2 className="text-xl font-bold text-white">Your Links</h2>
+              <button 
+                onClick={() => setIsAddingLink(true)}
+                className="btn btn-primary text-sm py-2 px-4"
+              >
+                + Add Link
+              </button>
+            </div>
 
-      {/* RIGHT COLUMN: Analytics & Settings */}
-      <div className="lg:col-span-4 space-y-6">
-         <AnalyticsPanel />
-         <SettingsPanel />
+            {/* Add Link Form */}
+            {isAddingLink && (
+              <div className="bg-[#111] rounded-xl p-6 border border-[#00C853]/30">
+                <h3 className="text-lg font-bold text-white mb-4">Create New Link</h3>
+                <div className="space-y-4">
+                  <input 
+                    className="input-field" 
+                    placeholder="Link Title (e.g., My Portfolio)"
+                    value={newLink.title}
+                    onChange={e => setNewLink({...newLink, title: e.target.value})}
+                  />
+                  <input 
+                    className="input-field" 
+                    placeholder="URL (e.g., https://example.com)"
+                    value={newLink.url}
+                    onChange={e => setNewLink({...newLink, url: e.target.value})}
+                  />
+                  <div className="flex gap-3 justify-end">
+                    <button className="btn btn-secondary text-sm py-2 px-4" onClick={() => setIsAddingLink(false)}>Cancel</button>
+                    <button className="btn btn-primary text-sm py-2 px-4" onClick={handleAddLink}>Create Link</button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Links List */}
+            <div className="bg-[#0a0a0a] rounded-xl border border-[#222] overflow-hidden">
+              <LinkListReorder 
+                links={links} 
+                onReorder={handleReorder}
+                onEdit={(l) => setSelectedLink(l)}
+                onDelete={handleDeleteLink}
+                onSelect={(l) => setSelectedLink(l)}
+                selectedId={selectedLink?.id}
+              />
+              {links.length === 0 && (
+                <div className="p-8 text-center text-[#666]">
+                  <p className="text-4xl mb-3">🔗</p>
+                  <p>No links yet. Add your first link!</p>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* RIGHT: Rule Editor & Analytics */}
+          <div className="space-y-6">
+            {/* Rule Configurator */}
+            {selectedLink ? (
+              <RuleConfigurator 
+                link={selectedLink}
+                onAddRule={(r) => handleAddRule(selectedLink.id, r)}
+                onDeleteRule={(rid) => handleDeleteRule(selectedLink.id, rid)}
+              />
+            ) : (
+              !isAddingLink && (
+                <div className="bg-[#111] rounded-xl border border-[#222] p-8 text-center">
+                  <div className="text-5xl mb-4 opacity-30">⚙️</div>
+                  <h3 className="text-lg font-bold text-[#E6E6E6] mb-2">Select a link to configure</h3>
+                  <p className="text-[#9A9A9A] text-sm">Click on a link from the list to add smart rules</p>
+                </div>
+              )
+            )}
+
+            {/* Mini Analytics */}
+            <div className="bg-[#111] rounded-xl border border-[#222] p-6">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="font-bold text-white">Top Performing Links</h3>
+                <button className="text-xs text-[#00C853] hover:underline">View All</button>
+              </div>
+              <div className="space-y-3">
+                <TopLinkRow title="🌐 My Portfolio" clicks={452} ctr="12%" />
+                <TopLinkRow title="💻 GitHub" clicks={320} ctr="8%" />
+                <TopLinkRow title="💼 LinkedIn" clicks={180} ctr="5%" />
+              </div>
+            </div>
+
+            {/* Quick Settings */}
+            <SettingsPanel />
+          </div>
+        </div>
       </div>
 
       {/* Modals */}
       {showOnboarding && <OnboardingModal onClose={() => setShowOnboarding(false)} />}
+    </div>
+  );
+}
+
+// Helper Components
+function StatCard({ label, value, change }: { label: string; value: string; change: string }) {
+  return (
+    <div className="bg-[#111] rounded-xl border border-[#222] p-4">
+      <p className="text-[#9A9A9A] text-xs mb-1">{label}</p>
+      <div className="flex items-end justify-between">
+        <span className="text-2xl font-bold text-white">{value}</span>
+        <span className="text-xs text-[#00C853] bg-[#00C853]/10 px-2 py-0.5 rounded">{change}</span>
+      </div>
+    </div>
+  );
+}
+
+function TopLinkRow({ title, clicks, ctr }: { title: string; clicks: number; ctr: string }) {
+  return (
+    <div className="flex items-center justify-between py-2 border-b border-[#222] last:border-0">
+      <span className="text-[#E6E6E6] text-sm">{title}</span>
+      <div className="flex gap-4 text-sm">
+        <span className="text-[#9A9A9A]">{clicks} clicks</span>
+        <span className="text-[#00C853]">{ctr}</span>
+      </div>
     </div>
   );
 }
