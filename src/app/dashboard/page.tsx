@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { LinkWithRules, LinkRule } from '@/types';
 import RuleConfigurator from '@/components/RuleConfigurator';
@@ -18,15 +18,7 @@ export default function DashboardPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Initial Fetch
-  useEffect(() => {
-    fetchLinks();
-    // Check if first time user (simple mock check)
-    if (!localStorage.getItem('hasSeenOnboarding')) {
-      setShowOnboarding(true);
-      localStorage.setItem('hasSeenOnboarding', 'true');
-    }
-  }, []);
+  const hasFetched = useRef(false);
 
   const fetchLinks = async () => {
     try {
@@ -41,6 +33,19 @@ export default function DashboardPage() {
       setIsLoading(false);
     }
   };
+
+  // Initial Fetch
+  useEffect(() => {
+    if (hasFetched.current) return;
+    hasFetched.current = true;
+    
+    fetchLinks();
+    // Check if first time user (simple mock check)
+    if (!localStorage.getItem('hasSeenOnboarding')) {
+      setShowOnboarding(true);
+      localStorage.setItem('hasSeenOnboarding', 'true');
+    }
+  }, []);
 
   // CRUD Handlers
   const handleAddLink = async () => {
