@@ -1,0 +1,115 @@
+/* [project]/Documents/GitHub/Advitiya_H/src/app/globals.css [app-client] (css) */
+:root {
+  --background: #000;
+  --foreground: #e6e6e6;
+  --foreground-secondary: #9a9a9a;
+  --accent: #00c853;
+  --accent-dim: #009624;
+  --focus-ring: #00c85359;
+}
+
+@theme inline {
+  --color-background: var(--background) ; --color-foreground: var(--foreground) ; --color-accent: var(--accent) ; --color-accent-dim: var(--accent-dim) ; --color-ring: var(--focus-ring) ; --font-sans: var(--font-geist-sans), "Inter", sans-serif; --font-mono: var(--font-geist-mono), monospace;
+}
+
+@media (prefers-color-scheme: light) {
+  :root {
+    --background: #000;
+    --foreground: #e6e6e6;
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+  font-family: Inter, sans-serif;
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 4px;
+  box-shadow: 0 0 0 4px var(--focus-ring);
+}
+
+@apply px-6 py-3 rounded-lg font-bold transition-all duration-200 cursor-pointer flex items-center justify-center gap-2;
+
+.btn {
+  font-size: 1rem;
+}
+
+.btn-primary {
+  background-color: var(--accent);
+  color: #000;
+  border: none;
+}
+
+.btn-primary:hover {
+  background-color: #00e676;
+  transform: scale(.98);
+}
+
+.btn-primary:active {
+  transform: scale(.95);
+}
+
+.btn-secondary {
+  border: 1px solid var(--accent);
+  color: var(--accent);
+  background-color: #0000;
+}
+
+.btn-secondary:hover {
+  background-color: #00c8531a;
+}
+
+@apply bg-[#111] border border-[#222] rounded-xl p-4 transition-all duration-300;
+
+.dashboard-card:hover {
+  border-color: var(--accent);
+  box-shadow: 0 4px 20px #00c8531a;
+}
+
+@apply w-full bg-[#111] border border-[#333] rounded-lg px-4 py-3 text-white placeholder-[#666] transition-all;
+
+.input-field:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 4px var(--focus-ring);
+  outline: none;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #000;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #333;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--accent);
+}
+
+.animate-in {
+  animation: .3s ease-out fadeIn;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/*# sourceMappingURL=Documents_GitHub_Advitiya_H_src_app_globals_css_bad6b30c._.single.css.map*/
