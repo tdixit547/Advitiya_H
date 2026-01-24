@@ -58,11 +58,19 @@ export default function RuleTreeBuilder({ hubId, variants }: RuleTreeBuilderProp
   // Save tree
   const handleSave = async () => {
     if (!rootNode) return;
+<<<<<<< Updated upstream
     
     setIsSaving(true);
     setError(null);
     setSuccess(null);
     
+=======
+
+    setIsSaving(true);
+    setError(null);
+    setSuccess(null);
+
+>>>>>>> Stashed changes
     try {
       const result = await updateRuleTree(hubId, {
         name: treeName,
@@ -157,7 +165,11 @@ export default function RuleTreeBuilder({ hubId, variants }: RuleTreeBuilderProp
               Define how visitors are routed to variants
             </p>
           </div>
+<<<<<<< Updated upstream
           
+=======
+
+>>>>>>> Stashed changes
           <div className="flex items-center gap-3">
             {cacheInfo && (
               <div className="text-xs text-[#666]">
@@ -215,11 +227,18 @@ export default function RuleTreeBuilder({ hubId, variants }: RuleTreeBuilderProp
             <button
               key={type}
               onClick={() => changeNodeType(type)}
+<<<<<<< Updated upstream
               className={`px-4 py-2 rounded-lg border text-sm transition-colors ${
                 rootNode?.type === type
                   ? 'bg-[#00C853] text-black border-[#00C853]'
                   : 'border-[#333] text-[#9A9A9A] hover:border-[#00C853]'
               }`}
+=======
+              className={`px-4 py-2 rounded-lg border text-sm transition-colors ${rootNode?.type === type
+                  ? 'bg-[#00C853] text-black border-[#00C853]'
+                  : 'border-[#333] text-[#9A9A9A] hover:border-[#00C853]'
+                }`}
+>>>>>>> Stashed changes
             >
               {type === 'leaf' && '🎯 Leaf (Direct)'}
               {type === 'device' && '📱 Device Branch'}
@@ -282,6 +301,7 @@ function NodeEditor({ node, onChange, variants, depth }: NodeEditorProps) {
 
 // ==================== Leaf Node Editor ====================
 
+<<<<<<< Updated upstream
 function LeafEditor({ 
   node, 
   onChange, 
@@ -289,6 +309,15 @@ function LeafEditor({
 }: { 
   node: LeafNode; 
   onChange: (node: LeafNode) => void; 
+=======
+function LeafEditor({
+  node,
+  onChange,
+  variants
+}: {
+  node: LeafNode;
+  onChange: (node: LeafNode) => void;
+>>>>>>> Stashed changes
   variants: Variant[];
 }) {
   const toggleVariant = (variantId: string) => {
@@ -309,11 +338,18 @@ function LeafEditor({
           <button
             key={v.variant_id}
             onClick={() => toggleVariant(v.variant_id)}
+<<<<<<< Updated upstream
             className={`p-3 rounded-lg border text-left text-sm transition-colors ${
               node.variant_ids.includes(v.variant_id)
                 ? 'bg-[#00C853]/20 border-[#00C853] text-white'
                 : 'border-[#333] text-[#9A9A9A] hover:border-[#00C853]/50'
             }`}
+=======
+            className={`p-3 rounded-lg border text-left text-sm transition-colors ${node.variant_ids.includes(v.variant_id)
+                ? 'bg-[#00C853]/20 border-[#00C853] text-white'
+                : 'border-[#333] text-[#9A9A9A] hover:border-[#00C853]/50'
+              }`}
+>>>>>>> Stashed changes
           >
             <div className="font-medium">{v.variant_id}</div>
             <div className="text-xs truncate opacity-60">{v.target_url}</div>
@@ -329,6 +365,7 @@ function LeafEditor({
 
 // ==================== Device Branch Editor ====================
 
+<<<<<<< Updated upstream
 function DeviceEditor({ 
   node, 
   onChange, 
@@ -337,11 +374,25 @@ function DeviceEditor({
 }: { 
   node: Extract<DecisionNode, { type: 'device' }>; 
   onChange: (node: DecisionNode) => void; 
+=======
+function DeviceEditor({
+  node,
+  onChange,
+  variants,
+  depth
+}: {
+  node: Extract<DecisionNode, { type: 'device' }>;
+  onChange: (node: DecisionNode) => void;
+>>>>>>> Stashed changes
   variants: Variant[];
   depth: number;
 }) {
   const devices = ['mobile', 'desktop', 'tablet', 'default'] as const;
+<<<<<<< Updated upstream
   
+=======
+
+>>>>>>> Stashed changes
   const setBranchVariants = (device: string, variantIds: string[]) => {
     const newBranches = { ...node.device_branches };
     newBranches[device as keyof typeof newBranches] = {
@@ -359,9 +410,15 @@ function DeviceEditor({
       </p>
       <div className="space-y-4">
         {devices.map((device) => {
+<<<<<<< Updated upstream
           const branch = node.device_branches[device];
           const selectedIds = branch?.type === 'leaf' ? branch.variant_ids : [];
           
+=======
+          const branch = node.device_branches?.[device];
+          const selectedIds = branch?.type === 'leaf' ? branch.variant_ids : [];
+
+>>>>>>> Stashed changes
           return (
             <div key={device} className="p-4 bg-black/30 rounded-lg">
               <div className="flex items-center justify-between mb-2">
@@ -395,6 +452,7 @@ function DeviceEditor({
 
 // ==================== Location Branch Editor ====================
 
+<<<<<<< Updated upstream
 function LocationEditor({ 
   node, 
   onChange, 
@@ -403,6 +461,16 @@ function LocationEditor({
 }: { 
   node: Extract<DecisionNode, { type: 'location' }>; 
   onChange: (node: DecisionNode) => void; 
+=======
+function LocationEditor({
+  node,
+  onChange,
+  variants,
+  depth
+}: {
+  node: Extract<DecisionNode, { type: 'location' }>;
+  onChange: (node: DecisionNode) => void;
+>>>>>>> Stashed changes
   variants: Variant[];
   depth: number;
 }) {
@@ -528,6 +596,7 @@ function LocationEditor({
 
 // ==================== Time Branch Editor (Simplified) ====================
 
+<<<<<<< Updated upstream
 function TimeEditor({ 
   node, 
   onChange, 
@@ -536,6 +605,16 @@ function TimeEditor({
 }: { 
   node: Extract<DecisionNode, { type: 'time' }>; 
   onChange: (node: DecisionNode) => void; 
+=======
+function TimeEditor({
+  node,
+  onChange,
+  variants,
+  depth
+}: {
+  node: Extract<DecisionNode, { type: 'time' }>;
+  onChange: (node: DecisionNode) => void;
+>>>>>>> Stashed changes
   variants: Variant[];
   depth: number;
 }) {
@@ -550,7 +629,11 @@ function TimeEditor({
     <div>
       <h4 className="text-white font-medium mb-3">⏰ Time-Based Routing</h4>
       <p className="text-[#666] text-sm mb-4">
+<<<<<<< Updated upstream
         Time-based routing requires more complex configuration. 
+=======
+        Time-based routing requires more complex configuration.
+>>>>>>> Stashed changes
         For now, set a default variant.
       </p>
 

@@ -1,0 +1,95 @@
+e488232c5961f934e0e3c472162361d6
+"use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || (function () {
+    var ownKeys = function(o) {
+        ownKeys = Object.getOwnPropertyNames || function (o) {
+            var ar = [];
+            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
+            return ar;
+        };
+        return ownKeys(o);
+    };
+    return function (mod) {
+        if (mod && mod.__esModule) return mod;
+        var result = {};
+        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
+        __setModuleDefault(result, mod);
+        return result;
+    };
+})();
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.hashPassword = exports.User = void 0;
+const mongoose_1 = __importStar(require("mongoose"));
+const bcryptjs_1 = __importDefault(require("bcryptjs"));
+const UserSchema = new mongoose_1.Schema({
+    user_id: {
+        type: String,
+        required: true,
+        unique: true,
+        index: true
+    },
+    email: {
+        type: String,
+        required: true,
+        unique: true,
+        lowercase: true,
+        trim: true,
+        index: true
+    },
+    password_hash: {
+        type: String,
+        required: true,
+        select: false // Don't include by default in queries
+    },
+    role: {
+        type: String,
+        enum: ['user', 'admin'],
+        default: 'user'
+    },
+    name: {
+        type: String,
+        trim: true
+    },
+}, {
+    timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' }
+});
+// Instance method to compare passwords
+UserSchema.methods.comparePassword = async function (password) {
+    return bcryptjs_1.default.compare(password, this.password_hash);
+};
+// Static method to hash password
+UserSchema.statics.hashPassword = async (password) => {
+    const salt = await bcryptjs_1.default.genSalt(12);
+    return bcryptjs_1.default.hash(password, salt);
+};
+// Index for role-based queries
+UserSchema.index({ role: 1 });
+exports.User = mongoose_1.default.model('User', UserSchema);
+/**
+ * Hash a password
+ */
+const hashPassword = async (password) => {
+    const salt = await bcryptjs_1.default.genSalt(12);
+    return bcryptjs_1.default.hash(password, salt);
+};
+exports.hashPassword = hashPassword;
+//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJmaWxlIjoiL1VzZXJzL2dyb3Zlci5oZWVyL0RvY3VtZW50cy9HaXRIdWIvQWR2aXRpeWFfSC9zcmMvbW9kZWxzL1VzZXIudHMiLCJtYXBwaW5ncyI6Ijs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7O0FBQUEscURBQXNEO0FBQ3RELHdEQUE4QjtBQWlCOUIsTUFBTSxVQUFVLEdBQUcsSUFBSSxpQkFBTSxDQUFRO0lBQ2pDLE9BQU8sRUFBRTtRQUNMLElBQUksRUFBRSxNQUFNO1FBQ1osUUFBUSxFQUFFLElBQUk7UUFDZCxNQUFNLEVBQUUsSUFBSTtRQUNaLEtBQUssRUFBRSxJQUFJO0tBQ2Q7SUFDRCxLQUFLLEVBQUU7UUFDSCxJQUFJLEVBQUUsTUFBTTtRQUNaLFFBQVEsRUFBRSxJQUFJO1FBQ2QsTUFBTSxFQUFFLElBQUk7UUFDWixTQUFTLEVBQUUsSUFBSTtRQUNmLElBQUksRUFBRSxJQUFJO1FBQ1YsS0FBSyxFQUFFLElBQUk7S0FDZDtJQUNELGFBQWEsRUFBRTtRQUNYLElBQUksRUFBRSxNQUFNO1FBQ1osUUFBUSxFQUFFLElBQUk7UUFDZCxNQUFNLEVBQUUsS0FBSyxDQUFFLHNDQUFzQztLQUN4RDtJQUNELElBQUksRUFBRTtRQUNGLElBQUksRUFBRSxNQUFNO1FBQ1osSUFBSSxFQUFFLENBQUMsTUFBTSxFQUFFLE9BQU8sQ0FBQztRQUN2QixPQUFPLEVBQUUsTUFBTTtLQUNsQjtJQUNELElBQUksRUFBRTtRQUNGLElBQUksRUFBRSxNQUFNO1FBQ1osSUFBSSxFQUFFLElBQUk7S0FDYjtDQUNKLEVBQUU7SUFDQyxVQUFVLEVBQUUsRUFBRSxTQUFTLEVBQUUsWUFBWSxFQUFFLFNBQVMsRUFBRSxZQUFZLEVBQUU7Q0FDbkUsQ0FBQyxDQUFDO0FBRUgsdUNBQXVDO0FBQ3ZDLFVBQVUsQ0FBQyxPQUFPLENBQUMsZUFBZSxHQUFHLEtBQUssV0FBVyxRQUFnQjtJQUNqRSxPQUFPLGtCQUFNLENBQUMsT0FBTyxDQUFDLFFBQVEsRUFBRSxJQUFJLENBQUMsYUFBYSxDQUFDLENBQUM7QUFDeEQsQ0FBQyxDQUFDO0FBRUYsaUNBQWlDO0FBQ2pDLFVBQVUsQ0FBQyxPQUFPLENBQUMsWUFBWSxHQUFHLEtBQUssRUFBRSxRQUFnQixFQUFtQixFQUFFO0lBQzFFLE1BQU0sSUFBSSxHQUFHLE1BQU0sa0JBQU0sQ0FBQyxPQUFPLENBQUMsRUFBRSxDQUFDLENBQUM7SUFDdEMsT0FBTyxrQkFBTSxDQUFDLElBQUksQ0FBQyxRQUFRLEVBQUUsSUFBSSxDQUFDLENBQUM7QUFDdkMsQ0FBQyxDQUFDO0FBRUYsK0JBQStCO0FBQy9CLFVBQVUsQ0FBQyxLQUFLLENBQUMsRUFBRSxJQUFJLEVBQUUsQ0FBQyxFQUFFLENBQUMsQ0FBQztBQUVqQixRQUFBLElBQUksR0FBRyxrQkFBUSxDQUFDLEtBQUssQ0FBUSxNQUFNLEVBQUUsVUFBVSxDQUFDLENBQUM7QUFFOUQ7O0dBRUc7QUFDSSxNQUFNLFlBQVksR0FBRyxLQUFLLEVBQUUsUUFBZ0IsRUFBbUIsRUFBRTtJQUNwRSxNQUFNLElBQUksR0FBRyxNQUFNLGtCQUFNLENBQUMsT0FBTyxDQUFDLEVBQUUsQ0FBQyxDQUFDO0lBQ3RDLE9BQU8sa0JBQU0sQ0FBQyxJQUFJLENBQUMsUUFBUSxFQUFFLElBQUksQ0FBQyxDQUFDO0FBQ3ZDLENBQUMsQ0FBQztBQUhXLFFBQUEsWUFBWSxnQkFHdkIiLCJuYW1lcyI6W10sInNvdXJjZXMiOlsiL1VzZXJzL2dyb3Zlci5oZWVyL0RvY3VtZW50cy9HaXRIdWIvQWR2aXRpeWFfSC9zcmMvbW9kZWxzL1VzZXIudHMiXSwic291cmNlc0NvbnRlbnQiOlsiaW1wb3J0IG1vbmdvb3NlLCB7IFNjaGVtYSwgRG9jdW1lbnQgfSBmcm9tICdtb25nb29zZSc7XG5pbXBvcnQgYmNyeXB0IGZyb20gJ2JjcnlwdGpzJztcblxuZXhwb3J0IHR5cGUgVXNlclJvbGUgPSAndXNlcicgfCAnYWRtaW4nO1xuXG5leHBvcnQgaW50ZXJmYWNlIElVc2VyIGV4dGVuZHMgRG9jdW1lbnQge1xuICAgIHVzZXJfaWQ6IHN0cmluZztcbiAgICBlbWFpbDogc3RyaW5nO1xuICAgIHBhc3N3b3JkX2hhc2g6IHN0cmluZztcbiAgICByb2xlOiBVc2VyUm9sZTtcbiAgICBuYW1lPzogc3RyaW5nO1xuICAgIGNyZWF0ZWRfYXQ6IERhdGU7XG4gICAgdXBkYXRlZF9hdDogRGF0ZTtcblxuICAgIC8vIEluc3RhbmNlIG1ldGhvZHNcbiAgICBjb21wYXJlUGFzc3dvcmQocGFzc3dvcmQ6IHN0cmluZyk6IFByb21pc2U8Ym9vbGVhbj47XG59XG5cbmNvbnN0IFVzZXJTY2hlbWEgPSBuZXcgU2NoZW1hPElVc2VyPih7XG4gICAgdXNlcl9pZDoge1xuICAgICAgICB0eXBlOiBTdHJpbmcsXG4gICAgICAgIHJlcXVpcmVkOiB0cnVlLFxuICAgICAgICB1bmlxdWU6IHRydWUsXG4gICAgICAgIGluZGV4OiB0cnVlXG4gICAgfSxcbiAgICBlbWFpbDoge1xuICAgICAgICB0eXBlOiBTdHJpbmcsXG4gICAgICAgIHJlcXVpcmVkOiB0cnVlLFxuICAgICAgICB1bmlxdWU6IHRydWUsXG4gICAgICAgIGxvd2VyY2FzZTogdHJ1ZSxcbiAgICAgICAgdHJpbTogdHJ1ZSxcbiAgICAgICAgaW5kZXg6IHRydWVcbiAgICB9LFxuICAgIHBhc3N3b3JkX2hhc2g6IHtcbiAgICAgICAgdHlwZTogU3RyaW5nLFxuICAgICAgICByZXF1aXJlZDogdHJ1ZSxcbiAgICAgICAgc2VsZWN0OiBmYWxzZSAgLy8gRG9uJ3QgaW5jbHVkZSBieSBkZWZhdWx0IGluIHF1ZXJpZXNcbiAgICB9LFxuICAgIHJvbGU6IHtcbiAgICAgICAgdHlwZTogU3RyaW5nLFxuICAgICAgICBlbnVtOiBbJ3VzZXInLCAnYWRtaW4nXSxcbiAgICAgICAgZGVmYXVsdDogJ3VzZXInXG4gICAgfSxcbiAgICBuYW1lOiB7XG4gICAgICAgIHR5cGU6IFN0cmluZyxcbiAgICAgICAgdHJpbTogdHJ1ZVxuICAgIH0sXG59LCB7XG4gICAgdGltZXN0YW1wczogeyBjcmVhdGVkQXQ6ICdjcmVhdGVkX2F0JywgdXBkYXRlZEF0OiAndXBkYXRlZF9hdCcgfVxufSk7XG5cbi8vIEluc3RhbmNlIG1ldGhvZCB0byBjb21wYXJlIHBhc3N3b3Jkc1xuVXNlclNjaGVtYS5tZXRob2RzLmNvbXBhcmVQYXNzd29yZCA9IGFzeW5jIGZ1bmN0aW9uIChwYXNzd29yZDogc3RyaW5nKTogUHJvbWlzZTxib29sZWFuPiB7XG4gICAgcmV0dXJuIGJjcnlwdC5jb21wYXJlKHBhc3N3b3JkLCB0aGlzLnBhc3N3b3JkX2hhc2gpO1xufTtcblxuLy8gU3RhdGljIG1ldGhvZCB0byBoYXNoIHBhc3N3b3JkXG5Vc2VyU2NoZW1hLnN0YXRpY3MuaGFzaFBhc3N3b3JkID0gYXN5bmMgKHBhc3N3b3JkOiBzdHJpbmcpOiBQcm9taXNlPHN0cmluZz4gPT4ge1xuICAgIGNvbnN0IHNhbHQgPSBhd2FpdCBiY3J5cHQuZ2VuU2FsdCgxMik7XG4gICAgcmV0dXJuIGJjcnlwdC5oYXNoKHBhc3N3b3JkLCBzYWx0KTtcbn07XG5cbi8vIEluZGV4IGZvciByb2xlLWJhc2VkIHF1ZXJpZXNcblVzZXJTY2hlbWEuaW5kZXgoeyByb2xlOiAxIH0pO1xuXG5leHBvcnQgY29uc3QgVXNlciA9IG1vbmdvb3NlLm1vZGVsPElVc2VyPignVXNlcicsIFVzZXJTY2hlbWEpO1xuXG4vKipcbiAqIEhhc2ggYSBwYXNzd29yZFxuICovXG5leHBvcnQgY29uc3QgaGFzaFBhc3N3b3JkID0gYXN5bmMgKHBhc3N3b3JkOiBzdHJpbmcpOiBQcm9taXNlPHN0cmluZz4gPT4ge1xuICAgIGNvbnN0IHNhbHQgPSBhd2FpdCBiY3J5cHQuZ2VuU2FsdCgxMik7XG4gICAgcmV0dXJuIGJjcnlwdC5oYXNoKHBhc3N3b3JkLCBzYWx0KTtcbn07XG4iXSwidmVyc2lvbiI6M30=

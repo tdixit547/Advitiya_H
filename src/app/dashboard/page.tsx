@@ -1,12 +1,17 @@
 // ============================================
 // SMART LINK HUB - Dashboard Page
 // Main management interface (protected)
+<<<<<<< Updated upstream
+=======
+// Premium UI with micro-animations
+>>>>>>> Stashed changes
 // ============================================
 
 'use client';
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import type { LinkHub, Variant, HubStats } from '@/types';
+<<<<<<< Updated upstream
 import { 
   getHubs, 
   createHub, 
@@ -15,6 +20,16 @@ import {
   deleteVariant,
   getHubStats,
   ApiError 
+=======
+import {
+  getHubs,
+  createHub,
+  getVariants,
+  createVariant,
+  deleteVariant,
+  getHubStats,
+  ApiError
+>>>>>>> Stashed changes
 } from '@/lib/api-client';
 import { useAuth } from '@/contexts/auth-context';
 import ProtectedRoute from '@/components/ProtectedRoute';
@@ -26,6 +41,11 @@ import RuleTreeBuilder from '@/components/RuleTreeBuilder';
 import AnalyticsPanel from '@/components/AnalyticsPanel';
 import { SettingsPanel, OnboardingModal } from '@/components/SettingsPanel';
 import ThemeToggle from '@/components/ThemeToggle';
+<<<<<<< Updated upstream
+=======
+import AnimatedCounter, { AnimatedPercentage } from '@/components/ui/AnimatedCounter';
+import { SkeletonStatCard } from '@/components/ui/SkeletonLoader';
+>>>>>>> Stashed changes
 
 export default function DashboardPage() {
   return (
@@ -37,27 +57,47 @@ export default function DashboardPage() {
 
 function DashboardContent() {
   const { user, logout } = useAuth();
+<<<<<<< Updated upstream
   
+=======
+
+>>>>>>> Stashed changes
   // Hub state
   const [hubs, setHubs] = useState<LinkHub[]>([]);
   const [selectedHub, setSelectedHub] = useState<LinkHub | null>(null);
   const [isLoadingHubs, setIsLoadingHubs] = useState(true);
   const [showCreateHub, setShowCreateHub] = useState(false);
+<<<<<<< Updated upstream
   
+=======
+
+>>>>>>> Stashed changes
   // Variant state
   const [variants, setVariants] = useState<Variant[]>([]);
   const [selectedVariant, setSelectedVariant] = useState<Variant | null>(null);
   const [isLoadingVariants, setIsLoadingVariants] = useState(false);
   const [isAddingVariant, setIsAddingVariant] = useState(false);
+<<<<<<< Updated upstream
   
   // Stats state
   const [stats, setStats] = useState<HubStats | null>(null);
   
+=======
+
+  // Stats state
+  const [stats, setStats] = useState<HubStats | null>(null);
+  const [isLoadingStats, setIsLoadingStats] = useState(false);
+
+>>>>>>> Stashed changes
   // UI state
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [activeTab, setActiveTab] = useState<'variants' | 'rules' | 'analytics'>('variants');
   const [error, setError] = useState<string | null>(null);
+<<<<<<< Updated upstream
   
+=======
+
+>>>>>>> Stashed changes
   const hasFetched = useRef(false);
 
   // Fetch hubs on mount
@@ -66,7 +106,11 @@ function DashboardContent() {
     try {
       const hubList = await getHubs();
       setHubs(hubList);
+<<<<<<< Updated upstream
       
+=======
+
+>>>>>>> Stashed changes
       // Auto-select first hub if available
       if (hubList.length > 0 && !selectedHub) {
         setSelectedHub(hubList[0]);
@@ -94,11 +138,20 @@ function DashboardContent() {
 
   // Fetch stats when hub changes
   const fetchStats = useCallback(async (hubId: string) => {
+<<<<<<< Updated upstream
+=======
+    setIsLoadingStats(true);
+>>>>>>> Stashed changes
     try {
       const hubStats = await getHubStats(hubId);
       setStats(hubStats);
     } catch (err) {
       console.error('Failed to fetch stats:', err);
+<<<<<<< Updated upstream
+=======
+    } finally {
+      setIsLoadingStats(false);
+>>>>>>> Stashed changes
     }
   }, []);
 
@@ -106,9 +159,15 @@ function DashboardContent() {
   useEffect(() => {
     if (hasFetched.current) return;
     hasFetched.current = true;
+<<<<<<< Updated upstream
     
     fetchHubs();
     
+=======
+
+    fetchHubs();
+
+>>>>>>> Stashed changes
     // Check onboarding
     if (typeof window !== 'undefined' && !localStorage.getItem('hasSeenOnboarding')) {
       setShowOnboarding(true);
@@ -135,7 +194,11 @@ function DashboardContent() {
   // Variant handlers
   const handleAddVariant = async (input: Parameters<typeof createVariant>[1]) => {
     if (!selectedHub) return;
+<<<<<<< Updated upstream
     
+=======
+
+>>>>>>> Stashed changes
     try {
       const newVariant = await createVariant(selectedHub.hub_id, input);
       setVariants([...variants, newVariant]);
@@ -149,7 +212,11 @@ function DashboardContent() {
 
   const handleDeleteVariant = async (variantId: string) => {
     if (!selectedHub || !confirm('Delete this variant?')) return;
+<<<<<<< Updated upstream
     
+=======
+
+>>>>>>> Stashed changes
     try {
       await deleteVariant(selectedHub.hub_id, variantId);
       setVariants(variants.filter(v => v.variant_id !== variantId));
@@ -162,16 +229,29 @@ function DashboardContent() {
   };
 
   const handleVariantUpdate = (updatedVariant: Variant) => {
+<<<<<<< Updated upstream
     setVariants(variants.map(v => 
+=======
+    setVariants(variants.map(v =>
+>>>>>>> Stashed changes
       v.variant_id === updatedVariant.variant_id ? updatedVariant : v
     ));
     setSelectedVariant(updatedVariant);
   };
 
+<<<<<<< Updated upstream
   return (
     <div className="min-h-screen page-bg">
       <div className="max-w-7xl mx-auto p-6 lg:p-8">
         
+=======
+  const tabs = ['variants', 'rules', 'analytics'] as const;
+
+  return (
+    <div className="min-h-screen page-bg">
+      <div className="max-w-7xl mx-auto p-6 lg:p-8 animate-fade-in-up">
+
+>>>>>>> Stashed changes
         {/* Header */}
         <header className="flex items-center justify-between mb-8">
           <div className="flex items-center gap-4">
@@ -183,10 +263,17 @@ function DashboardContent() {
               isLoading={isLoadingHubs}
             />
           </div>
+<<<<<<< Updated upstream
           
           <div className="flex items-center gap-4">
             {selectedHub && (
               <code className="text-[#00C853] bg-[#00C853]/10 px-3 py-2 rounded-lg border border-[#00C853]/20 text-sm">
+=======
+
+          <div className="flex items-center gap-4">
+            {selectedHub && (
+              <code className="text-[#00C853] bg-[#00C853]/10 px-3 py-2 rounded-lg border border-[#00C853]/20 text-sm animate-scale-in">
+>>>>>>> Stashed changes
                 /{selectedHub.slug}
               </code>
             )}
@@ -204,7 +291,11 @@ function DashboardContent() {
               <span className="text-sm" style={{ color: 'var(--foreground-secondary)' }}>{user?.email}</span>
               <button
                 onClick={logout}
+<<<<<<< Updated upstream
                 className="text-red-400 hover:text-red-300 text-sm"
+=======
+                className="text-red-400 hover:text-red-300 text-sm transition-colors"
+>>>>>>> Stashed changes
               >
                 Logout
               </button>
@@ -214,16 +305,27 @@ function DashboardContent() {
 
         {/* Error Display */}
         {error && (
+<<<<<<< Updated upstream
           <div className="mb-6 p-4 bg-red-500/10 border border-red-500/30 rounded-xl text-red-400">
             {error}
             <button onClick={() => setError(null)} className="ml-4 underline">Dismiss</button>
+=======
+          <div className="mb-6 p-4 bg-red-500/10 border border-red-500/30 rounded-xl text-red-400 animate-fade-in-up">
+            {error}
+            <button onClick={() => setError(null)} className="ml-4 underline hover:no-underline">Dismiss</button>
+>>>>>>> Stashed changes
           </div>
         )}
 
         {/* No Hub State */}
         {!isLoadingHubs && hubs.length === 0 && (
+<<<<<<< Updated upstream
           <div className="text-center py-20">
             <div className="w-20 h-20 bg-[#111] rounded-2xl flex items-center justify-center mx-auto mb-6">
+=======
+          <div className="text-center py-20 animate-fade-in-up">
+            <div className="w-20 h-20 bg-[#111] rounded-2xl flex items-center justify-center mx-auto mb-6 animate-pulse-glow">
+>>>>>>> Stashed changes
               <span className="text-4xl">🔗</span>
             </div>
             <h2 className="text-2xl font-bold text-white mb-2">Create Your First Hub</h2>
@@ -244,6 +346,7 @@ function DashboardContent() {
           <>
             {/* Stats Row */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+<<<<<<< Updated upstream
               <StatCard 
                 label="Total Impressions" 
                 value={stats?.aggregated.total_impressions ?? '-'} 
@@ -275,14 +378,81 @@ function DashboardContent() {
                       ? 'bg-[#00C853] text-black'
                       : 'text-[#9A9A9A] hover:text-white'
                   }`}
+=======
+              {isLoadingStats ? (
+                <>
+                  <SkeletonStatCard />
+                  <SkeletonStatCard />
+                  <SkeletonStatCard />
+                  <SkeletonStatCard />
+                </>
+              ) : (
+                <>
+                  <StatCard
+                    label="Total Impressions"
+                    value={stats?.aggregated.total_impressions ?? 0}
+                    icon="👁️"
+                    delay={0}
+                  />
+                  <StatCard
+                    label="Total Clicks"
+                    value={stats?.aggregated.total_clicks ?? 0}
+                    icon="🖱️"
+                    delay={1}
+                  />
+                  <StatCard
+                    label="Average CTR"
+                    value={stats?.aggregated.average_ctr != null
+                      ? stats.aggregated.average_ctr * 100
+                      : 0}
+                    isPercentage
+                    icon="📈"
+                    delay={2}
+                  />
+                  <StatCard
+                    label="Variants"
+                    value={stats?.aggregated.variant_count ?? variants.length}
+                    icon="🎯"
+                    delay={3}
+                  />
+                </>
+              )}
+            </div>
+
+            {/* Tab Navigation */}
+            <div className="relative flex mb-6 bg-[#111] rounded-xl p-1 w-fit">
+              {tabs.map((tab) => (
+                <button
+                  key={tab}
+                  onClick={() => setActiveTab(tab)}
+                  className={`relative px-5 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 z-10 ${activeTab === tab
+                      ? 'text-black'
+                      : 'text-[#9A9A9A] hover:text-white'
+                    }`}
+>>>>>>> Stashed changes
                 >
                   {tab.charAt(0).toUpperCase() + tab.slice(1)}
                 </button>
               ))}
+<<<<<<< Updated upstream
             </div>
 
             {/* Tab Content */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+=======
+              {/* Sliding indicator */}
+              <div
+                className="absolute top-1 bottom-1 bg-[#00C853] rounded-lg transition-all duration-300 ease-out"
+                style={{
+                  left: `calc(${tabs.indexOf(activeTab) * 33.33}% + 4px)`,
+                  width: 'calc(33.33% - 8px)',
+                }}
+              />
+            </div>
+
+            {/* Tab Content */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 animate-fade-in-up" key={activeTab}>
+>>>>>>> Stashed changes
               {activeTab === 'variants' && (
                 <>
                   {/* Left: Variant List */}
@@ -296,7 +466,11 @@ function DashboardContent() {
                         + Add Variant
                       </button>
                     </div>
+<<<<<<< Updated upstream
                     
+=======
+
+>>>>>>> Stashed changes
                     <VariantList
                       variants={variants}
                       selectedId={selectedVariant?.variant_id}
@@ -308,7 +482,11 @@ function DashboardContent() {
                   </div>
 
                   {/* Right: Variant Editor */}
+<<<<<<< Updated upstream
                   <div>
+=======
+                  <div className="animate-scale-in">
+>>>>>>> Stashed changes
                     {isAddingVariant ? (
                       <VariantEditor
                         hubId={selectedHub.hub_id}
@@ -324,7 +502,11 @@ function DashboardContent() {
                         onCancel={() => setSelectedVariant(null)}
                       />
                     ) : (
+<<<<<<< Updated upstream
                       <div className="bg-[#111] rounded-xl border border-[#222] p-8 text-center">
+=======
+                      <div className="bg-[#111] rounded-xl border border-[#222] p-8 text-center card-lift">
+>>>>>>> Stashed changes
                         <div className="text-5xl mb-4 opacity-30">🔗</div>
                         <h3 className="text-lg font-bold text-[#E6E6E6] mb-2">
                           Select a variant to edit
@@ -366,18 +548,54 @@ function DashboardContent() {
         onClose={() => setShowCreateHub(false)}
         onCreate={handleCreateHub}
       />
+<<<<<<< Updated upstream
       
+=======
+
+>>>>>>> Stashed changes
       {showOnboarding && <OnboardingModal onClose={() => setShowOnboarding(false)} />}
     </div>
   );
 }
 
+<<<<<<< Updated upstream
 // Helper Components
 function StatCard({ label, value }: { label: string; value: string | number }) {
   return (
     <div className="bg-[#111] rounded-xl border border-[#222] p-4">
       <p className="text-[#9A9A9A] text-xs mb-1">{label}</p>
       <span className="text-2xl font-bold text-white">{value}</span>
+=======
+// Enhanced Stat Card with animated counter
+function StatCard({
+  label,
+  value,
+  icon,
+  isPercentage = false,
+  delay = 0
+}: {
+  label: string;
+  value: number;
+  icon: string;
+  isPercentage?: boolean;
+  delay?: number;
+}) {
+  return (
+    <div
+      className={`stat-card animate-fade-in-up stagger-${delay + 1}`}
+    >
+      <div className="flex items-center gap-2 mb-2">
+        <span className="text-lg">{icon}</span>
+        <p className="text-[#9A9A9A] text-xs">{label}</p>
+      </div>
+      <div className="text-2xl font-bold text-white">
+        {isPercentage ? (
+          <AnimatedPercentage value={value} />
+        ) : (
+          <AnimatedCounter value={value} />
+        )}
+      </div>
+>>>>>>> Stashed changes
     </div>
   );
 }

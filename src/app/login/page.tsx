@@ -1,6 +1,10 @@
 // ============================================
 // SMART LINK HUB - Login Page
 // JWT authentication login form
+<<<<<<< Updated upstream
+=======
+// With micro-animations and premium styling
+>>>>>>> Stashed changes
 // ============================================
 
 'use client';
@@ -15,7 +19,11 @@ import ThemeToggle from '@/components/ThemeToggle';
 export default function LoginPage() {
   const router = useRouter();
   const { login, isLoading } = useAuth();
+<<<<<<< Updated upstream
   
+=======
+
+>>>>>>> Stashed changes
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
@@ -37,12 +45,17 @@ export default function LoginPage() {
   };
 
   return (
+<<<<<<< Updated upstream
     <div className="min-h-screen page-bg flex items-center justify-center p-4">
+=======
+    <div className="min-h-screen bg-black flex items-center justify-center p-4">
+>>>>>>> Stashed changes
       {/* Theme Toggle */}
       <div className="fixed top-6 right-6 z-50">
         <ThemeToggle />
       </div>
 
+<<<<<<< Updated upstream
       <div className="w-full max-w-md">
         {/* Header */}
         <div className="text-center mb-8">
@@ -62,13 +75,49 @@ export default function LoginPage() {
           {/* Error Message */}
           {error && (
             <div className="mb-4 p-3 bg-red-500/10 border border-red-500/30 rounded-lg text-red-400 text-sm">
+=======
+      {/* Background gradient */}
+      <div
+        className="fixed inset-0 opacity-20 pointer-events-none"
+        style={{
+          background: 'radial-gradient(ellipse at 50% 0%, rgba(0, 200, 83, 0.2) 0%, transparent 60%)',
+        }}
+      />
+
+      <div className="w-full max-w-md relative animate-fade-in-up">
+        {/* Header */}
+        <div className="text-center mb-8 animate-fade-in-up">
+          <Link href="/" className="inline-block transition-transform hover:scale-105">
+            <h1 className="text-3xl font-bold">
+              <span className="text-[#00C853]">Smart</span>
+              <span className="text-[#E6E6E6]"> Link Hub</span>
+            </h1>
+          </Link>
+          <p className="text-[#9A9A9A] mt-2">Sign in to manage your hubs</p>
+        </div>
+
+        {/* Login Form */}
+        <form
+          onSubmit={handleSubmit}
+          className="bg-[#111] border border-[#222] rounded-2xl p-8 animate-scale-in"
+        >
+          <h2 className="text-xl font-bold mb-6 text-[#E6E6E6]">Welcome back</h2>
+
+          {/* Error Message */}
+          {error && (
+            <div className="mb-4 p-3 bg-red-500/10 border border-red-500/30 rounded-lg text-red-400 text-sm animate-fade-in-up">
+>>>>>>> Stashed changes
               {error}
             </div>
           )}
 
           {/* Email Field */}
           <div className="mb-4">
+<<<<<<< Updated upstream
             <label htmlFor="email" className="block text-sm mb-2" style={{ color: 'var(--foreground-secondary)' }}>
+=======
+            <label htmlFor="email" className="block text-sm mb-2 text-[#9A9A9A]">
+>>>>>>> Stashed changes
               Email Address
             </label>
             <input
@@ -85,7 +134,11 @@ export default function LoginPage() {
 
           {/* Password Field */}
           <div className="mb-6">
+<<<<<<< Updated upstream
             <label htmlFor="password" className="block text-sm mb-2" style={{ color: 'var(--foreground-secondary)' }}>
+=======
+            <label htmlFor="password" className="block text-sm mb-2 text-[#9A9A9A]">
+>>>>>>> Stashed changes
               Password
             </label>
             <input
@@ -108,7 +161,11 @@ export default function LoginPage() {
           >
             {isLoading ? (
               <span className="flex items-center justify-center gap-2">
+<<<<<<< Updated upstream
                 <span className="w-4 h-4 border-2 border-black border-t-transparent rounded-full animate-spin"></span>
+=======
+                <span className="w-4 h-4 border-2 border-black border-t-transparent rounded-full animate-spin" />
+>>>>>>> Stashed changes
                 Signing in...
               </span>
             ) : (
@@ -117,9 +174,15 @@ export default function LoginPage() {
           </button>
 
           {/* Register Link */}
+<<<<<<< Updated upstream
           <p className="text-center mt-6" style={{ color: 'var(--foreground-secondary)' }}>
             Don't have an account?{' '}
             <Link href="/register" style={{ color: 'var(--accent)' }} className="hover:underline">
+=======
+          <p className="text-center mt-6 text-[#9A9A9A]">
+            Don&apos;t have an account?{' '}
+            <Link href="/register" className="text-[#00C853] hover:underline transition-colors">
+>>>>>>> Stashed changes
               Create one
             </Link>
           </p>
@@ -127,7 +190,11 @@ export default function LoginPage() {
 
         {/* Back to Home */}
         <p className="text-center mt-6">
+<<<<<<< Updated upstream
           <Link href="/" style={{ color: 'var(--foreground-secondary)' }} className="text-sm hover:opacity-80">
+=======
+          <Link href="/" className="text-sm text-[#9A9A9A] hover:text-[#E6E6E6] transition-colors">
+>>>>>>> Stashed changes
             ← Back to home
           </Link>
         </p>
@@ -135,4 +202,7 @@ export default function LoginPage() {
     </div>
   );
 }
+<<<<<<< Updated upstream
 
+=======
+>>>>>>> Stashed changes

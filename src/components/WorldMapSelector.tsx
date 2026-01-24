@@ -132,8 +132,13 @@ export default function WorldMapSelector({
   }, [isOpen]);
 
   const toggleCountry = useCallback((code: string) => {
+<<<<<<< Updated upstream
     setLocalSelected(prev => 
       prev.includes(code) 
+=======
+    setLocalSelected(prev =>
+      prev.includes(code)
+>>>>>>> Stashed changes
         ? prev.filter(c => c !== code)
         : [...prev, code]
     );
@@ -151,10 +156,17 @@ export default function WorldMapSelector({
   // Get style for each country feature - NO HOVER here, hover is handled per-layer
   const getCountryStyle = useCallback((feature: GeoJSON.Feature | undefined) => {
     if (!feature?.properties) return {};
+<<<<<<< Updated upstream
     
     const countryCode = feature.properties.ISO_A2;
     const isSelected = localSelected.includes(countryCode);
     
+=======
+
+    const countryCode = feature.properties.ISO_A2;
+    const isSelected = localSelected.includes(countryCode);
+
+>>>>>>> Stashed changes
     return {
       fillColor: isSelected ? '#00C853' : '#2d2d2d',
       weight: isSelected ? 2 : 1,
@@ -175,6 +187,7 @@ export default function WorldMapSelector({
   if (!isOpen) return null;
 
   return (
+<<<<<<< Updated upstream
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
       <div 
         className="w-full max-w-5xl max-h-[90vh] overflow-hidden rounded-2xl flex flex-col"
@@ -187,16 +200,37 @@ export default function WorldMapSelector({
         <div className="p-4 border-b" style={{ borderColor: 'var(--border)' }}>
           <div className="flex items-center justify-between mb-3">
             <h2 className="text-xl font-bold" style={{ color: 'var(--foreground)' }}>
+=======
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+      <div
+        className="w-full max-w-5xl rounded-2xl flex flex-col"
+        style={{
+          backgroundColor: '#111',
+          border: '1px solid #333',
+          height: '85vh',
+          maxHeight: '700px',
+        }}
+      >
+        {/* Header - Fixed Height */}
+        <div className="shrink-0 p-4 border-b border-[#333]">
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="text-xl font-bold text-white">
+>>>>>>> Stashed changes
               🌍 Select Countries
             </h2>
             <button
               onClick={onClose}
+<<<<<<< Updated upstream
               className="p-2 hover:opacity-70 transition-opacity text-xl"
               style={{ color: 'var(--foreground-secondary)' }}
+=======
+              className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-white/10 transition-colors text-[#888] hover:text-white"
+>>>>>>> Stashed changes
             >
               ✕
             </button>
           </div>
+<<<<<<< Updated upstream
           
           {/* Search and Stats */}
           <div className="flex gap-4 items-center">
@@ -230,6 +264,39 @@ export default function WorldMapSelector({
           {/* Map */}
           <div className="flex-1 relative" style={{ minHeight: '450px' }}>
             {mapReady && geoJsonData && (
+=======
+
+          {/* Search Bar */}
+          <div className="flex gap-3 items-center">
+            <div className="relative flex-1">
+              <input
+                type="text"
+                placeholder="Search countries..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full px-4 py-2.5 bg-black border border-[#444] rounded-lg text-white placeholder-[#666] focus:border-[#00C853] focus:outline-none transition-colors"
+              />
+              {searchQuery && (
+                <button
+                  onClick={() => setSearchQuery('')}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-[#666] hover:text-white"
+                >
+                  ✕
+                </button>
+              )}
+            </div>
+            <div className="px-3 py-2 bg-[#00C853]/20 text-[#00C853] rounded-lg text-sm font-medium whitespace-nowrap">
+              {localSelected.length} selected
+            </div>
+          </div>
+        </div>
+
+        {/* Main Content - Map + List */}
+        <div className="flex-1 flex min-h-0 overflow-hidden">
+          {/* Map Container */}
+          <div className="flex-1 relative bg-[#1a1a1a]">
+            {mapReady && geoJsonData ? (
+>>>>>>> Stashed changes
               <MapWithGeoJSON
                 geoJsonData={geoJsonData}
                 selectedCountries={localSelected}
@@ -239,15 +306,23 @@ export default function WorldMapSelector({
                 mapRef={mapRef}
                 geoJsonRef={geoJsonRef}
               />
+<<<<<<< Updated upstream
             )}
             {(!mapReady || !geoJsonData) && (
               <div className="absolute inset-0 flex items-center justify-center" style={{ backgroundColor: 'var(--background-secondary)' }}>
                 <div className="flex flex-col items-center gap-3" style={{ color: 'var(--foreground-secondary)' }}>
                   <span className="w-8 h-8 border-3 border-current border-t-transparent rounded-full animate-spin"></span>
+=======
+            ) : (
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div className="flex flex-col items-center gap-3 text-[#666]">
+                  <div className="w-8 h-8 border-2 border-[#00C853] border-t-transparent rounded-full animate-spin"></div>
+>>>>>>> Stashed changes
                   <span>Loading world map...</span>
                 </div>
               </div>
             )}
+<<<<<<< Updated upstream
           </div>
 
           {/* Country List */}
@@ -297,11 +372,67 @@ export default function WorldMapSelector({
                 <p className="text-sm p-3 text-center" style={{ color: 'var(--foreground-muted)' }}>
                   No countries found
                 </p>
+=======
+
+            {/* Hover Tooltip - Positioned Absolutely */}
+            {hoveredCountry && (
+              <div className="absolute bottom-4 left-4 px-4 py-2 bg-black/90 border border-[#333] rounded-lg shadow-lg z-10">
+                <span className="text-[#00C853] font-medium">
+                  {getCountryName(hoveredCountry)}
+                </span>
+                <span className="text-[#888] ml-2">({hoveredCountry})</span>
+                <span className="text-[#666] ml-3 text-sm">
+                  Click to {localSelected.includes(hoveredCountry) ? 'deselect' : 'select'}
+                </span>
+              </div>
+            )}
+          </div>
+
+          {/* Country List Sidebar - Fixed Width */}
+          <div className="w-72 border-l border-[#333] flex flex-col bg-[#0a0a0a]">
+            <div className="shrink-0 px-3 py-2 border-b border-[#333] text-xs font-medium uppercase tracking-wide text-[#666]">
+              {searchQuery ? 'Search Results' : 'All Countries'} ({countryList.length})
+            </div>
+            <div className="flex-1 overflow-y-auto p-2">
+              {countryList.map((country) => {
+                const isSelected = localSelected.includes(country.code);
+                const isHovered = hoveredCountry === country.code;
+                return (
+                  <button
+                    key={country.code}
+                    onClick={() => toggleCountry(country.code)}
+                    onMouseEnter={() => setHoveredCountry(country.code)}
+                    onMouseLeave={() => setHoveredCountry(null)}
+                    className={`w-full text-left px-3 py-2.5 rounded-lg flex items-center gap-3 transition-all mb-1 ${isSelected
+                      ? 'bg-[#00C853]/15 text-[#00C853]'
+                      : isHovered
+                        ? 'bg-white/5 text-white'
+                        : 'text-[#ccc] hover:bg-white/5'
+                      }`}
+                  >
+                    <span className={`w-5 h-5 rounded border-2 flex items-center justify-center shrink-0 transition-colors ${isSelected ? 'bg-[#00C853] border-[#00C853]' : 'border-[#444]'
+                      }`}>
+                      {isSelected && <span className="text-black text-xs">✓</span>}
+                    </span>
+                    <span className="text-sm font-medium flex-1 truncate">{country.name}</span>
+                    <span className={`text-xs px-1.5 py-0.5 rounded shrink-0 ${isSelected ? 'bg-[#00C853] text-black' : 'bg-[#222] text-[#888]'
+                      }`}>
+                      {country.code}
+                    </span>
+                  </button>
+                );
+              })}
+              {countryList.length === 0 && (
+                <div className="text-sm p-4 text-center text-[#666]">
+                  No countries found
+                </div>
+>>>>>>> Stashed changes
               )}
             </div>
           </div>
         </div>
 
+<<<<<<< Updated upstream
         {/* Selected Countries Tags */}
         {localSelected.length > 0 && (
           <div className="p-3 border-t" style={{ borderColor: 'var(--border)' }}>
@@ -319,12 +450,28 @@ export default function WorldMapSelector({
                   <button
                     onClick={() => toggleCountry(code)}
                     className="hover:opacity-70 ml-1"
+=======
+        {/* Selected Countries Tags - Fixed Height */}
+        <div className="shrink-0 h-16 border-t border-[#333] flex items-center px-4 overflow-hidden">
+          {localSelected.length > 0 ? (
+            <div className="flex gap-2 overflow-x-auto flex-1 py-2">
+              {localSelected.map((code) => (
+                <span
+                  key={code}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#00C853]/20 text-[#00C853] rounded-full text-sm whitespace-nowrap shrink-0"
+                >
+                  {getCountryName(code)}
+                  <button
+                    onClick={() => toggleCountry(code)}
+                    className="w-4 h-4 rounded-full bg-[#00C853]/30 hover:bg-[#00C853]/50 flex items-center justify-center text-xs"
+>>>>>>> Stashed changes
                   >
                     ×
                   </button>
                 </span>
               ))}
             </div>
+<<<<<<< Updated upstream
           </div>
         )}
 
@@ -333,6 +480,18 @@ export default function WorldMapSelector({
           <button
             onClick={handleClear}
             className="btn btn-secondary px-4 py-2"
+=======
+          ) : (
+            <span className="text-[#666] text-sm">No countries selected. Click on a country to select it.</span>
+          )}
+        </div>
+
+        {/* Footer - Fixed Height */}
+        <div className="shrink-0 p-4 border-t border-[#333] flex justify-between items-center bg-[#0a0a0a]">
+          <button
+            onClick={handleClear}
+            className="px-4 py-2 rounded-lg border border-[#444] text-[#888] hover:text-white hover:border-[#666] transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+>>>>>>> Stashed changes
             disabled={localSelected.length === 0}
           >
             Clear All
@@ -340,15 +499,25 @@ export default function WorldMapSelector({
           <div className="flex gap-3">
             <button
               onClick={onClose}
+<<<<<<< Updated upstream
               className="btn btn-secondary px-6 py-2"
+=======
+              className="px-6 py-2 rounded-lg border border-[#444] text-white hover:bg-white/10 transition-colors"
+>>>>>>> Stashed changes
             >
               Cancel
             </button>
             <button
               onClick={handleConfirm}
+<<<<<<< Updated upstream
               className="btn btn-primary px-6 py-2"
             >
               Confirm ({localSelected.length})
+=======
+              className="px-6 py-2 rounded-lg bg-[#00C853] text-black font-medium hover:bg-[#00E676] transition-colors"
+            >
+              Confirm Selection
+>>>>>>> Stashed changes
             </button>
           </div>
         </div>
@@ -373,13 +542,71 @@ function MapWithGeoJSON({
   selectedCountries,
   onCountryClick,
   onCountryHover,
+<<<<<<< Updated upstream
   getCountryStyle,
+=======
+>>>>>>> Stashed changes
   mapRef,
   geoJsonRef,
 }: MapWithGeoJSONProps) {
   const [leafletLoaded, setLeafletLoaded] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
+<<<<<<< Updated upstream
+=======
+  // Use refs to avoid stale closures
+  const selectedCountriesRef = useRef(selectedCountries);
+  const onCountryClickRef = useRef(onCountryClick);
+
+  // Keep refs updated
+  useEffect(() => {
+    selectedCountriesRef.current = selectedCountries;
+  }, [selectedCountries]);
+
+  useEffect(() => {
+    onCountryClickRef.current = onCountryClick;
+  }, [onCountryClick]);
+
+  // Get style based on selection status
+  const getStyle = (countryCode: string | null, isHovered: boolean = false): Record<string, unknown> => {
+    if (!countryCode) {
+      return {
+        fillColor: '#2d2d2d',
+        weight: 1,
+        opacity: 1,
+        color: '#444',
+        fillOpacity: 0.3,
+      };
+    }
+    const isSelected = selectedCountriesRef.current.includes(countryCode);
+    if (isSelected) {
+      return {
+        fillColor: '#00C853',
+        weight: 2,
+        opacity: 1,
+        color: '#00E676',
+        fillOpacity: 0.7,
+      };
+    }
+    if (isHovered) {
+      return {
+        fillColor: '#00C853',
+        weight: 2,
+        opacity: 1,
+        color: '#00C853',
+        fillOpacity: 0.4,
+      };
+    }
+    return {
+      fillColor: '#2d2d2d',
+      weight: 1,
+      opacity: 1,
+      color: '#444',
+      fillOpacity: 0.3,
+    };
+  };
+
+>>>>>>> Stashed changes
   useEffect(() => {
     if (typeof window === 'undefined' || !containerRef.current) return;
 
@@ -401,6 +628,7 @@ function MapWithGeoJSON({
         attribution: '&copy; <a href="https://carto.com/">CARTO</a>',
       }).addTo(map);
 
+<<<<<<< Updated upstream
       // Add GeoJSON layer
       const geoJsonLayer = L.geoJSON(geoJsonData, {
         style: (feature) => getCountryStyle(feature) as L.PathOptions,
@@ -412,6 +640,40 @@ function MapWithGeoJSON({
           layer.bindTooltip(
             `<strong>${countryName}</strong><br/><span style="opacity: 0.7">${countryCode}</span>`,
             { 
+=======
+      // Helper function to get country code from feature properties
+      const getCountryCode = (properties: Record<string, unknown> | null | undefined): string | null => {
+        if (!properties) return null;
+        return (
+          (properties.ISO_A2 as string) ||
+          (properties.iso_a2 as string) ||
+          (properties.ISO3166_1_A2 as string) ||
+          null
+        );
+      };
+
+      // Add GeoJSON layer with interactive polygons
+      const geoJsonLayer = L.geoJSON(geoJsonData, {
+        style: (feature) => {
+          const code = getCountryCode(feature?.properties);
+          return getStyle(code) as L.PathOptions;
+        },
+        interactive: true,
+        onEachFeature: (feature, layer) => {
+          const properties = feature.properties;
+          const countryCode = getCountryCode(properties);
+          const countryName = properties?.ADMIN || properties?.name || properties?.NAME || countryCode || 'Unknown';
+
+          if (!countryCode) return;
+
+          // Make layer interactive
+          (layer as L.Path).options.interactive = true;
+
+          // Bind tooltip
+          layer.bindTooltip(
+            `<strong>${countryName}</strong><br/><span style="opacity: 0.7">${countryCode}</span>`,
+            {
+>>>>>>> Stashed changes
               sticky: true,
               className: 'country-tooltip',
               direction: 'top',
@@ -419,6 +681,7 @@ function MapWithGeoJSON({
             }
           );
 
+<<<<<<< Updated upstream
           // Event handlers - apply hover style ONLY to this layer
           layer.on({
             mouseover: (e) => {
@@ -453,6 +716,43 @@ function MapWithGeoJSON({
                 onCountryClick(countryCode);
               }
             },
+=======
+          // Click handler
+          layer.on('click', () => {
+            console.log('🗺️ Country clicked:', countryCode);
+            onCountryClickRef.current(countryCode);
+          });
+
+          // Mouse enter - highlight
+          layer.on('mouseover', (e) => {
+            onCountryHover(countryCode);
+            const target = e.target as L.Path;
+            const isSelected = selectedCountriesRef.current.includes(countryCode);
+
+            // Always apply hover style (brighter green)
+            target.setStyle({
+              fillColor: isSelected ? '#00E676' : '#00C853',
+              weight: 2,
+              color: '#00C853',
+              fillOpacity: isSelected ? 0.8 : 0.5,
+            });
+
+            target.bringToFront();
+          });
+
+          // Mouse leave - reset to base style
+          layer.on('mouseout', (e) => {
+            onCountryHover(null);
+            const target = e.target as L.Path;
+            const isSelected = selectedCountriesRef.current.includes(countryCode);
+
+            target.setStyle({
+              fillColor: isSelected ? '#00C853' : '#2d2d2d',
+              weight: isSelected ? 2 : 1,
+              color: isSelected ? '#00E676' : '#444',
+              fillOpacity: isSelected ? 0.7 : 0.3,
+            });
+>>>>>>> Stashed changes
           });
         },
       }).addTo(map);
@@ -460,6 +760,10 @@ function MapWithGeoJSON({
       mapRef.current = map;
       geoJsonRef.current = geoJsonLayer;
       setLeafletLoaded(true);
+<<<<<<< Updated upstream
+=======
+      console.log('🗺️ Map initialized with', geoJsonData.features.length, 'countries');
+>>>>>>> Stashed changes
     });
 
     return () => {
@@ -471,6 +775,7 @@ function MapWithGeoJSON({
     };
   }, [geoJsonData]);
 
+<<<<<<< Updated upstream
   // Update styles when selection changes (not hover - hover is per-layer)
   useEffect(() => {
     if (geoJsonRef.current && leafletLoaded) {
@@ -485,6 +790,25 @@ function MapWithGeoJSON({
             color: isSelected ? '#00E676' : '#444',
             fillOpacity: isSelected ? 0.7 : 0.3,
           });
+=======
+  // Update styles when selection changes
+  useEffect(() => {
+    if (geoJsonRef.current && leafletLoaded) {
+      geoJsonRef.current.eachLayer((layer) => {
+        const geoLayer = layer as L.GeoJSON & { feature?: GeoJSON.Feature };
+        const feature = geoLayer.feature;
+        if (feature?.properties) {
+          const countryCode = feature.properties.ISO_A2 || feature.properties.iso_a2;
+          if (countryCode) {
+            const isSelected = selectedCountries.includes(countryCode);
+            (layer as L.Path).setStyle({
+              fillColor: isSelected ? '#00C853' : '#2d2d2d',
+              weight: isSelected ? 2 : 1,
+              color: isSelected ? '#00E676' : '#444',
+              fillOpacity: isSelected ? 0.7 : 0.3,
+            });
+          }
+>>>>>>> Stashed changes
         }
       });
     }
@@ -492,24 +816,58 @@ function MapWithGeoJSON({
 
   return (
     <>
+<<<<<<< Updated upstream
       <div ref={containerRef} style={{ height: '100%', width: '100%' }} />
       <style jsx global>{`
         .country-tooltip {
           background: var(--card-bg, #111) !important;
           color: var(--foreground, #fff) !important;
           border: 1px solid var(--border, #333) !important;
+=======
+      <div
+        ref={containerRef}
+        style={{
+          height: '100%',
+          width: '100%',
+          cursor: 'pointer',
+        }}
+      />
+      <style jsx global>{`
+        .country-tooltip {
+          background: #111 !important;
+          color: #fff !important;
+          border: 1px solid #333 !important;
+>>>>>>> Stashed changes
           border-radius: 8px !important;
           padding: 8px 12px !important;
           font-size: 14px !important;
           box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5) !important;
         }
         .country-tooltip::before {
+<<<<<<< Updated upstream
           border-top-color: var(--border, #333) !important;
         }
         .leaflet-container {
           background: #1a1a1a !important;
+=======
+          border-top-color: #333 !important;
+        }
+        .leaflet-container {
+          background: #1a1a1a !important;
+          cursor: crosshair !important;
+        }
+        .leaflet-interactive {
+          cursor: pointer !important;
+        }
+        .leaflet-interactive:hover {
+          cursor: pointer !important;
+>>>>>>> Stashed changes
         }
       `}</style>
     </>
   );
 }
+<<<<<<< Updated upstream
+=======
+
+>>>>>>> Stashed changes
