@@ -9,6 +9,7 @@ A dynamic link routing system with decision trees, variant resolution, Redis cac
 - **Redis Caching** - 10-second TTL with automatic cache invalidation on admin edits
 - **Async Event Logging** - Non-blocking event capture to Redis stream
 - **Background Workers** - Event persistence and 5-minute stats aggregation
+- **Flow Analytics (NEW)** - Sankey diagrams and Network graphs for visualizing user traffic flow
 
 ## Architecture
 
@@ -99,6 +100,84 @@ npm run worker
 | DELETE | `/api/admin/hubs/:hub_id/variants/:variant_id` | Delete variant |
 | GET | `/api/admin/hubs/:hub_id/stats` | Get analytics |
 | POST | `/api/admin/hubs/:hub_id/stats/aggregate` | Force stats aggregation |
+| GET | `/api/admin/hubs/:hub_id/analytics/sankey` | **NEW** Get Sankey diagram data |
+| GET | `/api/admin/hubs/:hub_id/analytics/network` | **NEW** Get Network graph data |
+
+## Flow Analytics (NEW)
+
+Visualize user traffic flow with **Sankey diagrams** and **Network graphs**.
+
+### What It Does
+
+- **Tracks referrer sources** - Where users come from (Google, Direct, Twitter, etc.)
+- **Maps user journeys** - Source → Link → Destination flow paths
+- **Enables flow visualization** - Data structured for Sankey and Network graph rendering
+
+### Sankey Diagram Endpoint
+
+```http
+GET /api/admin/hubs/:hub_id/analytics/sankey?start_date=2024-01-01&end_date=2024-01-31
+```
+
+**Response:**
+```json
+{
+  "nodes": [
+    { "id": "google.com", "label": "Google", "type": "source" },
+    { "id": "variant-001", "label": "YouTube Link", "type": "link" },
+    { "id": "dest_youtube.com", "label": "youtube.com", "type": "destination" }
+  ],
+  "links": [
+    { "source": "google.com", "target": "variant-001", "value": 150 },
+    { "source": "variant-001", "target": "dest_youtube.com", "value": 150 }
+  ],
+  "period": { "start": "...", "end": "..." }
+}
+```
+
+**Visualization:**
+```
+Google (150) ━━━━━━━━▶ YouTube Link ━━━━━━━━▶ youtube.com
+Direct (80) ━━━━━━▶ Instagram Link ━━━━▶ instagram.com
+```
+
+### Network Graph Endpoint
+
+```http
+GET /api/admin/hubs/:hub_id/analytics/network?start_date=2024-01-01&end_date=2024-01-31
+```
+
+**Response:**
+```json
+{
+  "nodes": [
+    { "id": "direct", "label": "Direct", "weight": 500, "type": "source" },
+    { "id": "variant-001", "label": "youtube.com", "weight": 800, "type": "link" }
+  ],
+  "edges": [
+    { "source": "direct", "target": "variant-001", "weight": 500 }
+  ]
+}
+```
+
+### Implementation Details
+
+| Component | File | Purpose |
+|-----------|------|---------|
+| `FlowAnalyticsService` | `src/services/FlowAnalyticsService.ts` | Aggregates events into Sankey/Network data |
+| Event Model | `src/models/Event.ts` | Stores `referrer` and `referrer_variant_id` fields |
+| Redirect Route | `src/routes/redirect.ts` | Captures `Referer` header on each visit |
+| Admin Routes | `src/routes/admin.ts` | Exposes `/analytics/sankey` and `/analytics/network` |
+
+### Frontend Libraries (Recommended)
+
+| Library | Use Case |
+|---------|----------|
+| `d3-sankey` | D3-based Sankey diagrams |
+| `recharts` | React charts with Sankey support |
+| `@nivo/sankey` | React Sankey with animations |
+| `react-force-graph` | Interactive network graphs |
+| `@nivo/network` | React network visualization |
 
 ## Decision Tree Structure
 
@@ -179,7 +258,8 @@ src/
 │   ├── DecisionTreeEngine.ts  # Tree traversal logic
 │   ├── VariantResolver.ts     # Variant selection logic
 │   ├── CacheService.ts        # Redis caching
-│   └── EventLogger.ts         # Async event logging
+│   ├── EventLogger.ts         # Async event logging
+│   └── FlowAnalyticsService.ts # Sankey & Network graph data (NEW)
 ├── workers/
 │   ├── EventProcessor.ts      # Event persistence
 │   └── StatsAggregator.ts     # Stats calculation
