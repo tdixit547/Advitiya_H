@@ -1,7 +1,7 @@
 'use client';
 
-import { 
-  LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer 
+import {
+  LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer
 } from 'recharts';
 import { AnalyticsStats } from '@/types';
 
@@ -10,6 +10,9 @@ const EMPTY_STATS: AnalyticsStats = {
   totalViews: 0,
   totalClicks: 0,
   uniqueVisitors: 0,
+  avgDwellTime: 0,
+  avgScrollDepth: 0,
+  engagementScoreDist: { LOW: 0, MEDIUM: 0, HIGH: 0 },
   topLinks: [],
   viewsByDay: [],
   viewsByCountry: [],
@@ -51,24 +54,24 @@ export default function AnalyticsPanel({ stats = EMPTY_STATS }: AnalyticsPanelPr
               <CartesianGrid strokeDasharray="3 3" stroke="#333" />
               <XAxis dataKey="date" stroke="#9A9A9A" />
               <YAxis stroke="#9A9A9A" />
-              <Tooltip 
+              <Tooltip
                 contentStyle={{ backgroundColor: '#111', border: '1px solid #333' }}
                 itemStyle={{ color: '#E6E6E6' }}
               />
-              <Line 
-                type="monotone" 
-                dataKey="views" 
-                stroke="#00C853" 
-                strokeWidth={3} 
-                dot={{ r: 4, fill: '#00C853' }} 
-                activeDot={{ r: 6 }} 
+              <Line
+                type="monotone"
+                dataKey="views"
+                stroke="#00C853"
+                strokeWidth={3}
+                dot={{ r: 4, fill: '#00C853' }}
+                activeDot={{ r: 6 }}
               />
-              <Line 
-                type="monotone" 
-                dataKey="clicks" 
-                stroke="#E6E6E6" 
-                strokeWidth={2} 
-                strokeDasharray="5 5" 
+              <Line
+                type="monotone"
+                dataKey="clicks"
+                stroke="#E6E6E6"
+                strokeWidth={2}
+                strokeDasharray="5 5"
               />
             </LineChart>
           </ResponsiveContainer>

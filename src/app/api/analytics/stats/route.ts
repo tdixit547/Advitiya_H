@@ -11,6 +11,13 @@ const DEMO_STATS: AnalyticsStats = {
   totalViews: 1250,
   totalClicks: 487,
   uniqueVisitors: 892,
+  avgDwellTime: 45,
+  avgScrollDepth: 72,
+  engagementScoreDist: {
+    LOW: 150,
+    MEDIUM: 500,
+    HIGH: 600,
+  },
   topLinks: [
     { id: 1, title: '🌐 My Website', clicks: 150, ctr: 12.0 },
     { id: 2, title: '💻 GitHub', clicks: 120, ctr: 9.6 },

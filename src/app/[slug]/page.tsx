@@ -11,6 +11,8 @@ import { evaluateRules } from '@/lib/rule-engine';
 import { getVisitorContext } from '@/lib/visitor-context';
 import { getLinksWithRules as fetchLinksFromStorage } from '@/lib/storage';
 import LinkButton from '@/components/LinkButton';
+import { EngagementProvider } from '@/components/EngagementProvider';
+import PageTracker from '@/components/PageTracker';
 
 // Demo data for initial testing (replace with DB queries later)
 const DEMO_HUB: Hub = {
@@ -123,77 +125,80 @@ export default async function HubPage({ params }: PageProps) {
   const { bg, accent, textColor } = hub.theme_config;
 
   return (
-    <main
-      className="min-h-screen flex flex-col items-center px-4 py-12"
-      style={{ backgroundColor: bg, color: textColor }}
-    >
-      {/* Profile Section */}
-      <div className="text-center mb-8 animate-fade-in">
-        {/* Avatar */}
-        <div
-          className="w-24 h-24 rounded-full mx-auto mb-4 flex items-center justify-center text-3xl font-bold"
-          style={{
-            backgroundColor: `${accent}20`,
-            border: `3px solid ${accent}`,
-            boxShadow: `0 0 20px ${accent}40`,
-          }}
-        >
-          {hub.title.charAt(0).toUpperCase()}
+    <EngagementProvider>
+      <PageTracker hubId={hub.id} />
+      <main
+        className="min-h-screen flex flex-col items-center px-4 py-12"
+        style={{ backgroundColor: bg, color: textColor }}
+      >
+        {/* Profile Section */}
+        <div className="text-center mb-8 animate-fade-in">
+          {/* Avatar */}
+          <div
+            className="w-24 h-24 rounded-full mx-auto mb-4 flex items-center justify-center text-3xl font-bold"
+            style={{
+              backgroundColor: `${accent}20`,
+              border: `3px solid ${accent}`,
+              boxShadow: `0 0 20px ${accent}40`,
+            }}
+          >
+            {hub.title.charAt(0).toUpperCase()}
+          </div>
+
+          {/* Title */}
+          <h1
+            className="text-2xl font-bold mb-2"
+            style={{ color: accent }}
+          >
+            {hub.title}
+          </h1>
+
+          {/* Bio */}
+          {hub.bio && (
+            <p className="text-gray-400 max-w-md mx-auto">{hub.bio}</p>
+          )}
         </div>
 
-        {/* Title */}
-        <h1
-          className="text-2xl font-bold mb-2"
-          style={{ color: accent }}
-        >
-          {hub.title}
-        </h1>
-
-        {/* Bio */}
-        {hub.bio && (
-          <p className="text-gray-400 max-w-md mx-auto">{hub.bio}</p>
-        )}
-      </div>
-
-      {/* Links Section */}
-      <div className="w-full max-w-md space-y-4">
-        {filteredLinks.length > 0 ? (
-          filteredLinks.map((link, index) => (
-            <LinkButton
-              key={link.id}
-              link={link}
-              accent={accent}
-              index={index}
-            />
-          ))
-        ) : (
-          <p className="text-center text-gray-500">No links available</p>
-        )}
-      </div>
-
-      {/* Footer */}
-      <footer className="mt-12 text-center text-gray-600 text-sm">
-        <p>
-          Powered by{' '}
-          <span style={{ color: accent }} className="font-semibold">
-            Smart Link Hub
-          </span>
-        </p>
-      </footer>
-
-      {/* Debug info (development only) */}
-      {process.env.NODE_ENV === 'development' && (
-        <div className="mt-8 p-4 rounded-lg text-xs font-mono" style={{ backgroundColor: '#111' }}>
-          <p className="text-gray-500 mb-2">Debug Info:</p>
-          <p>Device: {context.device}</p>
-          <p>OS: {context.os}</p>
-          <p>Country: {context.country || 'Unknown'}</p>
-          <p>Hour: {context.currentHour}</p>
-          <p>Day: {context.currentDay}</p>
-          <p>Total Links: {linksWithRules.length}</p>
-          <p>Filtered Links: {filteredLinks.length}</p>
+        {/* Links Section */}
+        <div className="w-full max-w-md space-y-4">
+          {filteredLinks.length > 0 ? (
+            filteredLinks.map((link, index) => (
+              <LinkButton
+                key={link.id}
+                link={link}
+                accent={accent}
+                index={index}
+              />
+            ))
+          ) : (
+            <p className="text-center text-gray-500">No links available</p>
+          )}
         </div>
-      )}
-    </main>
+
+        {/* Footer */}
+        <footer className="mt-12 text-center text-gray-600 text-sm">
+          <p>
+            Powered by{' '}
+            <span style={{ color: accent }} className="font-semibold">
+              Smart Link Hub
+            </span>
+          </p>
+        </footer>
+
+        {/* Debug info (development only) */}
+        {process.env.NODE_ENV === 'development' && (
+          <div className="mt-8 p-4 rounded-lg text-xs font-mono" style={{ backgroundColor: '#111' }}>
+            <p className="text-gray-500 mb-2">Debug Info:</p>
+            <p>Device: {context.device}</p>
+            <p>OS: {context.os}</p>
+            <p>Country: {context.country || 'Unknown'}</p>
+            <p>Hour: {context.currentHour}</p>
+            <p>Day: {context.currentDay}</p>
+            <p>Total Links: {linksWithRules.length}</p>
+            <p>Filtered Links: {filteredLinks.length}</p>
+          </div>
+        )}
+      </main>
+    </EngagementProvider>
   );
 }

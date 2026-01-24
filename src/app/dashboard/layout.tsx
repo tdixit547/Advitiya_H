@@ -19,7 +19,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
             <span className="text-2xl">⚡</span>
             <span className="text-xl font-bold text-[#00FF00]">Smart Link Hub</span>
           </Link>
-          
+
           <div className="flex items-center gap-6">
             <Link
               href="/dashboard"
@@ -32,6 +32,12 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
               className="text-gray-400 hover:text-[#00FF00] transition-colors"
             >
               Links
+            </Link>
+            <Link
+              href="/dashboard/engagement"
+              className="text-gray-400 hover:text-[#00FF00] transition-colors"
+            >
+              Engagement
             </Link>
             <Link
               href="/demo"

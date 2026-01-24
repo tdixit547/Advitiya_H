@@ -41,6 +41,10 @@ export interface Link {
   priority: number;
   click_count: number;
   is_active: boolean;
+  status_code?: number;
+  is_healthy?: boolean;
+  archive_url?: string;
+  last_checked_at?: string | Date;
   created_at: Date;
   updated_at: Date;
 }
@@ -112,6 +116,9 @@ export interface AnalyticsEvent {
   visitor_device: string | null;
   visitor_user_agent: string | null;
   referrer: string | null;
+  dwell_time_ms?: number;
+  scroll_depth_percent?: number;
+  engagement_score?: 'LOW' | 'MEDIUM' | 'HIGH';
   created_at?: Date;
 }
 
@@ -119,6 +126,13 @@ export interface AnalyticsStats {
   totalViews: number;
   totalClicks: number;
   uniqueVisitors: number;
+  avgDwellTime: number;
+  avgScrollDepth: number;
+  engagementScoreDist: {
+    LOW: number;
+    MEDIUM: number;
+    HIGH: number;
+  };
   topLinks: {
     id: number;
     title: string;

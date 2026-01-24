@@ -36,6 +36,10 @@ CREATE TABLE links (
   priority INT DEFAULT 0, -- For ordering (higher = top)
   click_count INT DEFAULT 0, -- For performance-based sorting
   is_active BOOLEAN DEFAULT TRUE,
+  last_checked_at TIMESTAMP,
+  status_code INT,
+  is_healthy BOOLEAN DEFAULT TRUE,
+  archive_url TEXT,
   created_at TIMESTAMP DEFAULT NOW(),
   updated_at TIMESTAMP DEFAULT NOW()
 );
