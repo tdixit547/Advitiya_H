@@ -4,3 +4,4 @@ export * from './Variant';
 export * from './VariantStats';
 export * from './Event';
 export * from './User';
+export * from './AnalyticsEvent';

@@ -26,3 +26,7 @@ npm-debug.log*
 
 redis/
 redis.zip
+dump.rdb
+node_modules
+.env
+.next

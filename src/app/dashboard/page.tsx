@@ -7,6 +7,7 @@
 'use client';
 
 import { useState, useEffect, useRef, useCallback } from 'react';
+import { useRouter } from 'next/navigation';
 import type { LinkHub, Variant, HubStats } from '@/types';
 import {
   getHubs,
@@ -40,6 +41,7 @@ export default function DashboardPage() {
 
 function DashboardContent() {
   const { user, logout } = useAuth();
+  const router = useRouter();
 
   // Hub state
   const [hubs, setHubs] = useState<LinkHub[]>([]);
@@ -206,6 +208,20 @@ function DashboardContent() {
             >
               View Live →
             </button>
+            <button
+              onClick={() => selectedHub && router.push(`/hub/${selectedHub.hub_id}/tools`)}
+              disabled={!selectedHub}
+              className="btn btn-secondary text-sm py-2 px-4 disabled:opacity-50"
+            >
+              🛠️ Tools
+            </button>
+            <button
+              onClick={() => selectedHub && router.push(`/analysis/${selectedHub.hub_id}`)}
+              disabled={!selectedHub}
+              className="btn btn-primary text-sm py-2 px-4 disabled:opacity-50"
+            >
+              📊 Analytics
+            </button>
             <div className="flex items-center gap-3">
               <ThemeToggle />
             </div>
@@ -300,8 +316,8 @@ function DashboardContent() {
                   key={tab}
                   onClick={() => setActiveTab(tab)}
                   className={`relative px-5 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 z-10 ${activeTab === tab
-                      ? 'text-black'
-                      : 'text-[#9A9A9A] hover:text-white'
+                    ? 'text-black'
+                    : 'text-[#9A9A9A] hover:text-white'
                     }`}
                 >
                   {tab.charAt(0).toUpperCase() + tab.slice(1)}

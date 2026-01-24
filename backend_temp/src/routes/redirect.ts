@@ -4,6 +4,8 @@ import { decisionTreeEngine, IRequestContext } from '../services/DecisionTreeEng
 import { variantResolver } from '../services/VariantResolver';
 import { cacheService } from '../services/CacheService';
 import { eventLogger } from '../services/EventLogger';
+import { analyticsEventService } from '../services/AnalyticsEventService';
+import { v4 as uuidv4 } from 'uuid';
 
 const router = Router();
 
@@ -60,6 +62,9 @@ router.get('/:slug', async (req: Request, res: Response) => {
         // Get device info for logging
         const deviceInfo = decisionTreeEngine.parseDevice(context.userAgent);
 
+        // Generate session ID for analytics (use cookie or generate new)
+        const sessionId = req.cookies?.session_id || uuidv4();
+
         // Create base event context (without event_type)
         const eventContext = {
             hub_id: hub.hub_id,
@@ -73,11 +78,36 @@ router.get('/:slug', async (req: Request, res: Response) => {
             chosen_variant_id: chosenVariantId,
         };
 
-        // Log IMPRESSION event (variant was resolved)
+        // Log to legacy eventLogger (Redis stream for stats aggregation)
         eventLogger.logImpression(eventContext);
-
-        // Log CLICK event (redirect is being executed)
         eventLogger.logClick(eventContext);
+
+        // Log to NEW analyticsEventService (MongoDB for Analysis Page)
+        // This ensures analytics data is persisted for the Analysis Page
+        analyticsEventService.logHubImpression(
+            hub.hub_id,
+            sessionId,
+            context.userAgent,
+            req.headers.referer,
+            getClientIP(req)
+        );
+        analyticsEventService.logLinkClick(
+            hub.hub_id,
+            chosenVariantId,
+            chosenVariantId,
+            sessionId,
+            context.userAgent,
+            req.headers.referer,
+            getClientIP(req)
+        );
+        analyticsEventService.logRedirect(
+            hub.hub_id,
+            chosenVariantId,
+            sessionId,
+            context.userAgent,
+            targetUrl,
+            getClientIP(req)
+        );
 
         // Redirect to the target URL
         return res.redirect(302, targetUrl);

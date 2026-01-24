@@ -210,8 +210,15 @@ router.get('/hubs/:hub_id/tree', requireAuth, requireOwnership, async (req: IAut
     try {
         const ruleTree = await cacheService.getRuleTree(req.params.hub_id);
 
+        // Return null ruleTree instead of 404 - this is a valid state for new hubs
         if (!ruleTree) {
-            return res.status(404).json({ error: 'Rule tree not found' });
+            return res.json({
+                ruleTree: null,
+                cache: {
+                    cached: false,
+                    ttl_seconds: 0,
+                },
+            });
         }
 
         const isCached = await cacheService.isCached(req.params.hub_id);

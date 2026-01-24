@@ -47,6 +47,7 @@ export interface LinkHub {
   theme: Theme;
   rule_tree_id?: string;
   owner_user_id?: string;
+  short_code?: string;  // Short URL code for /r/:code (6 chars, Base62)
   created_at?: string;
   updated_at?: string;
 }

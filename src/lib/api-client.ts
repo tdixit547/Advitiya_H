@@ -65,7 +65,7 @@ export async function apiRequest<T>(
   const { body, skipAuth = false, headers: customHeaders, ...rest } = options;
 
   const token = getStoredToken();
-  
+
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
     ...customHeaders as Record<string, string>,
@@ -104,7 +104,7 @@ export async function apiRequest<T>(
 
   // Parse response
   let data: T | { error: string; details?: Record<string, string> };
-  
+
   try {
     data = await response.json();
   } catch {
@@ -129,11 +129,11 @@ export async function apiRequest<T>(
 
 // ==================== Auth API Functions ====================
 
-import type { 
-  AuthResponse, 
-  LoginCredentials, 
-  RegisterCredentials, 
-  User 
+import type {
+  AuthResponse,
+  LoginCredentials,
+  RegisterCredentials,
+  User
 } from '@/types';
 
 export async function login(credentials: LoginCredentials): Promise<AuthResponse> {
@@ -142,10 +142,10 @@ export async function login(credentials: LoginCredentials): Promise<AuthResponse
     body: credentials,
     skipAuth: true,
   });
-  
+
   setStoredToken(response.token);
   setStoredUser(response.user);
-  
+
   return response;
 }
 
@@ -155,10 +155,10 @@ export async function register(credentials: RegisterCredentials): Promise<AuthRe
     body: credentials,
     skipAuth: true,
   });
-  
+
   setStoredToken(response.token);
   setStoredUser(response.user);
-  
+
   return response;
 }
 
@@ -230,8 +230,8 @@ export async function createVariant(hubId: string, input: CreateVariantInput): P
 }
 
 export async function updateVariant(
-  hubId: string, 
-  variantId: string, 
+  hubId: string,
+  variantId: string,
   input: UpdateVariantInput
 ): Promise<Variant> {
   return apiRequest<Variant>(`/api/admin/hubs/${hubId}/variants/${variantId}`, {
@@ -250,15 +250,15 @@ export async function deleteVariant(hubId: string, variantId: string): Promise<{
 
 import type { RuleTree, CreateRuleTreeInput } from '@/types';
 
-export async function getRuleTree(hubId: string): Promise<{ 
-  ruleTree: RuleTree | null; 
-  cache: { cached: boolean; ttl_seconds: number } 
+export async function getRuleTree(hubId: string): Promise<{
+  ruleTree: RuleTree | null;
+  cache: { cached: boolean; ttl_seconds: number }
 }> {
   return apiRequest(`/api/admin/hubs/${hubId}/tree`);
 }
 
 export async function updateRuleTree(
-  hubId: string, 
+  hubId: string,
   input: CreateRuleTreeInput
 ): Promise<{ message: string; version: number; ruleTree: RuleTree }> {
   return apiRequest(`/api/admin/hubs/${hubId}/tree`, {
@@ -281,13 +281,275 @@ export async function getHubStats(hubId: string): Promise<HubStats> {
   return apiRequest<HubStats>(`/api/admin/hubs/${hubId}/stats`);
 }
 
-export async function forceAggregateStats(hubId: string): Promise<{ 
-  message: string; 
-  stats: VariantStats[] 
+export async function forceAggregateStats(hubId: string): Promise<{
+  message: string;
+  stats: VariantStats[]
 }> {
   return apiRequest(`/api/admin/hubs/${hubId}/stats/aggregate`, {
     method: 'POST',
   });
+}
+
+// ==================== Analytics API Functions ====================
+
+export interface AnalyticsOverview {
+  success: boolean;
+  data: {
+    total_visits: number;
+    unique_users: number;
+    total_sessions: number;
+    total_clicks: number;
+    average_ctr: number;
+    top_performing_link: { link_id: string; name: string; clicks: number } | null;
+    traffic_trend: 'up' | 'down' | 'stable';
+    trend_percentage: number;
+  };
+  meta: { hub_id: string; time_window: string; generated_at: string };
+}
+
+export interface TimeSeriesPoint {
+  timestamp: string;
+  visits: number;
+  clicks: number;
+}
+
+export interface AnalyticsTimeseries {
+  success: boolean;
+  data: TimeSeriesPoint[];
+  meta: { hub_id: string; time_window: string; data_points: number; generated_at: string };
+}
+
+export interface LinkPerformance {
+  link_id: string;
+  variant_id: string;
+  name: string;
+  target_url: string;
+  impressions: number;
+  clicks: number;
+  ctr: number;
+  rank_score: number;
+}
+
+export interface AnalyticsLinks {
+  success: boolean;
+  data: LinkPerformance[];
+  meta: { hub_id: string; time_window: string; total_links: number; generated_at: string };
+}
+
+export interface AnalyticsSegments {
+  success: boolean;
+  data: {
+    devices: { type: string; count: number; percentage: number }[];
+    locations: { location: string; count: number; percentage: number }[];
+  };
+  meta: { hub_id: string; time_window: string; generated_at: string };
+}
+
+export interface AnalyticsHeatmap {
+  success: boolean;
+  data: {
+    data: { hour: number; day: number; value: number }[];
+  };
+  meta: { hub_id: string; time_window: string; generated_at: string };
+}
+
+export type TimeRange = '1h' | '24h' | '7d' | 'lifetime';
+
+export async function getHubAnalyticsOverview(hubId: string, range: TimeRange = '24h'): Promise<AnalyticsOverview> {
+  return apiRequest<AnalyticsOverview>(`/api/analytics/hub/${hubId}/overview?range=${range}`);
+}
+
+export async function getHubAnalyticsTimeseries(hubId: string, range: TimeRange = '24h'): Promise<AnalyticsTimeseries> {
+  return apiRequest<AnalyticsTimeseries>(`/api/analytics/hub/${hubId}/timeseries?range=${range}`);
+}
+
+export async function getHubAnalyticsLinks(hubId: string, range: TimeRange = '24h'): Promise<AnalyticsLinks> {
+  return apiRequest<AnalyticsLinks>(`/api/analytics/hub/${hubId}/links?range=${range}`);
+}
+
+export async function getHubAnalyticsSegments(hubId: string, range: TimeRange = '24h'): Promise<AnalyticsSegments> {
+  return apiRequest<AnalyticsSegments>(`/api/analytics/hub/${hubId}/segments?range=${range}`);
+}
+
+export async function getHubAnalyticsHeatmap(hubId: string, range: TimeRange = '7d'): Promise<AnalyticsHeatmap> {
+  return apiRequest<AnalyticsHeatmap>(`/api/analytics/hub/${hubId}/heatmap?range=${range}`);
+}
+
+// ==================== Performance Classification API ====================
+
+export interface PerformanceLink {
+  link_id: string;
+  link_name: string;
+  target_url: string;
+  impressions: number;
+  clicks: number;
+  ctr: number;
+  rank_score: number;
+  performance_score: number;
+}
+
+export interface PerformanceClassification {
+  success: boolean;
+  topLinks: PerformanceLink[];
+  leastLinks: PerformanceLink[];
+  meta: {
+    hub_id: string;
+    time_window: string;
+    min_impressions_threshold: number;
+    total_links_analyzed: number;
+    generated_at: string;
+  };
+}
+
+export async function getHubPerformanceClassification(hubId: string, range: TimeRange = '24h'): Promise<PerformanceClassification> {
+  return apiRequest<PerformanceClassification>(`/api/analytics/hub/${hubId}/performance?range=${range}`);
+}
+
+// ==================== Enhanced Analytics API ====================
+
+/** KPI Metric with day-over-day delta */
+export interface KPIMetric {
+  name: string;
+  value: number | string;
+  previousValue?: number | string;
+  delta?: number;
+  trend: 'up' | 'down' | 'stable';
+}
+
+/** Enhanced KPIs response */
+export interface EnhancedKPIs {
+  success: boolean;
+  metrics: KPIMetric[];
+  generated_at: string;
+}
+
+/** Trend data point */
+export interface TrendDataPoint {
+  period: string;
+  visits: number;
+  clicks: number;
+  ctr: number;
+}
+
+/** Trends response */
+export interface TrendsResponse {
+  success: boolean;
+  data: TrendDataPoint[];
+  meta: { hub_id: string; granularity: string; days: number; generated_at: string };
+}
+
+/** Weekday vs Weekend analysis */
+export interface WeekdayWeekendAnalysis {
+  success: boolean;
+  weekdayAvg: number;
+  weekendAvg: number;
+  percentDifference: number;
+  recommendation?: string;
+}
+
+/** Country breakdown */
+export interface CountryBreakdown {
+  success: boolean;
+  data: {
+    countries: { country: string; clicks: number; percentage: number }[];
+    total_clicks: number;
+  };
+}
+
+/** Rule analytics */
+export interface RuleAnalytics {
+  success: boolean;
+  data: {
+    links: {
+      link_id: string;
+      link_name: string;
+      rules: { rule_id: string; rule_reason: string; count: number; percentage: number }[];
+    }[];
+    total_impressions: number;
+  };
+}
+
+/** Comparison metric */
+export interface ComparisonMetric {
+  name: string;
+  before: number | string;
+  after: number | string;
+  changePercent: number;
+}
+
+/** Before/After comparison */
+export interface BeforeAfterComparison {
+  success: boolean;
+  metrics: ComparisonMetric[];
+}
+
+/** Position impact analysis */
+export interface PositionImpact {
+  success: boolean;
+  data: {
+    positions: { position: number; clicks: number; impressions: number; ctr: number; percentage_of_total: number }[];
+    insight: string;
+  };
+}
+
+/** ML Insight */
+export interface MLInsight {
+  type: 'opportunity' | 'warning' | 'success' | 'info';
+  priority: 'high' | 'medium' | 'low';
+  title: string;
+  description: string;
+  action?: string;
+  confidence?: number;
+}
+
+/** ML Insights response */
+export interface MLInsightsResponse {
+  success: boolean;
+  insights: MLInsight[];
+  disclaimer?: string;
+  generated_at?: string;
+}
+
+export type TimeGranularity = 'day' | 'week' | 'month';
+
+/** Get enhanced KPIs with day-over-day deltas */
+export async function getEnhancedKPIs(hubId: string): Promise<EnhancedKPIs> {
+  return apiRequest<EnhancedKPIs>(`/api/analytics/hub/${hubId}/kpi`);
+}
+
+/** Get trends by granularity */
+export async function getTrends(hubId: string, granularity: TimeGranularity = 'day', days: number = 30): Promise<TrendsResponse> {
+  return apiRequest<TrendsResponse>(`/api/analytics/hub/${hubId}/trends?granularity=${granularity}&days=${days}`);
+}
+
+/** Get weekday vs weekend analysis */
+export async function getWeekdayWeekend(hubId: string, days: number = 30): Promise<WeekdayWeekendAnalysis> {
+  return apiRequest<WeekdayWeekendAnalysis>(`/api/analytics/hub/${hubId}/weekday-weekend?days=${days}`);
+}
+
+/** Get country breakdown */
+export async function getCountryBreakdown(hubId: string, range: TimeRange = '7d'): Promise<CountryBreakdown> {
+  return apiRequest<CountryBreakdown>(`/api/analytics/hub/${hubId}/countries?range=${range}`);
+}
+
+/** Get rule analytics */
+export async function getRuleAnalytics(hubId: string, range: TimeRange = '7d'): Promise<RuleAnalytics> {
+  return apiRequest<RuleAnalytics>(`/api/analytics/hub/${hubId}/rules?range=${range}`);
+}
+
+/** Get before/after comparison */
+export async function getBeforeAfterComparison(hubId: string): Promise<BeforeAfterComparison> {
+  return apiRequest<BeforeAfterComparison>(`/api/analytics/hub/${hubId}/compare`);
+}
+
+/** Get position impact analysis */
+export async function getPositionImpact(hubId: string, range: TimeRange = '7d'): Promise<PositionImpact> {
+  return apiRequest<PositionImpact>(`/api/analytics/hub/${hubId}/position-impact?range=${range}`);
+}
+
+/** Get ML insights (advisory only) */
+export async function getMLInsights(hubId: string): Promise<MLInsightsResponse> {
+  return apiRequest<MLInsightsResponse>(`/api/analytics/hub/${hubId}/insights`);
 }
 
 // ==================== Debug API Function ====================
@@ -297,3 +559,5 @@ import type { DebugResponse } from '@/types';
 export async function getDebugInfo(slug: string): Promise<DebugResponse> {
   return apiRequest<DebugResponse>(`/${slug}/debug`, { skipAuth: true });
 }
+
+
