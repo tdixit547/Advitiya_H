@@ -51,16 +51,6 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                 </Link>
               );
             })}
-
-            <div className="w-px h-6 bg-gray-700 mx-2" />
-
-            <Link
-              href="/demo"
-              target="_blank"
-              className="px-4 py-2 rounded-lg bg-[#00FF00]/10 text-[#00FF00] border border-[#00FF00]/30 hover:bg-[#00FF00]/20 transition-all"
-            >
-              View Hub →
-            </Link>
           </div>
         </nav>
       </header>
