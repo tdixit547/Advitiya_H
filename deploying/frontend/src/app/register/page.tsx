@@ -1,0 +1,244 @@
+// ============================================
+// SMART LINK HUB - Register Page
+// New user registration form
+// ============================================
+
+'use client';
+
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import Link from 'next/link';
+import { useAuth } from '@/contexts/auth-context';
+import { ApiError } from '@/lib/api-client';
+
+export default function RegisterPage() {
+  const router = useRouter();
+  const { register, isLoading } = useAuth();
+
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    // ... (rest of handleSubmit unchanged)
+
+    // Password Field
+    <div className="mb-4">
+      <label htmlFor="password" className="block text-sm mb-2" style={{ color: 'var(--foreground-secondary)' }}>
+        Password
+      </label>
+      <div className="relative">
+        <input
+          id="password"
+          type={showPassword ? 'text' : 'password'}
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          className="input-field pr-10"
+          placeholder="••••••••"
+          required
+          autoComplete="new-password"
+          minLength={8}
+        />
+        <button
+          type="button"
+          onClick={() => setShowPassword(!showPassword)}
+          className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white transition-colors"
+          aria-label={showPassword ? 'Hide password' : 'Show password'}
+        >
+          {showPassword ? (
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M3.98 8.223A10.477 10.477 0 0 0 1.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.451 10.451 0 0 1 12 4.5c4.756 0 8.773 3.162 10.065 7.498a10.522 10.522 0 0 1-4.293 5.774M6.228 6.228 3 3m3.228 3.228 3.65 3.65m7.894 7.894L21 21m-3.228-3.228-3.65-3.65m0 0a3 3 0 1 0-4.243-4.243m4.242 4.242L9.88 9.88" />
+            </svg>
+          ) : (
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
+              <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+            </svg>
+          )}
+        </button>
+      </div>
+      <p style={{ color: 'var(--foreground-muted)' }} className="text-xs mt-1">Minimum 8 characters</p>
+    </div>
+    setError(null);
+
+    // Validate password match
+    if (password !== confirmPassword) {
+      setError('Passwords do not match');
+      return;
+    }
+
+    // Validate password length
+    if (password.length < 8) {
+      setError('Password must be at least 8 characters');
+      return;
+    }
+
+    try {
+      await register({ email, password, name: name || undefined });
+      router.push('/dashboard');
+    } catch (err) {
+      if (err instanceof ApiError) {
+        if (err.status === 409) {
+          setError('This email is already registered');
+        } else {
+          setError(err.message);
+        }
+      } else {
+        setError('An unexpected error occurred');
+      }
+    }
+  };
+
+  return (
+    <div className="min-h-screen flex items-center justify-center p-4" style={{ background: '#000000' }}>
+      <div className="w-full max-w-md">
+        {/* Header */}
+        <div className="text-center mb-8">
+          <Link href="/" className="inline-block">
+            <h1 className="text-3xl font-bold">
+              <span style={{ color: 'var(--accent)' }}>Smart</span>
+              <span style={{ color: 'var(--foreground)' }}> Link Hub</span>
+            </h1>
+          </Link>
+          <p style={{ color: 'var(--foreground-secondary)' }} className="mt-2">Create your account to get started</p>
+        </div>
+
+        {/* Register Form */}
+        <form onSubmit={handleSubmit} className="panel p-8">
+          <h2 className="text-xl font-bold mb-6" style={{ color: 'var(--foreground)' }}>Create Account</h2>
+
+          {/* Error Message */}
+          {error && (
+            <div className="mb-4 p-3 bg-red-500/10 border border-red-500/30 rounded-lg text-red-400 text-sm">
+              {error}
+            </div>
+          )}
+
+          {/* Name Field */}
+          <div className="mb-4">
+            <label htmlFor="name" className="block text-sm mb-2" style={{ color: 'var(--foreground-secondary)' }}>
+              Name <span style={{ color: 'var(--foreground-muted)' }}>(optional)</span>
+            </label>
+            <input
+              id="name"
+              type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              className="input-field"
+              placeholder="John Doe"
+              autoComplete="name"
+            />
+          </div>
+
+          {/* Email Field */}
+          <div className="mb-4">
+            <label htmlFor="email" className="block text-sm mb-2" style={{ color: 'var(--foreground-secondary)' }}>
+              Email Address
+            </label>
+            <input
+              id="email"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="input-field"
+              placeholder="you@example.com"
+              required
+              autoComplete="email"
+            />
+          </div>
+
+          {/* Password Field */}
+          <div className="mb-4">
+            <label htmlFor="password" className="block text-sm mb-2" style={{ color: 'var(--foreground-secondary)' }}>
+              Password
+            </label>
+            <div className="relative">
+              <input
+                id="password"
+                type={showPassword ? 'text' : 'password'}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="input-field pr-10"
+                placeholder="••••••••"
+                required
+                autoComplete="new-password"
+                minLength={8}
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white transition-colors"
+                aria-label={showPassword ? 'Hide password' : 'Show password'}
+              >
+                {showPassword ? (
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M3.98 8.223A10.477 10.477 0 0 0 1.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.451 10.451 0 0 1 12 4.5c4.756 0 8.773 3.162 10.065 7.498a10.522 10.522 0 0 1-4.293 5.774M6.228 6.228 3 3m3.228 3.228 3.65 3.65m7.894 7.894L21 21m-3.228-3.228-3.65-3.65m0 0a3 3 0 1 0-4.243-4.243m4.242 4.242L9.88 9.88" />
+                  </svg>
+                ) : (
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                  </svg>
+                )}
+              </button>
+            </div>
+            <p style={{ color: 'var(--foreground-muted)' }} className="text-xs mt-1">Minimum 8 characters</p>
+          </div>
+
+          {/* Confirm Password Field */}
+          <div className="mb-6">
+            <label htmlFor="confirmPassword" className="block text-sm mb-2" style={{ color: 'var(--foreground-secondary)' }}>
+              Confirm Password
+            </label>
+            <input
+              id="confirmPassword"
+              type="password"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              className="input-field"
+              placeholder="••••••••"
+              required
+              autoComplete="new-password"
+            />
+          </div>
+
+          {/* Submit Button */}
+          <button
+            type="submit"
+            disabled={isLoading}
+            className="w-full btn btn-primary py-3 text-lg disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {isLoading ? (
+              <span className="flex items-center justify-center gap-2">
+                <span className="w-4 h-4 border-2 border-black border-t-transparent rounded-full animate-spin"></span>
+                Creating account...
+              </span>
+            ) : (
+              'Create Account'
+            )}
+          </button>
+
+          {/* Login Link */}
+          <p className="text-center mt-6" style={{ color: 'var(--foreground-secondary)' }}>
+            Already have an account?{' '}
+            <Link href="/login" style={{ color: 'var(--accent)' }} className="hover:underline">
+              Sign in
+            </Link>
+          </p>
+        </form>
+
+        {/* Back to Home */}
+        <p className="text-center mt-6">
+          <Link href="/" style={{ color: 'var(--foreground-secondary)' }} className="text-sm hover:opacity-80">
+            ← Back to home
+          </Link>
+        </p>
+      </div>
+    </div>
+  );
+}
+
