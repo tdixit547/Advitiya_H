@@ -42,8 +42,8 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                   key={item.href}
                   href={item.href}
                   className={`px-4 py-2 rounded-lg transition-all flex items-center gap-2 ${isActive
-                      ? 'bg-[#00FF00]/20 text-[#00FF00] border border-[#00FF00]/30'
-                      : 'text-gray-400 hover:text-white hover:bg-gray-800/50'
+                    ? 'bg-[#00FF00]/20 text-[#00FF00] border border-[#00FF00]/30'
+                    : 'text-gray-400 hover:text-white hover:bg-gray-800/50'
                     }`}
                 >
                   <span>{item.icon}</span>
@@ -54,14 +54,13 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
 
             <div className="w-px h-6 bg-gray-700 mx-2" />
 
-            <a
-              href={`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}/demo/go`}
+            <Link
+              href="/demo"
               target="_blank"
-              rel="noopener noreferrer"
               className="px-4 py-2 rounded-lg bg-[#00FF00]/10 text-[#00FF00] border border-[#00FF00]/30 hover:bg-[#00FF00]/20 transition-all"
             >
               View Hub →
-            </a>
+            </Link>
           </div>
         </nav>
       </header>
