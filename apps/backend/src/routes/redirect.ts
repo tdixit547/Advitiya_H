@@ -105,6 +105,126 @@ router.get('/:slug', async (req: Request, res: Response) => {
 });
 
 /**
+ * Context-Aware Redirect Endpoint
+ * GET /:slug/go - Redirects to the best matching link based on context
+ * 
+ * Uses device, location, and time rules to determine the best link
+ * and immediately redirects the user there.
+ */
+router.get('/:slug/go', async (req: Request, res: Response) => {
+    try {
+        const { slug } = req.params;
+
+        // Find the hub by slug
+        const hub = await LinkHub.findOne({ slug }).lean();
+
+        if (!hub) {
+            return res.status(404).json({ error: 'Hub not found' });
+        }
+
+        // Build request context from the actual request
+        const context: IRequestContext = {
+            userAgent: req.headers['user-agent'] || '',
+            country: extractCountry(req),
+            lat: parseFloat(req.query.lat as string) || 0,
+            lon: parseFloat(req.query.lon as string) || 0,
+            timestamp: new Date(),
+        };
+
+        // Get all enabled variants for this hub
+        const variants = await Variant.find({
+            hub_id: hub.hub_id,
+            enabled: true
+        }).lean();
+
+        if (variants.length === 0) {
+            // No links configured - redirect to hub page
+            return res.redirect(`/${slug}`);
+        }
+
+        // Get stats for scoring
+        const stats = await VariantStats.find({ hub_id: hub.hub_id }).lean();
+        const statsMap = new Map(stats.map(s => [s.variant_id, s]));
+
+        // Prepare variants with conditions and scores
+        const variantsWithConditions: IVariantWithConditions[] = variants.map(v => {
+            return {
+                variant_id: v.variant_id,
+                target_url: v.target_url,
+                title: v.title || v.variant_id,
+                description: v.description,
+                icon: v.icon,
+                priority: v.priority,
+                enabled: v.enabled,
+                score: statsMap.get(v.variant_id)?.score || 0,
+                conditions: v.conditions,
+            };
+        });
+
+        // Filter variants based on context (device, location, time)
+        const filteredLinks = decisionTreeEngine.filterVariants(context, variantsWithConditions);
+
+        // Get device info for logging
+        const deviceInfo = decisionTreeEngine.parseDevice(context.userAgent);
+
+        if (filteredLinks.length === 0) {
+            // No matching links after filtering - use first available variant
+            const fallback = variantsWithConditions[0];
+            if (fallback) {
+                // Log click event
+                eventLogger.logClick({
+                    hub_id: hub.hub_id,
+                    ip: getClientIP(req),
+                    country: context.country,
+                    lat: context.lat,
+                    lon: context.lon,
+                    user_agent: context.userAgent,
+                    device_type: deviceInfo.type,
+                    timestamp: context.timestamp,
+                    chosen_variant_id: fallback.variant_id,
+                });
+
+                return res.redirect(fallback.target_url);
+            }
+            // Truly no links - redirect to hub page
+            return res.redirect(`/${slug}`);
+        }
+
+        // Select the best matching link (first one, as they're already sorted)
+        const bestLink = filteredLinks[0];
+
+        // Log HUB_VIEW event
+        eventLogger.logHubView({
+            hub_id: hub.hub_id,
+            ip: getClientIP(req),
+            country: context.country,
+            user_agent: context.userAgent,
+            device_type: deviceInfo.type,
+            timestamp: context.timestamp,
+        });
+
+        // Log CLICK event for the auto-selected link
+        eventLogger.logClick({
+            hub_id: hub.hub_id,
+            ip: getClientIP(req),
+            country: context.country,
+            lat: context.lat,
+            lon: context.lon,
+            user_agent: context.userAgent,
+            device_type: deviceInfo.type,
+            timestamp: context.timestamp,
+            chosen_variant_id: bestLink.variant_id,
+        });
+
+        // Redirect to the best matching link
+        return res.redirect(bestLink.target_url);
+    } catch (error) {
+        console.error('Context redirect error:', error);
+        return res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+/**
  * Click tracking endpoint
  * POST /api/analytics/click - Logs link click events
  */

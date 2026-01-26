@@ -15,13 +15,13 @@ interface DashboardLayoutProps {
 
 export default function DashboardLayout({ children }: DashboardLayoutProps) {
   const pathname = usePathname();
-  
+
   const navItems = [
     { href: '/dashboard', label: 'Overview', icon: '📊' },
     { href: '/dashboard/links', label: 'Links', icon: '🔗' },
     { href: '/dashboard/rules', label: 'Rules', icon: '⚙️' },
   ];
-  
+
   return (
     <div className="min-h-screen bg-black text-white">
       {/* Top Navigation */}
@@ -31,37 +31,37 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
             <span className="text-2xl">⚡</span>
             <span className="text-xl font-bold text-[#00FF00]">Smart Link Hub</span>
           </Link>
-          
+
           <div className="flex items-center gap-1">
             {navItems.map((item) => {
-              const isActive = pathname === item.href || 
+              const isActive = pathname === item.href ||
                 (item.href !== '/dashboard' && pathname?.startsWith(item.href));
-              
+
               return (
                 <Link
                   key={item.href}
                   href={item.href}
-                  className={`px-4 py-2 rounded-lg transition-all flex items-center gap-2 ${
-                    isActive
+                  className={`px-4 py-2 rounded-lg transition-all flex items-center gap-2 ${isActive
                       ? 'bg-[#00FF00]/20 text-[#00FF00] border border-[#00FF00]/30'
                       : 'text-gray-400 hover:text-white hover:bg-gray-800/50'
-                  }`}
+                    }`}
                 >
                   <span>{item.icon}</span>
                   <span className="font-medium">{item.label}</span>
                 </Link>
               );
             })}
-            
+
             <div className="w-px h-6 bg-gray-700 mx-2" />
-            
-            <Link
-              href="/demo"
+
+            <a
+              href={`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}/demo/go`}
               target="_blank"
+              rel="noopener noreferrer"
               className="px-4 py-2 rounded-lg bg-[#00FF00]/10 text-[#00FF00] border border-[#00FF00]/30 hover:bg-[#00FF00]/20 transition-all"
             >
               View Hub →
-            </Link>
+            </a>
           </div>
         </nav>
       </header>

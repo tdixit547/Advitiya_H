@@ -120,7 +120,7 @@ function DashboardContent() {
           <div className="flex items-center gap-4">
             {selectedHub && (
               <button
-                onClick={() => window.open(`/${selectedHub.slug}`, '_blank')}
+                onClick={() => window.open(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}/${selectedHub.slug}/go`, '_blank')}
                 className="btn btn-secondary text-sm py-2 px-4"
               >
                 View Live →
