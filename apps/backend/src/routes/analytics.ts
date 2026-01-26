@@ -475,6 +475,212 @@ router.get('/hub/:hubId/insights', requireAuth, async (req: Request, res: Respon
     }
 });
 
+/**
+ * GET /api/analytics/hub/:hubId/engagement
+ * Returns engagement metrics (dwell time, score distribution)
+ */
+router.get('/hub/:hubId/engagement', requireAuth, async (req: Request, res: Response) => {
+    try {
+        const { hubId } = req.params;
+        const { range } = req.query;
+        const userId = (req as any).user?.userId;
+
+        if (!await validateHubAccess(hubId, userId)) {
+            return res.status(403).json({ error: 'Access denied' });
+        }
+
+        const window = parseTimeWindow(range as string);
+        const metrics = await analyticsAggregationService.getEngagementMetrics(hubId, window);
+
+        res.json({
+            success: true,
+            data: metrics,
+            meta: {
+                hub_id: hubId,
+                time_window: window,
+                generated_at: new Date().toISOString()
+            }
+        });
+    } catch (error) {
+        console.error('Engagement metrics error:', error);
+        res.status(500).json({ error: 'Failed to fetch engagement metrics' });
+    }
+});
+
+/**
+ * GET /api/analytics/hub/:hubId/rage-clicks
+ * Returns rage click incidents for a hub to identify UX problems
+ */
+router.get('/hub/:hubId/rage-clicks', requireAuth, async (req: Request, res: Response) => {
+    try {
+        const { hubId } = req.params;
+        const { range } = req.query;
+        const userId = (req as any).user?.userId;
+
+        if (!await validateHubAccess(hubId, userId)) {
+            return res.status(403).json({ error: 'Access denied' });
+        }
+
+        const window = parseTimeWindow(range as string);
+
+        // Calculate time cutoff based on window
+        const now = new Date();
+        let cutoffDate = new Date(now.getTime() - 24 * 60 * 60 * 1000); // default 24h
+
+        switch (window) {
+            case TimeWindow.FIVE_MINUTES:
+                cutoffDate = new Date(now.getTime() - 5 * 60 * 1000);
+                break;
+            case TimeWindow.ONE_HOUR:
+                cutoffDate = new Date(now.getTime() - 60 * 60 * 1000);
+                break;
+            case TimeWindow.SEVEN_DAYS:
+                cutoffDate = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+                break;
+            case TimeWindow.LIFETIME:
+                cutoffDate = new Date(0);
+                break;
+        }
+
+        const { AnalyticsEvent, AnalyticsEventType } = await import('../models/AnalyticsEvent');
+
+        // Aggregate rage clicks by element/variant
+        const rageClicks = await AnalyticsEvent.aggregate([
+            {
+                $match: {
+                    hub_id: hubId,
+                    event_type: AnalyticsEventType.RAGE_CLICK,
+                    timestamp: { $gte: cutoffDate }
+                }
+            },
+            {
+                $group: {
+                    _id: {
+                        variant_id: '$variant_id',
+                        element_selector: '$element_selector',
+                        target_url: '$target_url'
+                    },
+                    total_incidents: { $sum: 1 },
+                    total_clicks: { $sum: '$rage_click_count' },
+                    last_occurrence: { $max: '$timestamp' },
+                    avg_clicks_per_incident: { $avg: '$rage_click_count' }
+                }
+            },
+            {
+                $sort: { total_incidents: -1 }
+            },
+            {
+                $limit: 50
+            },
+            {
+                $project: {
+                    _id: 0,
+                    variant_id: '$_id.variant_id',
+                    element_selector: '$_id.element_selector',
+                    target_url: '$_id.target_url',
+                    total_incidents: 1,
+                    total_clicks: 1,
+                    last_occurrence: 1,
+                    avg_clicks_per_incident: { $round: ['$avg_clicks_per_incident', 1] }
+                }
+            }
+        ]);
+
+        res.json({
+            success: true,
+            data: {
+                rage_clicks: rageClicks,
+                total_incidents: rageClicks.reduce((sum, r) => sum + r.total_incidents, 0),
+                most_problematic: rageClicks[0] || null
+            },
+            meta: {
+                hub_id: hubId,
+                time_window: window,
+                generated_at: new Date().toISOString()
+            }
+        });
+    } catch (error) {
+        console.error('Rage clicks analytics error:', error);
+        res.status(500).json({ error: 'Failed to fetch rage click data' });
+    }
+});
+
+/**
+ * GET /api/analytics/hub/:hubId/link-ranking
+ * Returns AI-suggested link ordering based on historical performance
+ */
+router.get('/hub/:hubId/link-ranking', requireAuth, async (req: Request, res: Response) => {
+    try {
+        const { hubId } = req.params;
+        const userId = (req as any).user?.userId;
+
+        if (!await validateHubAccess(hubId, userId)) {
+            return res.status(403).json({ error: 'Access denied' });
+        }
+
+        // Get link performance for the last 7 days
+        const window = TimeWindow.SEVEN_DAYS;
+        const links = await analyticsAggregationService.getLinkPerformance(hubId, window);
+
+        // Calculate ranking score for each link
+        // Formula: (CTR * 100) + (total_clicks / 10) + (recent_trend_bonus)
+        const rankedLinks = links.map((link: any) => {
+            const ctr = link.total_clicks / Math.max(link.total_impressions, 1);
+            const ctrScore = ctr * 100;
+            const volumeScore = link.total_clicks / 10;
+
+            // Simple recent trend: if clicks in last 24h > average, bonus points
+            const recentBonus = 0; // Would need time-series data for accurate calculation
+
+            const rankingScore = ctrScore + volumeScore + recentBonus;
+
+            return {
+                variant_id: link.variant_id,
+                title: link.title || link.variant_id,
+                current_position: link.position || 0,
+                suggested_position: 0, // Will be set after sorting
+                ranking_score: Math.round(rankingScore * 100) / 100,
+                ctr: Math.round(ctr * 10000) / 100,
+                total_clicks: link.total_clicks,
+                total_impressions: link.total_impressions,
+                confidence: ctr > 0.01 && link.total_impressions > 50 ? 'high' :
+                    link.total_impressions > 10 ? 'medium' : 'low',
+                reasoning: ctr > 0.05
+                    ? `High CTR (${(ctr * 100).toFixed(1)}%) indicates strong user interest`
+                    : link.total_clicks > 100
+                        ? `High engagement with ${link.total_clicks} total clicks`
+                        : `Limited data available for confident ranking`
+            };
+        });
+
+        // Sort by ranking score and assign suggested positions
+        rankedLinks.sort((a: any, b: any) => b.ranking_score - a.ranking_score);
+        rankedLinks.forEach((link: any, index: number) => {
+            link.suggested_position = index + 1;
+        });
+
+        res.json({
+            success: true,
+            data: {
+                ranked_links: rankedLinks,
+                total_links: rankedLinks.length,
+                recommendation: rankedLinks.length > 0
+                    ? `Place "${rankedLinks[0].title}" at the top for best results`
+                    : 'Not enough data to provide recommendations'
+            },
+            meta: {
+                hub_id: hubId,
+                time_window: window,
+                algorithm: 'ctr_weighted_volume',
+                generated_at: new Date().toISOString()
+            }
+        });
+    } catch (error) {
+        console.error('Link ranking error:', error);
+        res.status(500).json({ error: 'Failed to generate link ranking' });
+    }
+});
+
 export default router;
 
 

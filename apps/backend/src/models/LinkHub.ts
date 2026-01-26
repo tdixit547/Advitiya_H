@@ -55,6 +55,9 @@ export interface ITheme {
 export interface ILinkHub extends Document {
     hub_id: string;
     slug: string;
+    username?: string;
+    avatar?: string;
+    bio?: string;
     default_url: string;
     theme: ITheme;
     rule_tree_id?: mongoose.Types.ObjectId;
@@ -82,6 +85,9 @@ const LinkHubSchema = new Schema<ILinkHub>({
         unique: true,
         index: true
     },
+    username: { type: String },
+    avatar: { type: String },
+    bio: { type: String },
     default_url: {
         type: String,
         required: true

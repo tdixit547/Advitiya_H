@@ -79,6 +79,19 @@ export interface HeatmapData {
 }
 
 /**
+ * Engagement Metrics
+ */
+export interface EngagementMetrics {
+    average_dwell_time: number;
+    score_distribution: {
+        low: number;
+        medium: number;
+        high: number;
+    };
+    total_engaged_sessions: number;
+}
+
+/**
  * Analytics Aggregation Service
  * Computes aggregated metrics with caching
  */
@@ -615,6 +628,217 @@ export class AnalyticsAggregationService {
 
         return result;
     }
+
+    /**
+     * Get engagement metrics (Time & Attention)
+     */
+    async getEngagementMetrics(hubId: string, window: TimeWindow = TimeWindow.SEVEN_DAYS): Promise<EngagementMetrics> {
+        const cacheKey = `${this.cachePrefix}engagement:${hubId}:${window}`;
+
+        try {
+            const cached = await redis.get(cacheKey);
+            if (cached) return JSON.parse(cached);
+        } catch { /* ignore */ }
+
+        const windowMs = getWindowMs(window);
+        const startDate = new Date(Date.now() - windowMs);
+
+        const engagementData = await AnalyticsEvent.aggregate([
+            {
+                $match: {
+                    hub_id: hubId,
+                    timestamp: { $gte: startDate },
+                    engagement_score: { $exists: true }
+                }
+            },
+            {
+                $group: {
+                    _id: null,
+                    avgDwell: { $avg: '$dwell_time' },
+                    lowCount: {
+                        $sum: { $cond: [{ $eq: ['$engagement_score', 'Low'] }, 1, 0] }
+                    },
+                    mediumCount: {
+                        $sum: { $cond: [{ $eq: ['$engagement_score', 'Medium'] }, 1, 0] }
+                    },
+                    highCount: {
+                        $sum: { $cond: [{ $eq: ['$engagement_score', 'High'] }, 1, 0] }
+                    },
+                    total: { $sum: 1 }
+                }
+            }
+        ]);
+
+        const data = engagementData[0] || { avgDwell: 0, lowCount: 0, mediumCount: 0, highCount: 0, total: 0 };
+
+        const result: EngagementMetrics = {
+            average_dwell_time: Math.round(data.avgDwell || 0),
+            score_distribution: {
+                low: data.lowCount,
+                medium: data.mediumCount,
+                high: data.highCount
+            },
+            total_engaged_sessions: data.total
+        };
+
+        try {
+            await redis.setex(cacheKey, this.cacheTTL, JSON.stringify(result));
+        } catch { /* ignore */ }
+
+        return result;
+    }
+
+    /**
+     * Get referral metrics
+     */
+    async getReferralMetrics(hubId: string, window: TimeWindow = TimeWindow.SEVEN_DAYS): Promise<ReferralMetrics> {
+        const cacheKey = `${this.cachePrefix}referrals:${hubId}:${window}`;
+
+        try {
+            const cached = await redis.get(cacheKey);
+            if (cached) return JSON.parse(cached);
+        } catch { /* ignore */ }
+
+        const windowMs = getWindowMs(window);
+        const startDate = new Date(Date.now() - windowMs);
+
+        // Aggregate by source type
+        const sourceAgg = await AnalyticsEvent.aggregate([
+            {
+                $match: {
+                    hub_id: hubId,
+                    timestamp: { $gte: startDate },
+                    event_type: AnalyticsEventType.HUB_IMPRESSION
+                }
+            },
+            {
+                $group: {
+                    _id: '$source_type',
+                    count: { $sum: 1 }
+                }
+            }
+        ]);
+
+        // Aggregate by top referrers logic (simplified for now to just top domains)
+        // Ideally we parse the referrer string to get domain
+        // For now, we'll just group by the raw referrer string if it exists
+        const referrerAgg = await AnalyticsEvent.aggregate([
+            {
+                $match: {
+                    hub_id: hubId,
+                    timestamp: { $gte: startDate },
+                    referrer: { $ne: null }
+                }
+            },
+            {
+                $group: {
+                    _id: '$referrer',
+                    count: { $sum: 1 }
+                }
+            },
+            { $sort: { count: -1 } },
+            { $limit: 10 }
+        ]);
+
+        const totalVisits = sourceAgg.reduce((sum, s) => sum + s.count, 0);
+
+        const result: ReferralMetrics = {
+            sources: sourceAgg.map(s => ({
+                type: s._id || 'direct',
+                count: s.count,
+                percentage: totalVisits > 0 ? Math.round((s.count / totalVisits) * 100) : 0
+            })),
+            top_referrers: referrerAgg.map(r => ({
+                domain: r._id || 'Unknown',
+                count: r.count
+            }))
+        };
+
+        try {
+            await redis.setex(cacheKey, this.cacheTTL, JSON.stringify(result));
+        } catch { /* ignore */ }
+
+        return result;
+    }
+
+    /**
+     * Get conversion attribution metrics
+     */
+    async getConversionMetrics(hubId: string, window: TimeWindow = TimeWindow.SEVEN_DAYS): Promise<ConversionMetrics> {
+        const cacheKey = `${this.cachePrefix}conversion:${hubId}:${window}`;
+
+        try {
+            const cached = await redis.get(cacheKey);
+            if (cached) return JSON.parse(cached);
+        } catch { /* ignore */ }
+
+        const windowMs = getWindowMs(window);
+        const startDate = new Date(Date.now() - windowMs);
+
+        // Aggregate conversions and revenue
+        const conversionAgg = await AnalyticsEvent.aggregate([
+            {
+                $match: {
+                    hub_id: hubId,
+                    timestamp: { $gte: startDate },
+                    event_type: AnalyticsEventType.CONVERSION
+                }
+            },
+            {
+                $group: {
+                    _id: null,
+                    total_conversions: { $sum: 1 },
+                    total_revenue: { $sum: '$revenue' }
+                }
+            }
+        ]);
+
+        // Aggregate conversions by link
+        const linkAgg = await AnalyticsEvent.aggregate([
+            {
+                $match: {
+                    hub_id: hubId,
+                    timestamp: { $gte: startDate },
+                    event_type: AnalyticsEventType.CONVERSION,
+                    variant_id: { $ne: null }
+                }
+            },
+            {
+                $group: {
+                    _id: '$variant_id',
+                    conversions: { $sum: 1 },
+                    revenue: { $sum: '$revenue' }
+                }
+            },
+            { $sort: { revenue: -1, conversions: -1 } },
+            { $limit: 10 }
+        ]);
+
+        const totals = conversionAgg[0] || { total_conversions: 0, total_revenue: 0 };
+        const top_links = [];
+
+        for (const link of linkAgg) {
+            const variant = await Variant.findOne({ variant_id: link._id });
+            top_links.push({
+                link_id: link._id,
+                name: variant?.target_url || link._id,
+                conversions: link.conversions,
+                revenue: link.revenue
+            });
+        }
+
+        const result: ConversionMetrics = {
+            total_conversions: totals.total_conversions,
+            total_revenue: totals.total_revenue,
+            top_converting_links: top_links
+        };
+
+        try {
+            await redis.setex(cacheKey, this.cacheTTL, JSON.stringify(result));
+        } catch { /* ignore */ }
+
+        return result;
+    }
 }
 
 /**
@@ -644,6 +868,35 @@ export interface PerformanceClassification {
         total_links_analyzed: number;
         generated_at: string;
     };
+}
+
+/**
+ * Referral Metrics
+ */
+export interface ReferralMetrics {
+    sources: {
+        type: string;
+        count: number;
+        percentage: number;
+    }[];
+    top_referrers: {
+        domain: string;
+        count: number;
+    }[];
+}
+
+/**
+ * Conversion Metrics
+ */
+export interface ConversionMetrics {
+    total_conversions: number;
+    total_revenue: number;
+    top_converting_links: {
+        link_id: string;
+        name: string;
+        conversions: number;
+        revenue: number;
+    }[];
 }
 
 // Singleton instance

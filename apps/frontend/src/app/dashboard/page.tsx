@@ -26,21 +26,21 @@ export default function DashboardPage() {
 
 function DashboardContent() {
   const { user, logout } = useAuth();
-  
+
   // Hub state
   const [hubs, setHubs] = useState<LinkHub[]>([]);
   const [selectedHub, setSelectedHub] = useState<LinkHub | null>(null);
   const [isLoadingHubs, setIsLoadingHubs] = useState(true);
   const [showCreateHub, setShowCreateHub] = useState(false);
-  
+
   // Variant and Stats state
   const [variants, setVariants] = useState<Variant[]>([]);
   const [stats, setStats] = useState<HubStats | null>(null);
-  
+
   // UI state
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  
+
   const hasFetched = useRef(false);
 
   // Fetch hubs on mount
@@ -78,9 +78,9 @@ function DashboardContent() {
   useEffect(() => {
     if (hasFetched.current) return;
     hasFetched.current = true;
-    
+
     fetchHubs();
-    
+
     if (typeof window !== 'undefined' && !localStorage.getItem('hasSeenOnboarding')) {
       setShowOnboarding(true);
       localStorage.setItem('hasSeenOnboarding', 'true');
@@ -104,7 +104,7 @@ function DashboardContent() {
   return (
     <div className="min-h-screen page-bg">
       <div className="max-w-7xl mx-auto p-6 lg:p-8">
-        
+
         {/* Header */}
         <header className="flex items-center justify-between mb-8">
           <div className="flex items-center gap-4">
@@ -116,7 +116,7 @@ function DashboardContent() {
               isLoading={isLoadingHubs}
             />
           </div>
-          
+
           <div className="flex items-center gap-4">
             {selectedHub && (
               <button
@@ -170,7 +170,7 @@ function DashboardContent() {
           <>
             {/* Quick Navigation Cards */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-              <Link 
+              <Link
                 href="/dashboard/links"
                 className="bg-[#111] rounded-xl border border-[#222] p-6 hover:border-[#00C853]/50 transition-all group"
               >
@@ -187,8 +187,8 @@ function DashboardContent() {
                   <span className="ml-auto text-[#9A9A9A] group-hover:text-[#00C853] transition-colors">→</span>
                 </div>
               </Link>
-              
-              <Link 
+
+              <Link
                 href="/dashboard/rules"
                 className="bg-[#111] rounded-xl border border-[#222] p-6 hover:border-[#00C853]/50 transition-all group"
               >
@@ -206,7 +206,7 @@ function DashboardContent() {
                 </div>
               </Link>
 
-              <Link 
+              <Link
                 href={`/hub/${selectedHub.hub_id}/tools`}
                 className="bg-gradient-to-br from-[#1a1a2e] to-[#16213e] rounded-xl border border-[#4a4ae8]/30 p-6 hover:border-[#4a4ae8] transition-all group"
               >
@@ -224,7 +224,7 @@ function DashboardContent() {
                 </div>
               </Link>
 
-              <Link 
+              <Link
                 href={`/analysis/${selectedHub.hub_id}`}
                 className="bg-gradient-to-br from-[#111] to-[#0a2010] rounded-xl border border-[#00C853]/30 p-6 hover:border-[#00C853] transition-all group"
               >
@@ -239,6 +239,60 @@ function DashboardContent() {
                     </p>
                   </div>
                   <span className="ml-auto text-[#00C853] group-hover:text-[#00FF00] transition-colors">→</span>
+                </div>
+              </Link>
+
+              <Link
+                href="/dashboard/engagement"
+                className="bg-[#111] rounded-xl border border-[#222] p-6 hover:border-yellow-500/50 transition-all group"
+              >
+                <div className="flex items-center gap-4">
+                  <div className="text-4xl">⏱️</div>
+                  <div>
+                    <h3 className="text-lg font-bold text-white group-hover:text-yellow-500 transition-colors">
+                      Engagement
+                    </h3>
+                    <p className="text-[#9A9A9A] text-sm">
+                      Time & Attention
+                    </p>
+                  </div>
+                  <span className="ml-auto text-[#9A9A9A] group-hover:text-yellow-500 transition-colors">→</span>
+                </div>
+              </Link>
+
+              <Link
+                href="/dashboard/referrals"
+                className="bg-[#111] rounded-xl border border-[#222] p-6 hover:border-blue-500/50 transition-all group"
+              >
+                <div className="flex items-center gap-4">
+                  <div className="text-4xl">🌍</div>
+                  <div>
+                    <h3 className="text-lg font-bold text-white group-hover:text-blue-500 transition-colors">
+                      Sources
+                    </h3>
+                    <p className="text-[#9A9A9A] text-sm">
+                      Traffic & Referrers
+                    </p>
+                  </div>
+                  <span className="ml-auto text-[#9A9A9A] group-hover:text-blue-500 transition-colors">→</span>
+                </div>
+              </Link>
+
+              <Link
+                href="/dashboard/conversions"
+                className="bg-[#111] rounded-xl border border-[#222] p-6 hover:border-purple-500/50 transition-all group"
+              >
+                <div className="flex items-center gap-4">
+                  <div className="text-4xl">💰</div>
+                  <div>
+                    <h3 className="text-lg font-bold text-white group-hover:text-purple-500 transition-colors">
+                      Conversions
+                    </h3>
+                    <p className="text-[#9A9A9A] text-sm">
+                      Revenue & ROI
+                    </p>
+                  </div>
+                  <span className="ml-auto text-[#9A9A9A] group-hover:text-purple-500 transition-colors">→</span>
                 </div>
               </Link>
             </div>
@@ -258,7 +312,7 @@ function DashboardContent() {
         onClose={() => setShowCreateHub(false)}
         onCreate={handleCreateHub}
       />
-      
+
       {showOnboarding && <OnboardingModal onClose={() => setShowOnboarding(false)} />}
     </div>
   );

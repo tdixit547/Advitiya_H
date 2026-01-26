@@ -3,6 +3,8 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import LinkButton from '@/components/LinkButton';
+import EngagementTracker from '@/components/EngagementTracker';
+import RageClickDetector from '@/components/RageClickDetector';
 
 interface FilteredLink {
   variant_id: string;
@@ -42,7 +44,7 @@ interface HubData {
 export default function HubPage() {
   const params = useParams();
   const slug = params.slug as string;
-  
+
   const [hubData, setHubData] = useState<HubData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -161,6 +163,8 @@ export default function HubPage() {
         padding: '40px 20px',
       }}
     >
+      <EngagementTracker hubId={slug} />
+      <RageClickDetector hubId={slug} />
       <div
         style={{
           maxWidth: '640px',

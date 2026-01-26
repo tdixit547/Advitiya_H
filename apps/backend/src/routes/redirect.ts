@@ -4,6 +4,9 @@ import { Variant } from '../models/Variant';
 import { VariantStats } from '../models/VariantStats';
 import { decisionTreeEngine, IRequestContext, IVariantWithConditions } from '../services/DecisionTreeEngine';
 import { eventLogger } from '../services/EventLogger';
+import { analyticsEventService } from '../services/AnalyticsEventService';
+import { analyticsAggregationService } from '../services/AnalyticsAggregationService';
+import { AnalyticsEventType, SourceType } from '../models/AnalyticsEvent';
 
 const router = Router();
 
@@ -35,9 +38,9 @@ router.get('/:slug', async (req: Request, res: Response) => {
         };
 
         // Get all variants for this hub
-        const variants = await Variant.find({ 
+        const variants = await Variant.find({
             hub_id: hub.hub_id,
-            enabled: true 
+            enabled: true
         }).lean();
 
         // Get stats for scoring
@@ -45,17 +48,23 @@ router.get('/:slug', async (req: Request, res: Response) => {
         const statsMap = new Map(stats.map(s => [s.variant_id, s]));
 
         // Prepare variants with conditions and scores
-        const variantsWithConditions: IVariantWithConditions[] = variants.map(v => ({
-            variant_id: v.variant_id,
-            target_url: v.target_url,
-            title: v.title || v.variant_id,
-            description: v.description,
-            icon: v.icon,
-            priority: v.priority,
-            enabled: v.enabled,
-            score: statsMap.get(v.variant_id)?.score || 0,
-            conditions: v.conditions,
-        }));
+        const variantsWithConditions: IVariantWithConditions[] = variants.map(v => {
+            // Append tracking tokens to target_url
+            const separator = v.target_url.includes('?') ? '&' : '?';
+            const trackedUrl = `${v.target_url}${separator}hub_id=${hub.hub_id}&link_id=${v.variant_id}`;
+
+            return {
+                variant_id: v.variant_id,
+                target_url: trackedUrl,
+                title: v.title || v.variant_id,
+                description: v.description,
+                icon: v.icon,
+                priority: v.priority,
+                enabled: v.enabled,
+                score: statsMap.get(v.variant_id)?.score || 0,
+                conditions: v.conditions,
+            };
+        });
 
         // Filter variants based on context (device, location, time)
         const filteredLinks = decisionTreeEngine.filterVariants(context, variantsWithConditions);
@@ -138,6 +147,196 @@ router.post('/api/analytics/click', async (req: Request, res: Response) => {
 });
 
 /**
+ * Conversion Attribution Endpoint
+ * POST /api/analytics/conversion
+ */
+router.post('/api/analytics/conversion', async (req: Request, res: Response) => {
+    try {
+        const { hub_id, link_id, event_type, revenue, metadata } = req.body;
+
+        if (!hub_id) {
+            return res.status(400).json({ error: 'hub_id required' });
+        }
+
+        const context: IRequestContext = {
+            userAgent: req.headers['user-agent'] || '',
+            country: extractCountry(req),
+            lat: 0,
+            lon: 0,
+            timestamp: new Date(),
+        };
+
+        await analyticsEventService.logEvent({
+            event_type: AnalyticsEventType.CONVERSION,
+            hub_id,
+            link_id: link_id || undefined,
+            variant_id: link_id || undefined, // link_id maps to variant_id
+            session_id: 'external', // Conversion might come from webhook without session context
+            user_agent: context.userAgent,
+            ip_address: getClientIP(req),
+            source_type: SourceType.OTHER,
+            conversion_type: event_type || 'unknown',
+            revenue: typeof revenue === 'number' ? revenue : 0,
+            metadata: metadata || {}
+        });
+
+        return res.json({ success: true });
+    } catch (error) {
+        console.error('Conversion tracking error:', error);
+        return res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+/**
+ * Conversion Metrics Getter Endpoint
+ * GET /api/analytics/hub/:hub_id/conversions
+ */
+router.get('/api/analytics/hub/:hub_id/conversions', async (req: Request, res: Response) => {
+    try {
+        const { hub_id } = req.params;
+        const range = req.query.range as string || '7d';
+
+        // Map range to TimeWindow enum
+        let window = '7d';
+        if (range === '24h') window = '24h';
+        if (range === '1h') window = '1h';
+        if (range === '30d') window = '30d';
+
+        const metrics = await analyticsAggregationService.getConversionMetrics(hub_id, window as any);
+
+        return res.json({ success: true, data: metrics });
+    } catch (error) {
+        console.error('Conversion metrics error:', error);
+        return res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+/**
+ * Referral Metrics Endpoint
+ * GET /api/analytics/hub/:hub_id/referrals
+ */
+router.get('/api/analytics/hub/:hub_id/referrals', async (req: Request, res: Response) => {
+    try {
+        const { hub_id } = req.params;
+        const range = req.query.range as string || '7d';
+
+        // Map range to TimeWindow enum
+        let window = '7d';
+        if (range === '24h') window = '24h';
+        if (range === '1h') window = '1h';
+        if (range === '30d') window = '30d'; // Fallback to 7d in service if not mapped, but let's pass string
+
+        const metrics = await analyticsAggregationService.getReferralMetrics(hub_id, window as any);
+
+        return res.json({ success: true, data: metrics });
+    } catch (error) {
+        console.error('Referral metrics error:', error);
+        return res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+/**
+ * Engagement tracking endpoint
+ * POST /api/analytics/engagement - Logs time & attention metrics
+ */
+router.post('/api/analytics/engagement', async (req: Request, res: Response) => {
+    try {
+        // Use JSON.parse for beacon data if content-type is text/plain (sendBeacon quirk)
+        let body = req.body;
+        if (typeof body === 'string') {
+            try { body = JSON.parse(body); } catch { }
+        }
+
+        const { hub_id, dwell_time, scroll_depth, engagement_score, session_id } = body;
+
+        if (!hub_id) {
+            return res.status(400).json({ error: 'hub_id required' });
+        }
+
+        const context: IRequestContext = {
+            userAgent: req.headers['user-agent'] || '',
+            country: extractCountry(req),
+            lat: 0,
+            lon: 0,
+            timestamp: new Date(),
+        };
+
+        const deviceInfo = decisionTreeEngine.parseDevice(context.userAgent);
+
+        // We use HUB_IMPRESSION type but with extra data to indicate end-of-session engagement
+        // Or we could have a specific type. reusing HUB_IMPRESSION for now to keep it simple 
+        // as "User spent time on Hub". Ideally we'd update the existing session but we are stateless here.
+
+        await analyticsEventService.logEvent({
+            event_type: AnalyticsEventType.HUB_IMPRESSION,
+            hub_id,
+            session_id: session_id || 'unknown', // Tracker should ideally send session_id
+            user_agent: context.userAgent,
+            ip_address: getClientIP(req),
+            source_type: SourceType.DIRECT,
+            dwell_time,
+            scroll_depth,
+            engagement_score
+        });
+
+        return res.json({ success: true });
+    } catch (error) {
+        console.error('Engagement tracking error:', error);
+        return res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+/**
+ * Rage Click tracking endpoint
+ * POST /api/analytics/rage-click - Logs rapid click events indicating frustration
+ */
+router.post('/api/analytics/rage-click', async (req: Request, res: Response) => {
+    try {
+        // Use JSON.parse for beacon data if content-type is text/plain
+        let body = req.body;
+        if (typeof body === 'string') {
+            try { body = JSON.parse(body); } catch { }
+        }
+
+        const { hub_id, variant_id, rage_click_count, element_selector, target_url, session_id } = body;
+
+        if (!hub_id) {
+            return res.status(400).json({ error: 'hub_id required' });
+        }
+
+        const context: IRequestContext = {
+            userAgent: req.headers['user-agent'] || '',
+            country: extractCountry(req),
+            lat: 0,
+            lon: 0,
+            timestamp: new Date(),
+        };
+
+        const deviceInfo = decisionTreeEngine.parseDevice(context.userAgent);
+
+        // Log RAGE_CLICK event
+        await analyticsEventService.logEvent({
+            event_type: AnalyticsEventType.RAGE_CLICK,
+            hub_id,
+            variant_id: variant_id || undefined,
+            session_id: session_id || 'unknown',
+            user_agent: context.userAgent,
+            ip_address: getClientIP(req),
+            source_type: SourceType.DIRECT,
+            rage_click_count,
+            element_selector,
+            target_url
+        });
+
+        return res.json({ success: true });
+    } catch (error) {
+        console.error('Rage click tracking error:', error);
+        return res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+
+/**
  * Debug endpoint - returns resolution details
  * GET /:slug/debug
  */
@@ -159,9 +358,9 @@ router.get('/:slug/debug', async (req: Request, res: Response) => {
             timestamp: new Date(),
         };
 
-        const variants = await Variant.find({ 
+        const variants = await Variant.find({
             hub_id: hub.hub_id,
-            enabled: true 
+            enabled: true
         }).lean();
 
         const stats = await VariantStats.find({ hub_id: hub.hub_id }).lean();

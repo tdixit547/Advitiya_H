@@ -20,6 +20,20 @@ export interface EnhancedEventParams {
     link_position?: number | null;
     source_type?: SourceType;
     metadata?: Record<string, unknown>;
+
+    // Engagement fields (optional for standard clicks)
+    dwell_time?: number;
+    scroll_depth?: number;
+    engagement_score?: 'Low' | 'Medium' | 'High';
+
+    // Rage click fields
+    rage_click_count?: number;
+    element_selector?: string;
+    target_url?: string;
+
+    // Conversion fields
+    conversion_type?: string;
+    revenue?: number;
 }
 
 /**
@@ -87,7 +101,15 @@ export class AnalyticsEventService {
             rule_reason: params.rule_reason || null,
             link_position: params.link_position ?? null,
             source_type: params.source_type || SourceType.DIRECT,
-            metadata: params.metadata || {}
+            metadata: params.metadata || {},
+            dwell_time: params.dwell_time,
+            scroll_depth: params.scroll_depth,
+            engagement_score: params.engagement_score,
+            rage_click_count: params.rage_click_count,
+            element_selector: params.element_selector,
+            target_url: params.target_url,
+            conversion_type: params.conversion_type,
+            revenue: params.revenue
         });
 
         await event.save();
@@ -128,7 +150,15 @@ export class AnalyticsEventService {
                         rule_reason: params.rule_reason || null,
                         link_position: params.link_position ?? null,
                         source_type: params.source_type || SourceType.DIRECT,
-                        metadata: params.metadata || {}
+                        metadata: params.metadata || {},
+                        dwell_time: params.dwell_time,
+                        scroll_depth: params.scroll_depth,
+                        engagement_score: params.engagement_score,
+                        rage_click_count: params.rage_click_count,
+                        element_selector: params.element_selector,
+                        target_url: params.target_url,
+                        conversion_type: params.conversion_type,
+                        revenue: params.revenue
                     };
                 })
             );
