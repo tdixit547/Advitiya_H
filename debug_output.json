@@ -1,0 +1,38 @@
+{
+  "hub": {
+    "hub_id": "heer_com",
+    "slug": "heer-com"
+  },
+  "context": {
+    "userAgent": "node",
+    "country": "unknown",
+    "lat": 0,
+    "lon": 0,
+    "timestamp": "2026-01-27T11:39:15.026Z",
+    "device": {
+      "type": "desktop",
+      "browser": "unknown",
+      "os": "unknown"
+    }
+  },
+  "total_variants": 1,
+  "filtered_links": 0,
+  "links": [],
+  "all_variants_debug": [
+    {
+      "variant_id": "12345",
+      "target_url": "https://gemini.google.com/app/e26862c1ad62c06f",
+      "title": "12345",
+      "priority": 10,
+      "enabled": true,
+      "score": 0,
+      "conditions": {
+        "device_types": [
+          "mobile"
+        ],
+        "countries": [],
+        "time_windows": []
+      }
+    }
+  ]
+}

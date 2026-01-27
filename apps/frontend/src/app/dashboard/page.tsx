@@ -8,12 +8,13 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import Link from 'next/link';
 import type { LinkHub, Variant, HubStats } from '@/types';
-import { getHubs, createHub, getVariants, getHubStats } from '@/lib/api-client';
+import { getHubs, createHub, updateHub, getVariants, getHubStats } from '@/lib/api-client';
 import { useAuth } from '@/contexts/auth-context';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import HubSelector from '@/components/HubSelector';
 import CreateHubModal from '@/components/CreateHubModal';
 import AnalyticsPanel from '@/components/AnalyticsPanel';
+import EditHubModal from '@/components/EditHubModal';
 import { OnboardingModal } from '@/components/SettingsPanel';
 
 export default function DashboardPage() {
@@ -32,6 +33,7 @@ function DashboardContent() {
   const [selectedHub, setSelectedHub] = useState<LinkHub | null>(null);
   const [isLoadingHubs, setIsLoadingHubs] = useState(true);
   const [showCreateHub, setShowCreateHub] = useState(false);
+  const [showEditHub, setShowEditHub] = useState(false);
 
   // Variant and Stats state
   const [variants, setVariants] = useState<Variant[]>([]);
@@ -101,6 +103,12 @@ function DashboardContent() {
     setSelectedHub(newHub);
   };
 
+  const handleUpdateHub = async (hubId: string, input: Parameters<typeof updateHub>[1]) => {
+    const updatedHub = await updateHub(hubId, input);
+    setHubs(hubs.map(h => h.hub_id === hubId ? updatedHub : h));
+    setSelectedHub(updatedHub);
+  };
+
   return (
     <div className="min-h-screen page-bg">
       <div className="max-w-7xl mx-auto p-6 lg:p-8">
@@ -119,12 +127,20 @@ function DashboardContent() {
 
           <div className="flex items-center gap-4">
             {selectedHub && (
-              <button
-                onClick={() => window.open(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}/${selectedHub.slug}/go`, '_blank')}
-                className="btn btn-secondary text-sm py-2 px-4"
-              >
-                View Live →
-              </button>
+              <>
+                <button
+                  onClick={() => setShowEditHub(true)}
+                  className="btn btn-secondary text-sm py-2 px-4 transition-colors hover:bg-[#333]"
+                >
+                  ✎ Edit
+                </button>
+                <button
+                  onClick={() => window.open(`/${selectedHub.slug}`, '_blank')}
+                  className="btn btn-secondary text-sm py-2 px-4"
+                >
+                  View Live →
+                </button>
+              </>
             )}
             <div className="flex items-center gap-2 ml-4 border-l pl-4" style={{ borderColor: 'var(--border-secondary)' }}>
               <span className="text-sm" style={{ color: 'var(--foreground-secondary)' }}>{user?.email}</span>
@@ -312,6 +328,15 @@ function DashboardContent() {
         onClose={() => setShowCreateHub(false)}
         onCreate={handleCreateHub}
       />
+
+      {selectedHub && (
+        <EditHubModal
+          hub={selectedHub}
+          isOpen={showEditHub}
+          onClose={() => setShowEditHub(false)}
+          onUpdate={handleUpdateHub}
+        />
+      )}
 
       {showOnboarding && <OnboardingModal onClose={() => setShowOnboarding(false)} />}
     </div>

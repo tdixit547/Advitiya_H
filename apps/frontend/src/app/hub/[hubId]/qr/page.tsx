@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
+import QRCode from 'qrcode';
 
 // ==================== Types ====================
 
@@ -14,10 +15,7 @@ const SIZE_MAP: Record<QRSize, number> = {
     large: 400,
 };
 
-// ==================== Simple QR Code Generator ====================
-
-// QR Code Generator using qr-creator-like approach via URL API
-// Uses Google Charts API as a fallback since we can't install qrcode.react
+// ==================== QRCode Display Component ====================
 
 interface QRCodeDisplayProps {
     value: string;
@@ -29,14 +27,29 @@ interface QRCodeDisplayProps {
 function QRCodeDisplay({ value, size, fgColor, bgColor }: QRCodeDisplayProps) {
     const [qrSrc, setQrSrc] = useState<string>('');
     const [loading, setLoading] = useState(true);
-    const canvasRef = useRef<HTMLCanvasElement>(null);
 
     useEffect(() => {
-        // Generate QR code using a data URL approach
-        // Since we can't use external packages, we'll use the QR Server API
-        const apiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=${size}x${size}&data=${encodeURIComponent(value)}&bgcolor=${bgColor.replace('#', '')}&color=${fgColor.replace('#', '')}&format=svg`;
-        setQrSrc(apiUrl);
-        setLoading(false);
+        if (!value) return;
+        
+        setLoading(true);
+        // Generate QR code locally
+        QRCode.toDataURL(value, {
+            width: size,
+            margin: 1,
+            color: {
+                dark: fgColor,
+                light: bgColor,
+            },
+            errorCorrectionLevel: 'M',
+        })
+            .then((url) => {
+                setQrSrc(url);
+                setLoading(false);
+            })
+            .catch((err) => {
+                console.error('QR Generation failed:', err);
+                setLoading(false);
+            });
     }, [value, size, fgColor, bgColor]);
 
     if (loading) {
@@ -52,19 +65,17 @@ function QRCodeDisplay({ value, size, fgColor, bgColor }: QRCodeDisplayProps) {
 
     return (
         <div className="qr-code-container">
-            <img
-                src={qrSrc}
-                alt="QR Code"
-                width={size}
-                height={size}
-                style={{
-                    background: bgColor,
-                    borderRadius: '8px'
-                }}
-                crossOrigin="anonymous"
-            />
-            {/* Hidden canvas for PNG download */}
-            <canvas ref={canvasRef} style={{ display: 'none' }} width={size} height={size} />
+            {qrSrc && (
+                <img
+                    src={qrSrc}
+                    alt="QR Code"
+                    width={size}
+                    height={size}
+                    style={{
+                        borderRadius: '8px'
+                    }}
+                />
+            )}
         </div>
     );
 }
@@ -102,6 +113,7 @@ export default function QRCodePage() {
                     setError('Hub not found');
                 }
             } catch (err) {
+                console.error('Hub fetch error:', err);
                 setError('Failed to load hub data');
             } finally {
                 setLoading(false);
@@ -111,7 +123,14 @@ export default function QRCodePage() {
     }, [hubId]);
 
     // Generate QR URL
-    const baseUrl = typeof window !== 'undefined' ? window.location.origin : '';
+    // Use window.location.origin only on client side
+    const [baseUrl, setBaseUrl] = useState('');
+    useEffect(() => {
+        if (typeof window !== 'undefined') {
+            setBaseUrl(window.location.origin);
+        }
+    }, []);
+
     const fullUrl = hubData ? `${baseUrl}/${hubData.slug}` : '';
     const shortUrl = hubData?.short_code ? `${baseUrl}/r/${hubData.short_code}` : '';
 
@@ -125,21 +144,23 @@ export default function QRCodePage() {
         if (!qrValue) return;
 
         try {
-            // Fetch the QR code image and download it
-            const apiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=${size * 2}x${size * 2}&data=${encodeURIComponent(qrValue)}&bgcolor=${bgColor.replace('#', '')}&color=${fgColor.replace('#', '')}&format=png`;
-            const response = await fetch(apiUrl);
-            const blob = await response.blob();
-            const url = URL.createObjectURL(blob);
+            // Generate high-res for download
+            const url = await QRCode.toDataURL(qrValue, {
+                width: size * 2, // 2x size for better quality
+                margin: 1,
+                color: {
+                    dark: fgColor,
+                    light: bgColor,
+                },
+            });
+            
             const link = document.createElement('a');
             link.download = `qr-${hubData?.slug || hubId}.png`;
             link.href = url;
             link.click();
-            URL.revokeObjectURL(url);
         } catch (err) {
             console.error('Download failed:', err);
-            // Fallback: Open in new tab
-            const apiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=${size * 2}x${size * 2}&data=${encodeURIComponent(qrValue)}&bgcolor=${bgColor.replace('#', '')}&color=${fgColor.replace('#', '')}&format=png`;
-            window.open(apiUrl, '_blank');
+            alert('Failed to generate PNG download');
         }
     }, [qrValue, hubData, hubId, size, fgColor, bgColor]);
 
@@ -148,10 +169,17 @@ export default function QRCodePage() {
         if (!qrValue) return;
 
         try {
-            const apiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=${size}x${size}&data=${encodeURIComponent(qrValue)}&bgcolor=${bgColor.replace('#', '')}&color=${fgColor.replace('#', '')}&format=svg`;
-            const response = await fetch(apiUrl);
-            const svgText = await response.text();
-            const blob = new Blob([svgText], { type: 'image/svg+xml' });
+            const svgString = await QRCode.toString(qrValue, {
+                type: 'svg',
+                width: size,
+                margin: 1,
+                color: {
+                    dark: fgColor,
+                    light: bgColor,
+                },
+            });
+            
+            const blob = new Blob([svgString], { type: 'image/svg+xml' });
             const url = URL.createObjectURL(blob);
             const link = document.createElement('a');
             link.download = `qr-${hubData?.slug || hubId}.svg`;
@@ -160,9 +188,7 @@ export default function QRCodePage() {
             URL.revokeObjectURL(url);
         } catch (err) {
             console.error('Download failed:', err);
-            // Fallback: Open in new tab
-            const apiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=${size}x${size}&data=${encodeURIComponent(qrValue)}&bgcolor=${bgColor.replace('#', '')}&color=${fgColor.replace('#', '')}&format=svg`;
-            window.open(apiUrl, '_blank');
+            alert('Failed to generate SVG download');
         }
     }, [qrValue, hubData, hubId, size, fgColor, bgColor]);
 
@@ -261,10 +287,11 @@ export default function QRCodePage() {
                                 <div className="bg-[#111] border border-[#333] rounded-xl p-4">
                                     <div className="text-xs text-[#666] mb-2">Full URL</div>
                                     <div className="flex items-center gap-3">
-                                        <code className="flex-1 text-[#00C853] truncate">{fullUrl}</code>
+                                        <code className="flex-1 text-[#00C853] truncate">{fullUrl || 'Loading...'}</code>
                                         <button
                                             onClick={() => copyUrl(fullUrl)}
                                             className="px-3 py-1 bg-[#222] rounded-lg text-sm hover:bg-[#333]"
+                                            disabled={!fullUrl}
                                         >
                                             {copied ? '✓ Copied' : 'Copy'}
                                         </button>

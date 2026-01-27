@@ -156,7 +156,7 @@ export default function VariantEditor({
           priority,
           weight,
           enabled,
-          conditions: Object.keys(conditions).length > 0 ? conditions : undefined,
+          conditions: conditions,
         };
         
         const updated = await updateVariant(hubId, variantId, input);
@@ -168,7 +168,7 @@ export default function VariantEditor({
           priority,
           weight,
           enabled,
-          conditions: Object.keys(conditions).length > 0 ? conditions : undefined,
+          conditions: conditions,
         };
         
         await onSave(input);

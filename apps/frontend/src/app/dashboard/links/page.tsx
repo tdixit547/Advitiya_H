@@ -340,7 +340,7 @@ function LinksContent() {
                 </div>
                 <div>
                   <p className="text-2xl font-bold text-blue-400">
-                    {variantStats.reduce((sum, s) => sum + s.total_clicks, 0)}
+                    {variantStats.reduce((sum, s) => sum + (s.clicks || 0), 0)}
                   </p>
                   <p className="text-xs text-[#9A9A9A]">Total Clicks</p>
                 </div>

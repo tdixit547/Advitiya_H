@@ -1,8 +1,14 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  // Empty config - turbopack doesn't support webpack watchOptions
-  // Data persistence uses file system but HMR issue needs different solution
+  async rewrites() {
+    return [
+      {
+        source: '/r/:path*',
+        destination: 'http://localhost:3001/r/:path*',
+      },
+    ];
+  },
 };
 
 export default nextConfig;

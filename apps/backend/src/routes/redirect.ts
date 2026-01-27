@@ -512,6 +512,7 @@ router.get('/:slug/debug', async (req: Request, res: Response) => {
             total_variants: variants.length,
             filtered_links: filteredLinks.length,
             links: filteredLinks,
+            all_variants_debug: variantsWithConditions, // Added for debugging
         });
     } catch (error) {
         console.error('Debug error:', error);
