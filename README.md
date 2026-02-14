@@ -1,123 +1,153 @@
-# 🔗 Smart Link Hub - Advanced Link Management Platform
+# Smart Link Hub
 
-**Smart Link Hub** is a powerful, full-stack application designed to be the ultimate open-source alternative to Linktree, with advanced "Smart Routing" capabilities. It allows users to create personalized landing pages ("Hubs") and intelligently route visitors to specific destinations based on their device, location, or time of access.
+**Smart Link Hub** is an advanced, enterprise-grade link management platform designed to provide context-aware routing, real-time analytics, and customizable public profiles. It serves as a robust, self-hosted alternative to commercial link-in-bio services, offering granular control over traffic distribution based on user device, geolocation, and temporal factors.
 
-![Smart Link Hub Dashboard](https://via.placeholder.com/800x400?text=Smart+Link+Hub+Dashboard)
+## Overview
 
-## 🚀 Key Features
+Smart Link Hub distinguishes itself with a decision-tree-based routing engine. Unlike static redirection services, it dynamically evaluates every incoming request against a configurable set of rules to determine the optimal destination URL. This capability allows for sophisticated traffic management strategies, such as directing mobile users to specific app stores, routing international traffic to regional domains, and scheduling time-sensitive campaigns.
 
-### 🧠 Smart Routing Engine
-The core of the platform is its intelligent routing system. Instead of simple static links, Smart Link Hub evaluates incoming traffic against a decision tree of rules:
-*   **📱 Device Targeting:** Automatically route iOS users to the App Store and Android users to the Play Store.
-*   **🌍 Geolocation Targeting:** Send visitors to region-specific pages (e.g., US visitors to `.com`, Indian visitors to `.in`).
-*   **⏰ Time-Based Routing:** Schedule active links for specific campaigns or time windows.
+## Features
 
-### 📊 Comprehensive Analytics
-Gain deep insights into your audience with our real-time analytics dashboard:
-*   **Performance Metrics:** Track Clicks, Impressions, and Click-Through Rates (CTR).
-*   **Geographic Heatmaps:** Visualize where your traffic is coming from.
-*   **Device & OS Breakdown:** Understand what technology your audience uses.
-*   **Time Series Analysis:** View traffic trends over time (24h, 7 days, etc.).
+### Intelligent Routing Engine
+- **Device-Based Routing:** Automatically detects user device types (iOS, Android, Desktop) to serve platform-specific links.
+- **Geographic Targeting:** Routes traffic based on the visitor's country of origin, enabling localized content delivery.
+- **Temporal Scheduling:** Configures links to be active only during specific time windows, days of the week, or recurring intervals.
+- **Weighted Distribution:** Supports probabilistic traffic splitting for A/B testing and load balancing.
 
-### 📱 QR Code Generator (Enhanced)
-*   **Instant Generation:** Create custom QR codes for any Hub.
-*   **Profile Redirection:** QR codes now smartly redirect directly to your Hub Profile, ensuring users always see your latest links.
-*   **High-Quality Downloads:** Download codes in **PNG** or **SVG** formats for print and digital use.
-*   **Customization:** Fully customizable foreground and background colors to match your brand.
+### Comprehensive Analytics
+- **Real-Time Metrics:** Tracks clicks, impressions, and Click-Through Rates (CTR) with immediate data reflection.
+- **Audience Insights:** specialized visualization for geographic distribution, device types, and operating systems.
+- **Traffic Trends:** Time-series analysis to monitor peak engagement periods.
+- **Engagement Monitoring:** Tracks user interactions including scroll depth and "rage clicks" to identify UX bottlenecks.
 
-### 🛠️ Hub Management
-*   **Custom URLs:** Choose your own unique slug (e.g., `/my-brand`).
-*   **Theme Customization:** Personalize your Hub with custom background and accent colors.
-*   **Live Editing:** Update your Hub's details (Slug, Default URL) instantly via the Dashboard.
-*   **Multi-Hub Support:** Manage multiple brands or campaigns from a single account.
+### Hub Management System
+- **Public Profiles:** Generates clean, branded landing pages (e.g., `/brand-name`).
+- **Multi-Tenant Support:** Manages multiple hubs and campaigns from a single dashboard.
+- **Visual Rule Editor:** Intuitive, drag-and-drop interface for building complex routing logic trees.
+- **Live Configuration:** Updates to routing rules and profiles are applied instantly without deployment.
 
-## 🏗️ Technology Stack
+### Integrated Tools
+- **QR Code Generator:** Client-side generation of high-resolution QR codes (PNG/SVG) with customizable styles.
+- **URL Shortener:** Built-in microservice supporting multiple providers (TinyURL, Is.gd, Da.gd) with automatic failover.
 
-This project is built as a **Monorepo** using modern web technologies:
+## Architecture
 
-### **Frontend** (`apps/frontend`)
-*   **Framework:** [Next.js 15+ (App Router)](https://nextjs.org/)
-*   **Language:** TypeScript
-*   **Styling:** Tailwind CSS (v4)
-*   **State Management:** React Hooks & Context
-*   **Maps:** Leaflet (for visual country selection)
-*   **QR Generation:** `qrcode` library (Client-side generation)
+The project is structured as a monorepo containing three primary services:
 
-### **Backend** (`apps/backend`)
-*   **Runtime:** Node.js
-*   **Framework:** Express.js
-*   **Database:** MongoDB (with Mongoose ODM)
-*   **Caching:** Redis (for high-performance rule resolution)
-*   **Language:** TypeScript
-*   **Authentication:** JWT (JSON Web Tokens)
+1.  **Frontend**: Built with **Next.js 16** (App Router), leveraging **Tailwind CSS v4** for styling and **Recharts** for analytics visualization. It interfaces with the backend REST API for all data operations.
+2.  **Backend**: A **Node.js** and **Express** application acting as the core control plane. It handles authentication, decision tree evaluation, and data aggregation.
+    -   **Database**: **MongoDB** utilizing Mongoose for object modeling.
+    -   **Caching**: **Redis** is employed for caching compiled routing trees and high-velocity analytics writes.
+3.  **Shortener Microservice**: A lightweight **Python (Flask)** service dedicated to interfacing with external URL shortening providers.
 
-## 🛠️ Installation & Setup
+## Technology Stack
+
+### Frontend Application
+-   **Framework**: Next.js 16
+-   **Language**: TypeScript
+-   **Styling**: Tailwind CSS v4
+-   **State Management**: React Context & Hooks
+-   **Visualization**: Recharts, React-Leaflet
+-   **Utilities**: dnd-kit (Drag & Drop), qrcode
+
+### Backend API
+-   **Runtime**: Node.js
+-   **Framework**: Express.js
+-   **Language**: TypeScript
+-   **Database**: MongoDB
+-   **Caching**: Redis
+-   **Authentication**: JWT (JSON Web Tokens)
+-   **Validation**: Zod
+
+### Microservices
+-   **URL Shortener**: Python 3.8+, Flask, Pyshorteners
+
+## Getting Started
+
+Follow these instructions to set up the Smart Link Hub development environment.
 
 ### Prerequisites
-*   Node.js (v18+)
-*   MongoDB (or a connection URI)
-*   Redis (optional, but recommended for production performance)
 
-### 1. Clone the Repository
-```bash
-git clone https://github.com/yourusername/smart-link-hub.git
-cd smart-link-hub
-```
+-   **Node.js**: v18.0.0 or higher
+-   **MongoDB**: v5.0 or higher
+-   **Redis**: v6.0 or higher
+-   **Python**: v3.8 or higher (for the shortener service)
 
-### 2. Install Dependencies
-```bash
-npm install
-```
+### Installation
 
-### 3. Environment Configuration
-Create `.env` files in both `apps/frontend` and `apps/backend` based on the `.env.example` files provided.
+1.  **Clone the Repository**
 
-**Backend (`apps/backend/.env`):**
-```env
-PORT=3001
-MONGODB_URI=mongodb://localhost:27017/smart-link-hub
-REDIS_HOST=localhost
-JWT_SECRET=your_super_secret_key
-# ...other configs
-```
+    ```bash
+    git clone https://github.com/tdixit547/Advitiya_H.git
+    cd Advitiya_H
+    ```
 
-**Frontend (`apps/frontend/.env.local`):**
-```env
-NEXT_PUBLIC_API_URL=http://localhost:3001
-```
+2.  **Install Dependencies**
 
-### 4. Seed Database (Optional)
-Populate the database with sample data for testing analytics:
-```bash
-npm run seed
-```
+    ```bash
+    # Install Node.js dependencies for frontend and backend
+    npm install
 
-### 5. Run the Application
-Start both frontend and backend concurrently:
+    # Install Python dependencies for the shortener service
+    cd apps/shortener
+    pip install -r requirements.txt
+    cd ../..
+    ```
+
+### Configuration
+
+1.  **Backend Environment**
+    Create a `.env` file in `apps/backend/`:
+
+    ```env
+    PORT=3001
+    MONGODB_URI=mongodb://localhost:27017/smart-link-hub
+    REDIS_HOST=localhost
+    REDIS_PORT=6379
+    JWT_SECRET=your_secure_random_string
+    JWT_EXPIRES_IN=7d
+    ```
+
+2.  **Frontend Environment**
+    Create a `.env.local` file in `apps/frontend/`:
+
+    ```env
+    NEXT_PUBLIC_API_URL=http://localhost:3001
+    ```
+
+### Running the Application
+
+You can start the services individually or concurrently.
+
+**Concurrent Start (Recommended for Development):**
+
 ```bash
 npm run dev
 ```
-*   **Frontend:** `http://localhost:3000`
-*   **Backend:** `http://localhost:3001`
 
-## 🧪 Testing & Verification
+**Individual Services:**
 
-We have included several utility scripts to verify core functionalities:
-*   `verify_fix.js`: Tests the proxy configuration for Short URLs.
-*   `fetch_short_code.js`: Retrieves generated short codes from the database.
-*   `verify_redirect.js`: Confirms that redirects are pointing to the correct destinations.
+```bash
+# Backend
+npm run dev:backend
 
-## 📝 Recent Updates (Changelog)
+# Frontend
+npm run dev:frontend
 
-*   **Edit Hub Feature:** Added a modal to allow users to update their Hub's slug and default URL directly from the dashboard.
-*   **QR Code Engine:** Migrated from an external API to a local library for faster, more reliable, and privacy-focused QR generation.
-*   **Short URL Logic:** Updated the short URL behavior (`/r/:code`) to redirect users to the Hub Profile page instead of the fallback URL, providing a better user experience for QR code scans.
-*   **Frontend-Backend Integration:** Fixed proxy issues to ensuring seamless routing between the Next.js frontend and Express backend.
-*   **Country Selection Fix:** Resolved a bug where clearing country rules was not persisting to the database.
+# Shortener Service
+cd apps/shortener
+python app.py
+```
 
-## 🤝 Contributing
+## API Reference
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+The backend exposes a RESTful API. Key endpoints include:
 
----
-*Built for the Advitiya 2026 Hackathon.*
+-   `POST /api/auth/login`: Authenticate user.
+-   `GET /api/admin/hubs`: Retrieve managed hubs.
+-   `GET /:slug`: Public endpoint to resolve routing rules and return appropriate links.
+-   `POST /api/analytics/click`: Ingest click telemetry.
+
+## License
+
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
