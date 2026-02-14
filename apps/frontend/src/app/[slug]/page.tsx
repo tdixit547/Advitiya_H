@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
+import Link from 'next/link';
+import Image from 'next/image';
 import LinkButton from '@/components/LinkButton';
 import EngagementTracker from '@/components/EngagementTracker';
 import RageClickDetector from '@/components/RageClickDetector';
@@ -17,6 +19,7 @@ interface FilteredLink {
 }
 
 interface HubProfile {
+  hub_id: string;
   username: string;
   avatar: string | null;
   bio: string;
@@ -136,7 +139,7 @@ export default function HubPage() {
             [ ERROR ]
           </div>
           <div style={{ opacity: 0.8 }}>{error || 'Unknown error'}</div>
-          <a
+          <Link
             href="/"
             style={{
               display: 'inline-block',
@@ -146,7 +149,7 @@ export default function HubPage() {
             }}
           >
             → Return to home
-          </a>
+          </Link>
         </div>
       </div>
     );
@@ -163,8 +166,8 @@ export default function HubPage() {
         padding: '40px 20px',
       }}
     >
-      <EngagementTracker hubId={slug} />
-      <RageClickDetector hubId={slug} />
+      <EngagementTracker hubId={profile.hub_id} />
+      <RageClickDetector hubId={profile.hub_id} />
       <div
         style={{
           maxWidth: '640px',
@@ -175,16 +178,17 @@ export default function HubPage() {
         <header style={{ textAlign: 'center', marginBottom: '48px' }}>
           {/* Avatar */}
           {profile.avatar ? (
-            <img
+            <Image
               src={profile.avatar}
               alt={profile.username}
+              width={120}
+              height={120}
               style={{
-                width: '120px',
-                height: '120px',
                 borderRadius: '50%',
                 border: '3px solid #00FF00',
                 margin: '0 auto 16px',
                 boxShadow: '0 0 30px rgba(0, 255, 0, 0.4)',
+                objectFit: 'cover',
               }}
             />
           ) : (
@@ -263,7 +267,7 @@ export default function HubPage() {
                 <LinkButton
                   key={link.variant_id}
                   variantId={link.variant_id}
-                  hubId={profile.slug}
+                  hubId={profile.hub_id}
                   title={link.title}
                   targetUrl={link.target_url}
                   description={link.description}

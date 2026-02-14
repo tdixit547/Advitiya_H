@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
+import DashboardNav from '@/components/DashboardNav';
 import {
     getHubAnalyticsOverview,
     getHubAnalyticsTimeseries,
@@ -10,12 +11,8 @@ import {
     getHubAnalyticsHeatmap,
     getHubPerformanceClassification,
     getEnhancedKPIs,
-    getTrends,
     getWeekdayWeekend,
-    getCountryBreakdown,
-    getRuleAnalytics,
     getBeforeAfterComparison,
-    getPositionImpact,
     getMLInsights,
     type AnalyticsOverview,
     type AnalyticsTimeseries,
@@ -23,18 +20,11 @@ import {
     type AnalyticsSegments,
     type AnalyticsHeatmap,
     type PerformanceClassification,
-    type PerformanceLink,
     type TimeRange,
     type EnhancedKPIs,
-    type TrendsResponse,
     type WeekdayWeekendAnalysis,
-    type CountryBreakdown,
-    type RuleAnalytics,
     type BeforeAfterComparison,
-    type PositionImpact,
     type MLInsightsResponse,
-    type MLInsight,
-    type TimeGranularity,
 } from '@/lib/api-client';
 import {
     LineChart,
@@ -76,11 +66,17 @@ function MetricCard({ title, value, subtitle, trend, trendValue, icon }: MetricC
         down: '↓',
         stable: '→',
     };
+    const iconMap: Record<string, React.ReactNode> = {
+        views: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#00C853" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" /><circle cx="12" cy="12" r="3" /></svg>,
+        users: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#00C853" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" /></svg>,
+        clicks: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#00C853" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 3l7.07 16.97 2.51-7.39 7.39-2.51L3 3z" /><path d="M13 13l6 6" /></svg>,
+        chart: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#00C853" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18" /><polyline points="17 6 23 6 23 12" /></svg>,
+    };
 
     return (
         <div className="bg-[#111] border border-[#333] rounded-xl p-5 hover:border-[#00C853]/50 transition-colors">
             <div className="flex items-start justify-between mb-3">
-                <span className="text-2xl">{icon}</span>
+                <span className="flex items-center">{iconMap[icon] || icon}</span>
                 {trend && (
                     <span className={`text-sm font-medium ${trendColors[trend]}`}>
                         {trendIcons[trend]} {trendValue !== undefined ? `${Math.abs(trendValue).toFixed(1)}%` : ''}
@@ -135,7 +131,7 @@ export default function AnalysisPage() {
     const router = useRouter();
     const hubId = params.hubId as string;
 
-    const [timeRange, setTimeRange] = useState<TimeRange>('24h');
+    const [timeRange, setTimeRange] = useState<TimeRange>('1h');
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
@@ -239,7 +235,7 @@ export default function AnalysisPage() {
         return (
             <div className="min-h-screen bg-black flex items-center justify-center">
                 <div className="text-center">
-                    <div className="text-4xl mb-4">📊</div>
+                    <div className="flex justify-center mb-4"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="20" x2="18" y2="10" /><line x1="12" y1="20" x2="12" y2="4" /><line x1="6" y1="20" x2="6" y2="14" /></svg></div>
                     <h1 className="text-xl font-bold text-white mb-2">Analytics Error</h1>
                     <p className="text-[#888] mb-4">{error}</p>
                     <button
@@ -277,18 +273,13 @@ export default function AnalysisPage() {
 
     return (
         <div className="min-h-screen bg-black text-white">
+            <DashboardNav />
             {/* Header */}
-            <header className="sticky top-0 z-10 bg-black/80 backdrop-blur-md border-b border-[#333]">
+            <header className="sticky top-[49px] z-10 bg-black/80 backdrop-blur-md border-b border-[#333]">
                 <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
                     <div className="flex items-center gap-4">
-                        <button
-                            onClick={() => router.push('/dashboard')}
-                            className="text-[#888] hover:text-white transition-colors"
-                        >
-                            ← Back to Dashboard
-                        </button>
                         <h1 className="text-xl font-bold">
-                            📊 Analytics: <span className="text-[#00C853]">{hubId}</span>
+                            Analytics: <span className="text-[#00C853]">{hubId}</span>
                         </h1>
                     </div>
                     <div className="flex items-center gap-3">
@@ -296,24 +287,24 @@ export default function AnalysisPage() {
                             onClick={handleOpenPerformanceModal}
                             className="px-4 py-2 bg-gradient-to-r from-[#00C853] to-[#69F0AE] text-black rounded-lg font-medium hover:opacity-90 transition-opacity"
                         >
-                            🏆 Top & Least
+                            Top & Least
                         </button>
                         <div className="relative group">
                             <button className="px-4 py-2 bg-[#222] text-white rounded-lg font-medium border border-[#444] hover:bg-[#333] transition-colors">
-                                📥 Export Report
+                                Export Report
                             </button>
                             <div className="absolute right-0 mt-2 w-48 bg-[#111] border border-[#333] rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50">
                                 <button
                                     onClick={() => handleExport('csv')}
                                     className="w-full px-4 py-3 text-left hover:bg-[#222] rounded-t-lg text-sm"
                                 >
-                                    📄 Export as CSV
+                                    Export as CSV
                                 </button>
                                 <button
                                     onClick={() => handleExport('pdf')}
                                     className="w-full px-4 py-3 text-left hover:bg-[#222] rounded-b-lg text-sm border-t border-[#333]"
                                 >
-                                    📊 Export as PDF
+                                    Export as PDF
                                 </button>
                             </div>
                         </div>
@@ -332,24 +323,24 @@ export default function AnalysisPage() {
                             <h2 className="text-lg font-semibold mb-4 text-[#888]">Overview</h2>
                             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                                 <MetricCard
-                                    icon="👁️"
+                                    icon="views"
                                     title="Total Visits"
                                     value={overview?.data.total_visits?.toLocaleString() || '0'}
                                     trend={overview?.data.traffic_trend}
                                     trendValue={overview?.data.trend_percentage}
                                 />
                                 <MetricCard
-                                    icon="👤"
+                                    icon="users"
                                     title="Unique Users"
                                     value={overview?.data.unique_users?.toLocaleString() || '0'}
                                 />
                                 <MetricCard
-                                    icon="🖱️"
+                                    icon="clicks"
                                     title="Total Clicks"
                                     value={overview?.data.total_clicks?.toLocaleString() || '0'}
                                 />
                                 <MetricCard
-                                    icon="📈"
+                                    icon="chart"
                                     title="Average CTR"
                                     value={`${overview?.data.average_ctr?.toFixed(2) || '0'}%`}
                                     subtitle={overview?.data.top_performing_link?.name || 'No clicks yet'}
@@ -460,7 +451,7 @@ export default function AnalysisPage() {
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        {links?.data.map((link, i) => (
+                                        {links?.data.map((link) => (
                                             <tr key={link.link_id} className="border-b border-[#222] hover:bg-[#1a1a1a]">
                                                 <td className="py-3 pr-4">
                                                     <div className="text-white truncate max-w-[200px]" title={link.target_url}>
@@ -504,7 +495,7 @@ export default function AnalysisPage() {
                                                     cx="50%"
                                                     cy="50%"
                                                     outerRadius={80}
-                                                    label={({ type, percentage }) => `${type}: ${percentage}%`}
+                                                    label={({ name, percent }) => `${name}: ${((percent ?? 0) * 100).toFixed(0)}%`}
                                                 >
                                                     {segments.data.devices.map((_, index) => (
                                                         <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
@@ -527,7 +518,7 @@ export default function AnalysisPage() {
                                         <div className="space-y-3">
                                             {segments.data.locations.slice(0, 5).map((loc, i) => (
                                                 <div key={loc.location} className="flex items-center gap-3">
-                                                    <div className="w-6 text-lg">{['🥇', '🥈', '🥉', '4️⃣', '5️⃣'][i]}</div>
+                                                    <div className="w-6 text-lg text-[#00C853] font-bold">{i + 1}</div>
                                                     <div className="flex-1">
                                                         <div className="flex justify-between mb-1">
                                                             <span className="text-sm text-white">{loc.location}</span>
@@ -612,8 +603,8 @@ export default function AnalysisPage() {
                         {/* Enhanced KPIs with Day-over-Day Deltas */}
                         <section>
                             <h2 className="text-lg font-semibold mb-4 text-[#888] flex items-center gap-2">
-                                📊 Enhanced KPIs
-                                {enhancedLoading && <span className="animate-spin">⏳</span>}
+                                Enhanced KPIs
+                                {enhancedLoading && <span className="animate-spin inline-block w-4 h-4 border-2 border-[#00C853] border-t-transparent rounded-full"></span>}
                             </h2>
                             {enhancedKPIs ? (
                                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -651,7 +642,7 @@ export default function AnalysisPage() {
 
                         {/* Before vs After Comparison */}
                         <section>
-                            <h2 className="text-lg font-semibold mb-4 text-[#888]">📈 7-Day Comparison (Before vs After)</h2>
+                            <h2 className="text-lg font-semibold mb-4 text-[#888]">7-Day Comparison (Before vs After)</h2>
                             {comparison ? (
                                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                                     {comparison.metrics.map((m) => (
@@ -690,12 +681,12 @@ export default function AnalysisPage() {
 
                         {/* Weekday vs Weekend Engagement */}
                         <section>
-                            <h2 className="text-lg font-semibold mb-4 text-[#888]">📅 Weekday vs Weekend Engagement</h2>
+                            <h2 className="text-lg font-semibold mb-4 text-[#888]">Weekday vs Weekend Engagement</h2>
                             {weekdayWeekend ? (
                                 <div className="bg-[#111] border border-[#333] rounded-xl p-6">
                                     <div className="grid grid-cols-2 gap-6 mb-4">
                                         <div className="text-center">
-                                            <div className="text-4xl mb-2">💼</div>
+                                            <div className="flex justify-center mb-2"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2" /><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" /></svg></div>
                                             <div className="text-xs text-[#666] uppercase mb-1">Weekday Avg</div>
                                             <div className="text-2xl font-bold text-white">
                                                 {weekdayWeekend.weekdayAvg?.toFixed(1) || 0}
@@ -703,7 +694,7 @@ export default function AnalysisPage() {
                                             <div className="text-xs text-[#888]">clicks/day</div>
                                         </div>
                                         <div className="text-center">
-                                            <div className="text-4xl mb-2">🎉</div>
+                                            <div className="flex justify-center mb-2"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10" /><path d="M8 14s1.5 2 4 2 4-2 4-2" /><line x1="9" y1="9" x2="9.01" y2="9" /><line x1="15" y1="9" x2="15.01" y2="9" /></svg></div>
                                             <div className="text-xs text-[#666] uppercase mb-1">Weekend Avg</div>
                                             <div className="text-2xl font-bold text-white">
                                                 {weekdayWeekend.weekendAvg?.toFixed(1) || 0}
@@ -720,7 +711,7 @@ export default function AnalysisPage() {
                                     </div>
                                     {weekdayWeekend.recommendation && (
                                         <div className="mt-3 text-xs text-[#888] text-center">
-                                            💡 {weekdayWeekend.recommendation}
+                                            {weekdayWeekend.recommendation}
                                         </div>
                                     )}
                                 </div>
@@ -733,7 +724,7 @@ export default function AnalysisPage() {
 
                         {/* ML Insights & Recommendations */}
                         <section>
-                            <h2 className="text-lg font-semibold mb-4 text-[#888]">🤖 AI Insights & Recommendations</h2>
+                            <h2 className="text-lg font-semibold mb-4 text-[#888]">AI Insights & Recommendations</h2>
                             {mlInsights && mlInsights.insights && mlInsights.insights.length > 0 ? (
                                 <div className="space-y-3">
                                     {mlInsights.insights.map((insight, i) => (
@@ -746,9 +737,9 @@ export default function AnalysisPage() {
                                         >
                                             <div className="flex items-start gap-3">
                                                 <span className="text-2xl">
-                                                    {insight.type === 'opportunity' ? '🚀' :
-                                                        insight.type === 'warning' ? '⚠️' :
-                                                            insight.type === 'success' ? '✅' : '💡'}
+                                                    {insight.type === 'opportunity' ? '→' :
+                                                        insight.type === 'warning' ? '!' :
+                                                            insight.type === 'success' ? '✓' : 'i'}
                                                 </span>
                                                 <div className="flex-1">
                                                     <div className="text-white font-medium">{insight.title}</div>
@@ -783,7 +774,7 @@ export default function AnalysisPage() {
                                 </div>
                             ) : (
                                 <div className="bg-[#111] border border-[#333] rounded-xl p-8 text-center">
-                                    <div className="text-4xl mb-3">🤖</div>
+                                    <div className="flex justify-center mb-3"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><rect x="4" y="4" width="16" height="16" rx="2" ry="2" /><rect x="9" y="9" width="6" height="6" /><line x1="9" y1="1" x2="9" y2="4" /><line x1="15" y1="1" x2="15" y2="4" /><line x1="9" y1="20" x2="9" y2="23" /><line x1="15" y1="20" x2="15" y2="23" /><line x1="20" y1="9" x2="23" y2="9" /><line x1="20" y1="14" x2="23" y2="14" /><line x1="1" y1="9" x2="4" y2="9" /><line x1="1" y1="14" x2="4" y2="14" /></svg></div>
                                     <div className="text-[#666]">
                                         {enhancedLoading ? 'Generating AI insights...' : 'No insights available yet. Keep collecting data!'}
                                     </div>
@@ -803,7 +794,7 @@ export default function AnalysisPage() {
                         <div className="flex items-center justify-between p-6 border-b border-[#333]">
                             <div>
                                 <h2 className="text-xl font-bold text-white flex items-center gap-2">
-                                    🏆 Link Performance Classification
+                                    Link Performance Classification
                                 </h2>
                                 <p className="text-sm text-[#888] mt-1">
                                     Based on Performance Score = rank_score × CTR (time-decayed)

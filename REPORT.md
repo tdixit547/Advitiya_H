@@ -51,18 +51,18 @@ The project follows a modern **Monorepo** architecture, ensuring code cohesion a
 
 ```mermaid
 graph TD
-    User[Visitor] -->|Click/Scan| Front[Next.js Frontend / Proxy]
-    Front -->|/r/* Requests| Back[Express Backend]
+    User["Visitor"] -->|"Click/Scan"| Front["Next.js Frontend / Proxy"]
+    Front -->|"/r/* Requests"| Back["Express Backend"]
     
     subgraph Backend Services
-        Back -->|Auth Check| Mongo[(MongoDB)]
-        Back -->|Resolve Rules| Redis[(Redis Cache)]
-        Back -->|Log Events| Analytics[Analytics Service]
+        Back -->|"Auth Check"| Mongo[("MongoDB")]
+        Back -->|"Resolve Rules"| Redis[("Redis Cache")]
+        Back -->|"Log Events"| Analytics["Analytics Service"]
     end
     
     subgraph Frontend Pages
-        Front -->|/dashboard| Dashboard[Admin Dashboard]
-        Front -->|/[slug]| Profile[Public Profile Page]
+        Front -->|"/dashboard"| Dashboard["Admin Dashboard"]
+        Front -->|"/[slug]"| Profile["Public Profile Page"]
     end
 ```
 

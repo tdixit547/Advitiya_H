@@ -29,13 +29,13 @@ export default function LinkButton({
     e.preventDefault();
     setIsLoading(true);
 
-    try {
-      // Track the click before opening the URL
-      await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}/api/analytics/click`, {
+      // Track the click before opening the URL - FIRE AND FORGET
+      fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}/api/analytics/click`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
+        keepalive: true, // Ensure request survives page unload/navigation
         body: JSON.stringify({
           hub_id: hubId,
           variant_id: variantId,
@@ -44,10 +44,8 @@ export default function LinkButton({
             timestamp: new Date().toISOString(),
           },
         }),
-      });
-    } catch (error) {
-      console.error('Failed to track click:', error);
-    }
+      }).catch(err => console.error('Failed to track click:', err)); // Catch in background
+
 
     // Open the URL in a new tab
     window.open(targetUrl, '_blank', 'noopener,noreferrer');

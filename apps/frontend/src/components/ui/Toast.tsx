@@ -73,7 +73,7 @@ function Toast({ toast, onClose }: { toast: ToastMessage; onClose: () => void })
 
   const iconMap = {
     success: '✓',
-    error: '✕',
+    error: '×',
     info: 'ℹ',
   };
 
@@ -102,7 +102,7 @@ function Toast({ toast, onClose }: { toast: ToastMessage; onClose: () => void })
           className="ml-auto text-[#666] hover:text-white transition-colors p-1"
           aria-label="Dismiss notification"
         >
-          ✕
+          ×
         </button>
       </div>
     </div>

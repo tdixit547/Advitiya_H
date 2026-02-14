@@ -2,8 +2,10 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { getHubStats } from '@/lib/api-client';
-import type { HubStats } from '@/types';
+import DashboardNav from '@/components/DashboardNav';
+import { shortenHubUrl, getShortenerStatus } from '@/lib/api-client';
+import type { ShortenerProvider } from '@/lib/api-client';
+import QRCode from 'qrcode';
 
 // ==================== Types ====================
 
@@ -11,8 +13,16 @@ interface HubData {
     hub_id: string;
     slug: string;
     short_code?: string;
+    external_short_url?: string;
     default_url: string;
 }
+
+// ==================== Provider Config ====================
+
+const PROVIDER_OPTIONS: { value: ShortenerProvider; label: string; icon: string }[] = [
+    { value: 'tinyurl', label: 'TinyURL', icon: '🔗' },
+    { value: 'dagd', label: 'da.gd', icon: '🚀' },
+];
 
 // ==================== Main Component ====================
 
@@ -24,23 +34,24 @@ export default function HubToolsPage() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [hubData, setHubData] = useState<HubData | null>(null);
-    const [stats, setStats] = useState<HubStats | null>(null);
     const [copied, setCopied] = useState<string | null>(null);
 
-    // Fetch hub data and stats
+    // Shortener state
+    const [shortenerAvailable, setShortenerAvailable] = useState(false);
+    const [selectedProvider, setSelectedProvider] = useState<ShortenerProvider>('tinyurl');
+    const [shortening, setShortening] = useState(false);
+    const [externalShortUrl, setExternalShortUrl] = useState<string | null>(null);
+    const [shortenError, setShortenError] = useState<string | null>(null);
+
+    // Fetch hub data
     useEffect(() => {
         const fetchData = async () => {
             try {
                 const token = localStorage.getItem('auth_token');
-                
-                // Fetch hub data
                 const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}/api/admin/hubs`, {
                     headers: { Authorization: `Bearer ${token}` }
                 });
-
-                if (!res.ok) {
-                    throw new Error('Failed to fetch hubs');
-                }
+                if (!res.ok) throw new Error('Failed to fetch hubs');
 
                 const data = await res.json();
                 const hub = data.find?.((h: HubData) => h.hub_id === hubId) ||
@@ -48,16 +59,16 @@ export default function HubToolsPage() {
 
                 if (hub) {
                     setHubData(hub);
-                    
-                    // Fetch stats for this hub
-                    try {
-                        const hubStats = await getHubStats(hubId);
-                        setStats(hubStats);
-                    } catch (err) {
-                        console.warn('Could not fetch stats:', err);
-                    }
+                    if (hub.external_short_url) setExternalShortUrl(hub.external_short_url);
                 } else {
                     setError('Hub not found');
+                }
+
+                try {
+                    const status = await getShortenerStatus();
+                    setShortenerAvailable(status.available);
+                } catch {
+                    setShortenerAvailable(false);
                 }
             } catch (err) {
                 console.error('Failed to load hub:', err);
@@ -69,12 +80,78 @@ export default function HubToolsPage() {
         fetchData();
     }, [hubId]);
 
-    // Generate URLs
+    // URL helpers
     const baseUrl = typeof window !== 'undefined' ? window.location.origin : '';
     const fullUrl = hubData ? `${baseUrl}/${hubData.slug}` : '';
     const shortUrl = hubData?.short_code ? `${baseUrl}/r/${hubData.short_code}` : '';
 
-    // Copy to clipboard
+    // QR code value — prefers external short URL, then internal short, then full
+    const qrValue = externalShortUrl || shortUrl || fullUrl;
+
+    // QR code state
+    const [qrSrc, setQrSrc] = useState<string>('');
+    const [qrLoading, setQrLoading] = useState(true);
+    const [qrDark, setQrDark] = useState(false); // false = white bg, true = dark bg
+
+    // QR color scheme
+    const qrColors = qrDark
+        ? { dark: '#00C853', light: '#0a0a0a' }
+        : { dark: '#000000', light: '#FFFFFF' };
+
+    // Generate QR code whenever qrValue or theme changes
+    useEffect(() => {
+        if (!qrValue) return;
+        setQrLoading(true);
+        QRCode.toDataURL(qrValue, {
+            width: 220,
+            margin: 1,
+            color: qrColors,
+            errorCorrectionLevel: 'M',
+        })
+            .then((url) => { setQrSrc(url); setQrLoading(false); })
+            .catch(() => setQrLoading(false));
+    }, [qrValue, qrDark]);
+
+    // Download QR as PNG
+    const downloadQRPNG = useCallback(async () => {
+        if (!qrValue) return;
+        try {
+            const url = await QRCode.toDataURL(qrValue, {
+                width: 600,
+                margin: 1,
+                color: qrColors,
+            });
+            const link = document.createElement('a');
+            link.download = `qr-${hubData?.slug || hubId}.png`;
+            link.href = url;
+            link.click();
+        } catch (err) {
+            console.error('QR download failed:', err);
+        }
+    }, [qrValue, hubData, hubId, qrDark]);
+
+    // Download QR as SVG
+    const downloadQRSVG = useCallback(async () => {
+        if (!qrValue) return;
+        try {
+            const svgString = await QRCode.toString(qrValue, {
+                type: 'svg',
+                width: 400,
+                margin: 1,
+                color: qrColors,
+            });
+            const blob = new Blob([svgString], { type: 'image/svg+xml' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.download = `qr-${hubData?.slug || hubId}.svg`;
+            link.href = url;
+            link.click();
+            URL.revokeObjectURL(url);
+        } catch (err) {
+            console.error('QR download failed:', err);
+        }
+    }, [qrValue, hubData, hubId, qrDark]);
+
     const copyToClipboard = useCallback(async (text: string, label: string) => {
         try {
             await navigator.clipboard.writeText(text);
@@ -85,10 +162,28 @@ export default function HubToolsPage() {
         }
     }, []);
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const handleShortenUrl = async () => {
+        if (!hubData) return;
+        setShortening(true);
+        setShortenError(null);
+        try {
+            const result = await shortenHubUrl(hubData.hub_id, selectedProvider);
+            setExternalShortUrl(result.external_short_url);
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        } catch (err: any) {
+            setShortenError(err.message || 'Failed to shorten URL');
+        } finally {
+            setShortening(false);
+        }
+    };
+
+    // ==================== Loading / Error States ====================
+
     if (loading) {
         return (
             <div className="min-h-screen bg-black flex items-center justify-center">
-                <div className="w-10 h-10 border-3 border-[#00C853] border-t-transparent rounded-full animate-spin"></div>
+                <div className="w-10 h-10 border-3 border-[#00C853] border-t-transparent rounded-full animate-spin" />
             </div>
         );
     }
@@ -97,8 +192,12 @@ export default function HubToolsPage() {
         return (
             <div className="min-h-screen bg-black flex items-center justify-center">
                 <div className="text-center">
-                    <div className="text-5xl mb-4">❌</div>
-                    <h1 className="text-xl font-bold text-white mb-2">Error</h1>
+                    <div className="w-16 h-16 mx-auto mb-4 bg-red-500/10 rounded-2xl flex items-center justify-center">
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#ef4444" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <circle cx="12" cy="12" r="10" /><line x1="15" y1="9" x2="9" y2="15" /><line x1="9" y1="9" x2="15" y2="15" />
+                        </svg>
+                    </div>
+                    <h1 className="text-xl font-bold text-white mb-2">Something went wrong</h1>
                     <p className="text-[#888] mb-6">{error}</p>
                     <button
                         onClick={() => router.push('/dashboard')}
@@ -111,219 +210,327 @@ export default function HubToolsPage() {
         );
     }
 
+    // ==================== Render ====================
+
     return (
         <div className="min-h-screen bg-black text-white">
-            {/* Header */}
-            <header className="sticky top-0 z-10 bg-black/80 backdrop-blur-md border-b border-[#333]">
-                <div className="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between">
-                    <div className="flex items-center gap-4">
-                        <button
-                            onClick={() => router.push('/dashboard')}
-                            className="text-[#888] hover:text-white transition-colors flex items-center gap-2"
-                        >
-                            <span>←</span>
-                            <span>Dashboard</span>
-                        </button>
-                        <h1 className="text-xl font-bold">
-                            🛠️ Hub Tools: <span className="text-[#00C853]">/{hubData?.slug}</span>
+            <DashboardNav />
+
+            {/* Page Header */}
+            <header className="sticky top-[49px] z-10 bg-black/80 backdrop-blur-md border-b border-[#222]">
+                <div className="max-w-4xl mx-auto px-6 py-5 flex items-center justify-between">
+                    <div>
+                        <h1 className="text-2xl font-bold tracking-tight">
+                            Tools
                         </h1>
+                        <p className="text-sm text-[#666] mt-0.5">
+                            Utilities for <span className="text-[#00C853] font-medium">/{hubData?.slug}</span>
+                        </p>
                     </div>
+                    <button
+                        onClick={() => router.push('/dashboard')}
+                        className="px-4 py-2 text-sm text-[#888] border border-[#333] rounded-lg hover:text-white hover:border-[#555] transition-colors"
+                    >
+                        ← Back
+                    </button>
                 </div>
             </header>
 
-            <main className="max-w-5xl mx-auto px-6 py-12">
-                {/* URL Display Section */}
-                <section className="mb-12">
-                    <h2 className="text-2xl font-bold mb-6">Your Smart URLs</h2>
-                    <div className="grid md:grid-cols-2 gap-6">
-                        {/* Full URL Card */}
-                        <div className="bg-[#0f0f0f] border border-[#333] rounded-2xl p-6">
-                            <div className="flex items-center gap-3 mb-4">
-                                <div className="w-10 h-10 bg-[#222] rounded-xl flex items-center justify-center">
-                                    🔗
-                                </div>
-                                <div>
-                                    <h3 className="font-semibold text-white">Full URL</h3>
-                                    <p className="text-xs text-[#888]">Your smart link slug</p>
-                                </div>
-                            </div>
-                            <div className="bg-[#111] border border-[#333] rounded-xl px-4 py-3 mb-4">
-                                <code className="text-[#00C853] text-sm break-all">{fullUrl}</code>
+            <main className="max-w-4xl mx-auto px-6 py-10 space-y-8">
+
+                {/* ─── Section 1: Share Your Link ─── */}
+                <section>
+                    <div className="flex items-center gap-3 mb-5">
+                        <div className="w-8 h-8 bg-[#00C853]/15 rounded-lg flex items-center justify-center">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#00C853" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                                <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
+                                <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
+                            </svg>
+                        </div>
+                        <h2 className="text-lg font-semibold">Share Your Link</h2>
+                    </div>
+
+                    <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-2xl divide-y divide-[#1a1a1a]">
+                        {/* Full URL */}
+                        <div className="p-5 flex items-center justify-between gap-4">
+                            <div className="min-w-0 flex-1">
+                                <div className="text-xs text-[#666] uppercase tracking-wider font-medium mb-1.5">Full URL</div>
+                                <code className="text-[#ccc] text-sm break-all font-mono">{fullUrl}</code>
                             </div>
                             <button
                                 onClick={() => copyToClipboard(fullUrl, 'full')}
-                                className="w-full py-3 bg-[#222] text-white rounded-xl font-medium hover:bg-[#333] transition-colors"
+                                className={`shrink-0 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+                                    copied === 'full'
+                                        ? 'bg-[#00C853]/20 text-[#00C853]'
+                                        : 'bg-[#161616] text-[#888] hover:text-white hover:bg-[#222] border border-[#222] hover:border-[#444]'
+                                }`}
                             >
-                                {copied === 'full' ? '✅ Copied!' : '📋 Copy Full URL'}
+                                {copied === 'full' ? '✓ Copied' : 'Copy'}
                             </button>
                         </div>
 
-                        {/* Short URL Card */}
-                        <div className="bg-[#0f0f0f] border border-[#00C853]/30 rounded-2xl p-6">
-                            <div className="flex items-center gap-3 mb-4">
-                                <div className="w-10 h-10 bg-[#00C853]/20 rounded-xl flex items-center justify-center">
-                                    ⚡
+
+
+                        {/* External Short URL (if generated) */}
+                        {externalShortUrl && (
+                            <div className="p-5 flex items-center justify-between gap-4">
+                                <div className="min-w-0 flex-1">
+                                    <div className="flex items-center gap-2 mb-1.5">
+                                        <div className="text-xs text-[#666] uppercase tracking-wider font-medium">External Short URL</div>
+                                        <div className="w-1.5 h-1.5 bg-[#00C853] rounded-full" />
+                                    </div>
+                                    <code className="text-[#00C853] text-sm break-all font-mono font-bold">{externalShortUrl}</code>
                                 </div>
-                                <div>
-                                    <h3 className="font-semibold text-white">Short URL</h3>
-                                    <p className="text-xs text-[#00C853]">Compact & easy to share</p>
+                                <div className="shrink-0 flex items-center gap-2">
+                                    <button
+                                        onClick={() => copyToClipboard(externalShortUrl, 'external')}
+                                        className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+                                            copied === 'external'
+                                                ? 'bg-[#00C853]/20 text-[#00C853]'
+                                                : 'bg-[#00C853] text-black hover:bg-[#00E676]'
+                                        }`}
+                                    >
+                                        {copied === 'external' ? '✓ Copied' : 'Copy'}
+                                    </button>
+                                    <button
+                                        onClick={() => window.open(externalShortUrl, '_blank')}
+                                        className="px-3 py-2 rounded-lg text-sm text-[#888] hover:text-white bg-[#161616] border border-[#222] hover:border-[#444] transition-colors"
+                                        title="Open in new tab"
+                                    >
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" /><polyline points="15 3 21 3 21 9" /><line x1="10" y1="14" x2="21" y2="3" />
+                                        </svg>
+                                    </button>
                                 </div>
                             </div>
-                            {shortUrl ? (
-                                <>
-                                    <div className="bg-[#111] border border-[#00C853]/30 rounded-xl px-4 py-3 mb-4">
-                                        <code className="text-[#00C853] text-sm font-bold">{shortUrl}</code>
-                                    </div>
-                                    <button
-                                        onClick={() => copyToClipboard(shortUrl, 'short')}
-                                        className="w-full py-3 bg-[#00C853] text-black rounded-xl font-medium hover:bg-[#00E676] transition-colors"
-                                    >
-                                        {copied === 'short' ? '✅ Copied!' : '📋 Copy Short URL'}
-                                    </button>
-                                </>
-                            ) : (
-                                <div className="bg-[#111] border border-[#333] rounded-xl px-4 py-3 mb-4">
-                                    <p className="text-[#666] text-sm text-center">
-                                        Short URL not available for this hub
-                                    </p>
-                                </div>
-                            )}
-                        </div>
+                        )}
                     </div>
                 </section>
 
-                {/* Tools Section */}
-                <section className="mb-12">
-                    <h2 className="text-2xl font-bold mb-6">Tools</h2>
-                    <div className="grid md:grid-cols-2 gap-6">
-                        {/* QR Code Generator Card */}
+                {/* ─── Section 2: QR Code ─── */}
+                <section>
+                    <div className="flex items-center justify-between mb-5">
+                        <div className="flex items-center gap-3">
+                            <div className="w-8 h-8 bg-[#00C853]/15 rounded-lg flex items-center justify-center">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#00C853" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                                    <rect x="3" y="3" width="7" height="7" /><rect x="14" y="3" width="7" height="7" /><rect x="3" y="14" width="7" height="7" /><rect x="14" y="14" width="7" height="7" />
+                                </svg>
+                            </div>
+                            <h2 className="text-lg font-semibold">QR Code</h2>
+                        </div>
                         <button
                             onClick={() => router.push(`/hub/${hubId}/qr`)}
-                            className="bg-gradient-to-br from-[#1a1a2e] to-[#16213e] border border-[#333] rounded-2xl p-8 text-left
-                                       hover:border-[#00C853]/50 hover:shadow-lg hover:shadow-[#00C853]/10 transition-all duration-300
-                                       group"
+                            className="text-xs text-[#555] hover:text-[#00C853] transition-colors"
                         >
-                            <div className="w-16 h-16 bg-[#00C853]/20 rounded-2xl flex items-center justify-center mb-6 
-                                          group-hover:scale-110 group-hover:bg-[#00C853]/30 transition-all duration-300">
-                                <span className="text-4xl">📱</span>
-                            </div>
-                            <h3 className="text-xl font-bold text-white mb-2">QR Code Generator</h3>
-                            <p className="text-[#888] mb-4">
-                                Create scannable QR codes for your smart link. Download in PNG or SVG format with customizable size and themes.
-                            </p>
-                            <div className="flex items-center gap-2 text-[#00C853] font-medium">
-                                <span>Generate QR Code</span>
-                                <span className="group-hover:translate-x-1 transition-transform">→</span>
-                            </div>
+                            Customize →
                         </button>
+                    </div>
 
-                        {/* Link Shortener Info Card */}
-                        <div className="bg-gradient-to-br from-[#1a2e1a] to-[#0f1f0f] border border-[#333] rounded-2xl p-8">
-                            <div className="w-16 h-16 bg-[#00C853]/20 rounded-2xl flex items-center justify-center mb-6">
-                                <span className="text-4xl">🔗</span>
+                    <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-2xl p-6">
+                        <div className="flex flex-col sm:flex-row items-center gap-6">
+                            {/* QR Code Preview */}
+                            <div className="shrink-0">
+                                <div className={`p-3 rounded-xl transition-colors duration-200 ${qrDark ? 'bg-[#0a0a0a] border border-[#222]' : 'bg-white'}`} style={{ width: 156, height: 156 }}>
+                                    {qrLoading ? (
+                                        <div className="w-full h-full flex items-center justify-center">
+                                            <div className="w-6 h-6 border-2 border-[#00C853] border-t-transparent rounded-full animate-spin" />
+                                        </div>
+                                    ) : qrSrc ? (
+                                        // eslint-disable-next-line @next/next/no-img-element
+                                        <img src={qrSrc} alt="QR Code" width={132} height={132} className="rounded" />
+                                    ) : (
+                                        <div className="w-full h-full flex items-center justify-center text-[#ccc] text-xs">No URL</div>
+                                    )}
+                                </div>
+                                {/* Dark/Light QR Toggle */}
+                                <div className="flex justify-center mt-2 gap-1">
+                                    <button
+                                        onClick={() => setQrDark(false)}
+                                        className={`w-6 h-6 rounded border-2 transition-all duration-150 ${
+                                            !qrDark ? 'border-[#00C853] bg-white' : 'border-[#333] bg-white/80 opacity-50 hover:opacity-80'
+                                        }`}
+                                        title="Light background"
+                                    />
+                                    <button
+                                        onClick={() => setQrDark(true)}
+                                        className={`w-6 h-6 rounded border-2 transition-all duration-150 ${
+                                            qrDark ? 'border-[#00C853] bg-[#0a0a0a]' : 'border-[#333] bg-[#0a0a0a] opacity-50 hover:opacity-80'
+                                        }`}
+                                        title="Dark background"
+                                    />
+                                </div>
                             </div>
-                            <h3 className="text-xl font-bold text-white mb-2">Link Shortening</h3>
-                            <p className="text-[#888] mb-4">
-                                {shortUrl
-                                    ? 'Your hub has a short URL automatically generated. Use it for social media, QR codes, or anywhere character count matters.'
-                                    : 'Short URLs are automatically generated when you create a hub. No additional setup required!'
-                                }
-                            </p>
 
-                            {shortUrl ? (
-                                <div className="space-y-3">
-                                    <div className="bg-[#111] border border-[#00C853]/30 rounded-xl px-4 py-3">
-                                        <code className="text-[#00C853] text-sm font-bold">{shortUrl}</code>
+                            {/* QR Info + Actions */}
+                            <div className="flex-1 min-w-0 text-center sm:text-left">
+                                <div className="text-xs text-[#555] uppercase tracking-wider font-medium mb-1.5">Pointing to</div>
+                                <code className="text-sm text-[#00C853] font-mono break-all block mb-4">
+                                    {qrValue || 'Loading...'}
+                                </code>
+
+                                {externalShortUrl && (
+                                    <div className="flex items-center gap-1.5 mb-4 justify-center sm:justify-start">
+                                        <div className="w-1.5 h-1.5 bg-[#00C853] rounded-full animate-pulse" />
+                                        <span className="text-xs text-[#00C853]/70">Using shortened URL</span>
                                     </div>
-                                    <div className="flex gap-3">
-                                        <button
-                                            onClick={() => copyToClipboard(shortUrl, 'short2')}
-                                            className="flex-1 py-2 bg-[#00C853] text-black rounded-lg font-medium hover:bg-[#00E676] transition-colors text-sm"
-                                        >
-                                            {copied === 'short2' ? '✅ Copied!' : '📋 Copy'}
-                                        </button>
-                                        <button
-                                            onClick={() => window.open(shortUrl, '_blank')}
-                                            className="flex-1 py-2 bg-[#222] text-white rounded-lg font-medium hover:bg-[#333] transition-colors text-sm"
-                                        >
-                                            🔗 Test Link
-                                        </button>
+                                )}
+
+                                <div className="flex gap-2 justify-center sm:justify-start">
+                                    <button
+                                        onClick={downloadQRPNG}
+                                        className="px-4 py-2 bg-[#00C853] text-black rounded-lg text-sm font-medium hover:bg-[#00E676] transition-colors"
+                                    >
+                                        PNG
+                                    </button>
+                                    <button
+                                        onClick={downloadQRSVG}
+                                        className="px-4 py-2 bg-[#161616] text-[#888] rounded-lg text-sm font-medium hover:text-white hover:bg-[#222] border border-[#222] hover:border-[#444] transition-colors"
+                                    >
+                                        SVG
+                                    </button>
+                                    <button
+                                        onClick={() => copyToClipboard(qrValue, 'qr')}
+                                        className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+                                            copied === 'qr'
+                                                ? 'bg-[#00C853]/20 text-[#00C853]'
+                                                : 'bg-[#161616] text-[#888] hover:text-white hover:bg-[#222] border border-[#222] hover:border-[#444]'
+                                        }`}
+                                    >
+                                        {copied === 'qr' ? '✓ Copied' : 'Copy URL'}
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                {/* ─── Section 3: URL Shortener ─── */}
+                <section>
+                    <div className="flex items-center justify-between mb-5">
+                        <div className="flex items-center gap-3">
+                            <div className="w-8 h-8 bg-[#00C853]/15 rounded-lg flex items-center justify-center">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#00C853" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                                    <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+                                </svg>
+                            </div>
+                            <h2 className="text-lg font-semibold">URL Shortener</h2>
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <div className={`w-2 h-2 rounded-full ${shortenerAvailable ? 'bg-[#00C853]' : 'bg-red-500'}`} />
+                            <span className={`text-xs ${shortenerAvailable ? 'text-[#555]' : 'text-red-400'}`}>
+                                {shortenerAvailable ? 'Online' : 'Offline'}
+                            </span>
+                        </div>
+                    </div>
+
+                    <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-2xl p-6">
+                        {!shortenerAvailable ? (
+                            <div className="text-center py-6">
+                                <div className="w-12 h-12 mx-auto mb-3 bg-[#1a1a1a] rounded-2xl flex items-center justify-center">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#555" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                        <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+                                    </svg>
+                                </div>
+                                <p className="text-sm text-[#666] mb-1">Shortener service is offline</p>
+                                <p className="text-xs text-[#444]">Start the shortener service to generate external short URLs</p>
+                            </div>
+                        ) : (
+                            <>
+                                {/* Provider selection */}
+                                <div className="mb-5">
+                                    <label className="text-xs text-[#555] uppercase tracking-wider font-medium mb-3 block">Provider</label>
+                                    <div className="flex gap-2">
+                                        {PROVIDER_OPTIONS.map((p) => (
+                                            <button
+                                                key={p.value}
+                                                onClick={() => setSelectedProvider(p.value)}
+                                                className={`flex-1 py-2.5 px-4 rounded-xl text-sm font-medium transition-all duration-200 ${
+                                                    selectedProvider === p.value
+                                                        ? 'bg-[#00C853]/15 text-[#00C853] ring-1 ring-[#00C853]/30'
+                                                        : 'bg-[#111] text-[#666] hover:text-[#999] hover:bg-[#161616]'
+                                                }`}
+                                            >
+                                                <span className="mr-2">{p.icon}</span>
+                                                {p.label}
+                                            </button>
+                                        ))}
                                     </div>
                                 </div>
-                            ) : (
-                                <div className="bg-[#111] border border-[#333] rounded-xl px-4 py-3 text-center">
-                                    <p className="text-[#666] text-sm">Short URL will appear here once generated</p>
-                                </div>
-                            )}
-                        </div>
+
+                                {/* Generate button */}
+                                <button
+                                    onClick={handleShortenUrl}
+                                    disabled={shortening}
+                                    className={`w-full py-3.5 rounded-xl font-semibold transition-all duration-300 ${
+                                        shortening
+                                            ? 'bg-[#222] text-[#666] cursor-wait'
+                                            : 'bg-gradient-to-r from-[#00C853] to-[#00E676] text-black hover:shadow-[0_0_24px_rgba(0,200,83,0.2)] hover:scale-[1.005] active:scale-[0.995]'
+                                    }`}
+                                >
+                                    {shortening ? (
+                                        <span className="flex items-center justify-center gap-3">
+                                            <div className="w-4 h-4 border-2 border-[#666] border-t-transparent rounded-full animate-spin" />
+                                            Generating...
+                                        </span>
+                                    ) : (
+                                        `Shorten with ${PROVIDER_OPTIONS.find(p => p.value === selectedProvider)?.label}`
+                                    )}
+                                </button>
+
+                                {/* Error message */}
+                                {shortenError && (
+                                    <div className="mt-4 flex items-center gap-3 bg-red-500/5 border border-red-500/20 rounded-xl px-4 py-3">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ef4444" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="shrink-0">
+                                            <circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" />
+                                        </svg>
+                                        <p className="text-red-400 text-sm">{shortenError}</p>
+                                    </div>
+                                )}
+                            </>
+                        )}
                     </div>
                 </section>
 
-                {/* Stats At-a-Glance */}
-                <section className="mb-12">
-                    <h2 className="text-2xl font-bold mb-6">Quick Stats</h2>
-                    <div className="bg-[#0f0f0f] border border-[#333] rounded-2xl p-6">
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-                            <div className="text-center">
-                                <div className="text-3xl font-bold text-[#00C853] mb-1">👁️</div>
-                                <div className="text-xs text-[#888]">Total Impressions</div>
-                                <div className="text-xl font-bold text-white">
-                                    {stats?.aggregated.total_impressions?.toLocaleString() || '—'}
-                                </div>
-                            </div>
-                            <div className="text-center">
-                                <div className="text-3xl font-bold text-[#00C853] mb-1">🖱️</div>
-                                <div className="text-xs text-[#888]">Total Clicks</div>
-                                <div className="text-xl font-bold text-white">
-                                    {stats?.aggregated.total_clicks?.toLocaleString() || '—'}
-                                </div>
-                            </div>
-                            <div className="text-center">
-                                <div className="text-3xl font-bold text-[#00C853] mb-1">🎯</div>
-                                <div className="text-xs text-[#888]">Active Variants</div>
-                                <div className="text-xl font-bold text-white">
-                                    {stats?.aggregated.variant_count?.toString() || '—'}
-                                </div>
-                            </div>
-                            <div className="text-center">
-                                <div className="text-3xl font-bold text-[#00C853] mb-1">📈</div>
-                                <div className="text-xs text-[#888]">Average CTR</div>
-                                <div className="text-xl font-bold text-white">
-                                    {stats?.aggregated.average_ctr !== undefined
-                                        ? `${(stats.aggregated.average_ctr * 100).toFixed(1)}%`
-                                        : '—'}
-                                </div>
-                            </div>
+                {/* ─── Section 4: How It Works ─── */}
+                <section>
+                    <div className="flex items-center gap-3 mb-5">
+                        <div className="w-8 h-8 bg-[#00C853]/15 rounded-lg flex items-center justify-center">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#00C853" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                                <circle cx="12" cy="12" r="10" /><line x1="12" y1="16" x2="12" y2="12" /><line x1="12" y1="8" x2="12.01" y2="8" />
+                            </svg>
                         </div>
-                        <div className="mt-4 pt-4 border-t border-[#333] text-center">
-                            <button
-                                onClick={() => router.push(`/analysis/${hubId}`)}
-                                className="px-6 py-3 bg-gradient-to-r from-[#00C853] to-[#00E676] text-black rounded-xl font-medium hover:opacity-90 transition-opacity"
-                            >
-                                📊 View Full Analytics Dashboard →
-                            </button>
-                        </div>
+                        <h2 className="text-lg font-semibold">How It Works</h2>
+                    </div>
+
+                    <div className="grid sm:grid-cols-3 gap-4">
+                        {[
+                            {
+                                step: '1',
+                                title: 'Share',
+                                desc: 'Copy your hub URL or generate an external short link and share it anywhere.',
+                            },
+                            {
+                                step: '2',
+                                title: 'Route',
+                                desc: 'Visitors are routed through your hub rules — by device, location, time, and priority.',
+                            },
+                            {
+                                step: '3',
+                                title: 'Track',
+                                desc: 'Every click and impression is tracked with detailed analytics and insights.',
+                            },
+                        ].map((item) => (
+                            <div key={item.step} className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-5">
+                                <div className="w-7 h-7 bg-[#00C853]/10 rounded-lg flex items-center justify-center mb-3">
+                                    <span className="text-xs font-bold text-[#00C853]">{item.step}</span>
+                                </div>
+                                <h4 className="text-sm font-semibold text-white mb-1.5">{item.title}</h4>
+                                <p className="text-xs text-[#555] leading-relaxed">{item.desc}</p>
+                            </div>
+                        ))}
                     </div>
                 </section>
 
-                {/* Info Section */}
-                <section className="bg-[#0a0a0a] border border-[#222] rounded-2xl p-6">
-                    <h3 className="text-lg font-semibold text-white mb-4">💡 How It Works</h3>
-                    <div className="grid md:grid-cols-3 gap-6 text-sm text-[#888]">
-                        <div>
-                            <h4 className="text-white font-medium mb-2">QR Codes</h4>
-                            <p>Generate QR codes that point to your smart link. When scanned, visitors go through your configured rules and analytics are tracked.</p>
-                        </div>
-                        <div>
-                            <h4 className="text-white font-medium mb-2">Short URLs</h4>
-                            <p>Your short URLs work exactly like regular links. They redirect through your hub, preserving all routing rules and analytics.</p>
-                        </div>
-                        <div>
-                            <h4 className="text-white font-medium mb-2">Analytics</h4>
-                            <p>All visits through QR codes or short URLs are tracked. View detailed analytics including devices, locations, and click patterns.</p>
-                        </div>
-                    </div>
-                </section>
             </main>
         </div>
     );

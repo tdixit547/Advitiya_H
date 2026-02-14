@@ -43,7 +43,9 @@ export default function VariantList({
   if (variants.length === 0) {
     return (
       <div className="bg-[#0a0a0a] rounded-xl border border-[#222] p-8 text-center">
-        <p className="text-4xl mb-3">🔗</p>
+        <div className="mb-4 opacity-30 flex justify-center">
+          <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" /><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" /></svg>
+        </div>
         <p className="text-[#666]">No variants yet. Add your first variant!</p>
       </div>
     );
@@ -95,7 +97,7 @@ export default function VariantList({
                           key={device}
                           className="text-xs bg-blue-500/20 text-blue-400 px-2 py-0.5 rounded"
                         >
-                          📱 {device}
+                          {device}
                         </span>
                       ))}
                       {variant.conditions.countries?.map(country => (
@@ -103,12 +105,12 @@ export default function VariantList({
                           key={country}
                           className="text-xs bg-green-500/20 text-green-400 px-2 py-0.5 rounded"
                         >
-                          🌍 {country}
+                          {country}
                         </span>
                       ))}
                       {variant.conditions.time_windows?.length ? (
                         <span className="text-xs bg-purple-500/20 text-purple-400 px-2 py-0.5 rounded">
-                          ⏰ {variant.conditions.time_windows.length} time rule{variant.conditions.time_windows.length > 1 ? 's' : ''}
+                          {variant.conditions.time_windows.length} time rule{variant.conditions.time_windows.length > 1 ? 's' : ''}
                         </span>
                       ) : null}
                     </div>

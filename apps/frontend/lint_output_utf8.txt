@@ -1,0 +1,196 @@
+﻿
+> @smart-link-hub/frontend@0.1.0 lint
+> eslint
+
+
+C:\SEM 3\FULL_STACK\Advitiya_H\Advitiya_H\apps\frontend\src\__tests__\config\testDatabase.ts
+  42:21  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\SEM 3\FULL_STACK\Advitiya_H\Advitiya_H\apps\frontend\src\__tests__\integration\backend.test.ts
+    8:29  warning  'cleanupTestDatabase' is defined but never used  @typescript-eslint/no-unused-vars
+   11:10  warning  'Variant' is defined but never used              @typescript-eslint/no-unused-vars
+   78:22  error    A `require()` style import is forbidden          @typescript-eslint/no-require-imports
+  104:20  error    Unexpected any. Specify a different type         @typescript-eslint/no-explicit-any
+  129:20  error    Unexpected any. Specify a different type         @typescript-eslint/no-explicit-any
+  154:20  error    Unexpected any. Specify a different type         @typescript-eslint/no-explicit-any
+  182:20  error    Unexpected any. Specify a different type         @typescript-eslint/no-explicit-any
+  203:26  error    A `require()` style import is forbidden          @typescript-eslint/no-require-imports
+  257:20  error    Unexpected any. Specify a different type         @typescript-eslint/no-explicit-any
+  401:21  error    A `require()` style import is forbidden          @typescript-eslint/no-require-imports
+  589:26  error    A `require()` style import is forbidden          @typescript-eslint/no-require-imports
+
+C:\SEM 3\FULL_STACK\Advitiya_H\Advitiya_H\apps\frontend\src\app\[slug]\page.tsx
+  140:11  error    Do not use an `<a>` element to navigate to `/`. Use `<Link />` from `next/link` instead. See: https://nextjs.org/docs/messages/no-html-link-for-pages                                                                                                                                    @next/next/no-html-link-for-pages
+  140:11  error    Do not use an `<a>` element to navigate to `/`. Use `<Link />` from `next/link` instead. See: https://nextjs.org/docs/messages/no-html-link-for-pages                                                                                                                                    @next/next/no-html-link-for-pages
+  179:13  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+C:\SEM 3\FULL_STACK\Advitiya_H\Advitiya_H\apps\frontend\src\app\analysis\[hubId]\page.tsx
+   13:5   warning  'getTrends' is defined but never used            @typescript-eslint/no-unused-vars
+   15:5   warning  'getCountryBreakdown' is defined but never used  @typescript-eslint/no-unused-vars
+   16:5   warning  'getRuleAnalytics' is defined but never used     @typescript-eslint/no-unused-vars
+   18:5   warning  'getPositionImpact' is defined but never used    @typescript-eslint/no-unused-vars
+   26:10  warning  'PerformanceLink' is defined but never used      @typescript-eslint/no-unused-vars
+   29:10  warning  'TrendsResponse' is defined but never used       @typescript-eslint/no-unused-vars
+   31:10  warning  'CountryBreakdown' is defined but never used     @typescript-eslint/no-unused-vars
+   32:10  warning  'RuleAnalytics' is defined but never used        @typescript-eslint/no-unused-vars
+   34:10  warning  'PositionImpact' is defined but never used       @typescript-eslint/no-unused-vars
+   36:10  warning  'MLInsight' is defined but never used            @typescript-eslint/no-unused-vars
+   37:10  warning  'TimeGranularity' is defined but never used      @typescript-eslint/no-unused-vars
+  463:65  warning  'i' is defined but never used                    @typescript-eslint/no-unused-vars
+
+C:\SEM 3\FULL_STACK\Advitiya_H\Advitiya_H\apps\frontend\src\app\dashboard\conversions\page.tsx
+    6:44  error  Unexpected any. Specify a different type                                                                                                                         @typescript-eslint/no-explicit-any
+   96:67  error  Unexpected any. Specify a different type                                                                                                                         @typescript-eslint/no-explicit-any
+  120:21  error  Do not use an `<a>` element to navigate to `/dashboard/`. Use `<Link />` from `next/link` instead. See: https://nextjs.org/docs/messages/no-html-link-for-pages  @next/next/no-html-link-for-pages
+
+C:\SEM 3\FULL_STACK\Advitiya_H\Advitiya_H\apps\frontend\src\app\dashboard\engagement\page.tsx
+    4:8   warning  'AnalyticsPanel' is defined but never used                                                                                                                       @typescript-eslint/no-unused-vars
+    5:10  warning  'useParams' is defined but never used                                                                                                                            @typescript-eslint/no-unused-vars
+    8:44  error    Unexpected any. Specify a different type                                                                                                                         @typescript-eslint/no-explicit-any
+    9:50  error    Unexpected any. Specify a different type                                                                                                                         @typescript-eslint/no-explicit-any
+   10:52  error    Unexpected any. Specify a different type                                                                                                                         @typescript-eslint/no-explicit-any
+  179:78  error    Unexpected any. Specify a different type                                                                                                                         @typescript-eslint/no-explicit-any
+  229:70  error    Unexpected any. Specify a different type                                                                                                                         @typescript-eslint/no-explicit-any
+  266:21  error    Do not use an `<a>` element to navigate to `/dashboard/`. Use `<Link />` from `next/link` instead. See: https://nextjs.org/docs/messages/no-html-link-for-pages  @next/next/no-html-link-for-pages
+
+C:\SEM 3\FULL_STACK\Advitiya_H\Advitiya_H\apps\frontend\src\app\dashboard\referrals\page.tsx
+    6:44  error  Unexpected any. Specify a different type                                                                                                                         @typescript-eslint/no-explicit-any
+   50:61  error  Unexpected any. Specify a different type                                                                                                                         @typescript-eslint/no-explicit-any
+   51:69  error  Unexpected any. Specify a different type                                                                                                                         @typescript-eslint/no-explicit-any
+   67:60  error  Unexpected any. Specify a different type                                                                                                                         @typescript-eslint/no-explicit-any
+   94:68  error  Unexpected any. Specify a different type                                                                                                                         @typescript-eslint/no-explicit-any
+  118:21  error  Do not use an `<a>` element to navigate to `/dashboard/`. Use `<Link />` from `next/link` instead. See: https://nextjs.org/docs/messages/no-html-link-for-pages  @next/next/no-html-link-for-pages
+
+C:\SEM 3\FULL_STACK\Advitiya_H\Advitiya_H\apps\frontend\src\app\hub\[hubId]\qr\page.tsx
+    3:31  warning  'useRef' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    @typescript-eslint/no-unused-vars
+   34:9   error    Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+C:\SEM 3\FULL_STACK\Advitiya_H\Advitiya_H\apps\frontend\src\app\hub\[hubId]\qr\page.tsx:34:9
+  32 |         if (!value) return;
+  33 |         
+> 34 |         setLoading(true);
+     |         ^^^^^^^^^^ Avoid calling setState() directly within an effect
+  35 |         // Generate QR code locally
+  36 |         QRCode.toDataURL(value, {
+  37 |             width: size,  react-hooks/set-state-in-effect
+   69:17  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               @next/next/no-img-element
+  109:46  error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              @typescript-eslint/no-explicit-any
+
+C:\SEM 3\FULL_STACK\Advitiya_H\Advitiya_H\apps\frontend\src\app\login\page.tsx
+  115:16  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+
+C:\SEM 3\FULL_STACK\Advitiya_H\Advitiya_H\apps\frontend\src\components\EngagementTracker.tsx
+  10:30  error  Error: Cannot call impure function during render
+
+`Date.now` is an impure function. Calling an impure function can produce unstable results that update unpredictably when the component happens to re-render. (https://react.dev/reference/rules/components-and-hooks-must-be-pure#components-and-hooks-must-be-idempotent).
+
+C:\SEM 3\FULL_STACK\Advitiya_H\Advitiya_H\apps\frontend\src\components\EngagementTracker.tsx:10:30
+   8 |
+   9 | export default function EngagementTracker({ hubId }: EngagementTrackerProps) {
+> 10 |     const startTime = useRef(Date.now());
+     |                              ^^^^^^^^^^ Cannot call impure function
+  11 |     const maxScroll = useRef(0);
+  12 |     const sent = useRef(false);
+  13 |  react-hooks/purity
+
+C:\SEM 3\FULL_STACK\Advitiya_H\Advitiya_H\apps\frontend\src\components\RuleTreeBuilder.tsx
+  337:3  warning  'depth' is defined but never used  @typescript-eslint/no-unused-vars
+  403:3  warning  'depth' is defined but never used  @typescript-eslint/no-unused-vars
+  563:3  warning  'depth' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\SEM 3\FULL_STACK\Advitiya_H\Advitiya_H\apps\frontend\src\components\WorldMapSelector.tsx
+    9:8   warning  'dynamic' is defined but never used                                                                                                                                                                                                                                          @typescript-eslint/no-unused-vars
+   10:34  warning  'Layer' is defined but never used                                                                                                                                                                                                                                            @typescript-eslint/no-unused-vars
+  447:6   warning  React Hook useEffect has missing dependencies: 'geoJsonRef', 'getCountryStyle', and 'mapRef'. Either include them or remove the dependency array. If 'getCountryStyle' changes too often, find the parent component that defines it and wrap that definition in useCallback  react-hooks/exhaustive-deps
+  455:29  error    Unexpected any. Specify a different type                                                                                                                                                                                                                                     @typescript-eslint/no-explicit-any
+  477:33  error    Unexpected any. Specify a different type                                                                                                                                                                                                                                     @typescript-eslint/no-explicit-any
+  497:32  error    Unexpected any. Specify a different type                                                                                                                                                                                                                                     @typescript-eslint/no-explicit-any
+  523:6   warning  React Hook useEffect has a missing dependency: 'geoJsonRef'. Either include it or remove the dependency array                                                                                                                                                                react-hooks/exhaustive-deps
+  542:6   warning  React Hook useEffect has a missing dependency: 'geoJsonRef'. Either include it or remove the dependency array                                                                                                                                                                react-hooks/exhaustive-deps
+
+C:\SEM 3\FULL_STACK\Advitiya_H\Advitiya_H\apps\frontend\src\components\ui\AnimatedCounter.tsx
+  36:13  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+C:\SEM 3\FULL_STACK\Advitiya_H\Advitiya_H\apps\frontend\src\components\ui\AnimatedCounter.tsx:36:13
+  34 |
+  35 |         if (prefersReducedMotion) {
+> 36 |             setDisplayValue(value);
+     |             ^^^^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  37 |             return;
+  38 |         }
+  39 |  react-hooks/set-state-in-effect
+
+C:\SEM 3\FULL_STACK\Advitiya_H\Advitiya_H\apps\frontend\src\contexts\theme-context.tsx
+  28:5  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+C:\SEM 3\FULL_STACK\Advitiya_H\Advitiya_H\apps\frontend\src\contexts\theme-context.tsx:28:5
+  26 |   // Load theme from localStorage on mount
+  27 |   useEffect(() => {
+> 28 |     setMounted(true);
+     |     ^^^^^^^^^^ Avoid calling setState() directly within an effect
+  29 |     const savedTheme = localStorage.getItem(THEME_KEY) as Theme | null;
+  30 |     if (savedTheme && (savedTheme === 'dark' || savedTheme === 'light')) {
+  31 |       setThemeState(savedTheme);  react-hooks/set-state-in-effect
+
+Γ£û 63 problems (36 errors, 27 warnings)
+
+node.exe : npm error 
+Lifecycle script 
+`lint` failed with 
+error:
+At line:1 char:1
++ & "C:\Program Files
+\nodejs/node.exe" 
+"C:\Program 
+Files\nodejs/node_mo 
+...
++ ~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~
+    + CategoryInfo   
+           : NotSpe  
+  cified: (npm err   
+ or Lifec...led w    
+ith error::Strin    
+g) [], RemoteExc    
+eption
+    + FullyQualified 
+   ErrorId : Native  
+  CommandError
+ 
+npm error code 1
+npm error path 
+C:\SEM 3\FULL_STACK\A
+dvitiya_H\Advitiya_H\
+apps\frontend
+npm error workspace @
+smart-link-hub/fronte
+nd@0.1.0
+npm error location 
+C:\SEM 3\FULL_STACK\A
+dvitiya_H\Advitiya_H\
+apps\frontend
+npm error command 
+failed
+npm error command C:\
+WINDOWS\system32\cmd.
+exe /d /s /c eslint

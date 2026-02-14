@@ -95,8 +95,20 @@ export async function apiRequest<T>(
 
   // Handle unauthorized - redirect to login
   if (response.status === 401) {
+    // For auth endpoints (login/register), pass through the actual backend error
+    if (endpoint.includes('/auth/')) {
+      let errorMessage = 'Authentication failed';
+      try {
+        const errorData = await response.json();
+        errorMessage = errorData.error || errorMessage;
+      } catch {
+        // If response body is not valid JSON, use default message
+      }
+      throw new ApiError(errorMessage, 401);
+    }
+
     removeStoredToken();
-    if (typeof window !== 'undefined' && !endpoint.includes('/auth/')) {
+    if (typeof window !== 'undefined') {
       window.location.href = '/login';
     }
     throw new ApiError('Session expired. Please login again.', 401);
@@ -552,6 +564,75 @@ export async function getMLInsights(hubId: string): Promise<MLInsightsResponse> 
   return apiRequest<MLInsightsResponse>(`/api/analytics/hub/${hubId}/insights`);
 }
 
+// ==================== Engagement & Ranking API Functions ====================
+
+/** Engagement metrics */
+export interface EngagementMetrics {
+  success: boolean;
+  data: {
+    average_dwell_time: number;
+    score_distribution: { low: number; medium: number; high: number };
+    total_engaged_sessions: number;
+  };
+  meta: { hub_id: string; time_window: string; generated_at: string };
+}
+
+/** Rage click data */
+export interface RageClickData {
+  success: boolean;
+  data: {
+    rage_clicks: {
+      variant_id?: string;
+      element_selector: string;
+      target_url: string;
+      total_incidents: number;
+      total_clicks: number;
+      avg_clicks_per_incident: number;
+      last_occurrence?: string;
+    }[];
+    total_incidents: number;
+    most_problematic: unknown;
+  };
+  meta: { hub_id: string; time_window: string; generated_at: string };
+}
+
+/** Link ranking */
+export interface LinkRankingData {
+  success: boolean;
+  data: {
+    ranked_links: {
+      variant_id: string;
+      title: string;
+      current_position: number;
+      suggested_position: number;
+      ranking_score: number;
+      ctr: number;
+      total_clicks: number;
+      total_impressions: number;
+      confidence: 'high' | 'medium' | 'low';
+      reasoning: string;
+    }[];
+    total_links: number;
+    recommendation: string;
+  };
+  meta: { hub_id: string; time_window: string; algorithm: string; generated_at: string };
+}
+
+/** Get engagement metrics (dwell time, score distribution) */
+export async function getEngagementMetrics(hubId: string, range: TimeRange = '7d'): Promise<EngagementMetrics> {
+  return apiRequest<EngagementMetrics>(`/api/analytics/hub/${hubId}/engagement?range=${range}`);
+}
+
+/** Get rage click incidents */
+export async function getRageClicks(hubId: string, range: TimeRange = '7d'): Promise<RageClickData> {
+  return apiRequest<RageClickData>(`/api/analytics/hub/${hubId}/rage-clicks?range=${range}`);
+}
+
+/** Get AI-powered link ranking */
+export async function getLinkRanking(hubId: string): Promise<LinkRankingData> {
+  return apiRequest<LinkRankingData>(`/api/analytics/hub/${hubId}/link-ranking`);
+}
+
 // ==================== Debug API Function ====================
 
 import type { DebugResponse } from '@/types';
@@ -559,5 +640,38 @@ import type { DebugResponse } from '@/types';
 export async function getDebugInfo(slug: string): Promise<DebugResponse> {
   return apiRequest<DebugResponse>(`/${slug}/debug`, { skipAuth: true });
 }
+// ==================== URL Shortener API Functions ====================
 
+export type ShortenerProvider = 'tinyurl' | 'isgd' | 'dagd' | 'clckru';
 
+export interface ShortenResponse {
+  external_short_url: string;
+  original_url: string;
+  provider: string;
+  note?: string;
+}
+
+export interface ShortenerStatus {
+  available: boolean;
+  providers: string[];
+}
+
+/**
+ * Shorten a hub's URL using the Python pyshorteners microservice
+ */
+export async function shortenHubUrl(
+  hubId: string,
+  provider: ShortenerProvider = 'tinyurl'
+): Promise<ShortenResponse> {
+  return apiRequest<ShortenResponse>(`/api/admin/hubs/${hubId}/shorten`, {
+    method: 'POST',
+    body: { provider },
+  });
+}
+
+/**
+ * Check if the Python URL shortener service is available
+ */
+export async function getShortenerStatus(): Promise<ShortenerStatus> {
+  return apiRequest<ShortenerStatus>('/api/admin/shortener/status');
+}

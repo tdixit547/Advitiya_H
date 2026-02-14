@@ -7,7 +7,7 @@ interface EngagementTrackerProps {
 }
 
 export default function EngagementTracker({ hubId }: EngagementTrackerProps) {
-    const startTime = useRef(Date.now());
+    const startTime = useRef<number>(0);
     const maxScroll = useRef(0);
     const sent = useRef(false);
 

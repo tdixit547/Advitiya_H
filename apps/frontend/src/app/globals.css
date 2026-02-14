@@ -49,6 +49,24 @@ body {
 }
 
 /* ====================
+   Global Interactive Elements
+   ==================== */
+
+button,
+a,
+[role="button"],
+input[type="submit"],
+input[type="button"],
+select {
+  cursor: pointer;
+}
+
+button:not(.btn),
+a:not(.btn) {
+  transition: all var(--transition-base) var(--ease-out);
+}
+
+/* ====================
    Focus & Accessibility
    ==================== */
 
@@ -110,6 +128,7 @@ body {
 .dashboard-card {
   @apply bg-[#111111] border border-[#222222] rounded-xl p-4;
   transition: all var(--transition-slow) var(--ease-out);
+  cursor: pointer;
 }
 
 .dashboard-card:hover {

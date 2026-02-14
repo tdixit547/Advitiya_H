@@ -14,13 +14,14 @@ async function run() {
         await mongoose.connect('mongodb://localhost:27017/smart-link-hub');
         console.log('Connected to MongoDB');
 
-        const hub = await LinkHub.findOne({ short_code: { $exists: true } });
+        const hub = await LinkHub.findOne({ short_code: 'D1Yn0V' });
         
         if (hub) {
             console.log(`FOUND_CODE: ${hub.short_code}`);
-            console.log(`EXPECTED_SLUG: ${hub.slug}`);
+            console.log(`HUB_ID: ${hub.hub_id}`);
+            console.log(`SLUG: ${hub.slug}`);
         } else {
-            console.log('NO_HUBS_FOUND');
+            console.log('NO_HUB_FOUND_FOR_CODE');
         }
 
         await mongoose.disconnect();

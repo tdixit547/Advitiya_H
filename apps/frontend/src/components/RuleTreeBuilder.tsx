@@ -46,7 +46,16 @@ export default function RuleTreeBuilder({ hubId, variants }: RuleTreeBuilderProp
         });
       }
     } catch (err) {
-      console.error('Failed to fetch rule tree:', err);
+      // 404 = no rule tree yet — initialize with defaults
+      if (err instanceof ApiError && err.status === 404) {
+        setTreeName('Main Decision Tree');
+        setRootNode({
+          type: 'leaf',
+          variant_ids: variants.length > 0 ? [variants[0].variant_id] : [],
+        });
+      } else {
+        console.error('Failed to fetch rule tree:', err);
+      }
     } finally {
       setIsLoading(false);
     }
@@ -222,10 +231,10 @@ export default function RuleTreeBuilder({ hubId, variants }: RuleTreeBuilderProp
                   : 'border-[#333] text-[#9A9A9A] hover:border-[#00C853]'
               }`}
             >
-              {type === 'leaf' && '🎯 Leaf (Direct)'}
-              {type === 'device' && '📱 Device Branch'}
-              {type === 'location' && '🌍 Location Branch'}
-              {type === 'time' && '⏰ Time Branch'}
+              {type === 'leaf' && 'Leaf (Direct)'}
+              {type === 'device' && 'Device Branch'}
+              {type === 'location' && 'Location Branch'}
+              {type === 'time' && 'Time Branch'}
             </button>
           ))}
         </div>
@@ -301,7 +310,7 @@ function LeafEditor({
 
   return (
     <div>
-      <h4 className="text-white font-medium mb-3">🎯 Select Variants</h4>
+      <h4 className="text-white font-medium mb-3">Select Variants</h4>
       <p className="text-[#666] text-sm mb-4">
         Choose which variants to serve when this leaf is reached
       </p>
@@ -354,7 +363,7 @@ function DeviceEditor({
 
   return (
     <div>
-      <h4 className="text-white font-medium mb-3">📱 Device Branches</h4>
+      <h4 className="text-white font-medium mb-3">Device Branches</h4>
       <p className="text-[#666] text-sm mb-4">
         Route visitors based on their device type
       </p>
@@ -367,7 +376,7 @@ function DeviceEditor({
             <div key={device} className="p-4 bg-black/30 rounded-lg">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-white font-medium capitalize">
-                  {device === 'default' ? '🔄 Default' : `${device === 'mobile' ? '📱' : device === 'desktop' ? '💻' : '📟'} ${device}`}
+                  {device === 'default' ? 'Default' : device}
                 </span>
               </div>
               <select
@@ -460,7 +469,7 @@ function LocationEditor({
 
   return (
     <div>
-      <h4 className="text-white font-medium mb-3">🌍 Location Branches</h4>
+      <h4 className="text-white font-medium mb-3">Location Branches</h4>
       <p className="text-[#666] text-sm mb-4">
         Route visitors based on their country
       </p>
@@ -471,7 +480,7 @@ function LocationEditor({
           onClick={() => setIsMapOpen(true)} 
           className="btn btn-primary px-6 py-3 flex items-center gap-2"
         >
-          <span>🗺️</span>
+          <span>Map</span>
           <span>Select Countries from Map</span>
           {selectedCountries.length > 0 && (
             <span className="ml-2 bg-black/30 px-2 py-0.5 rounded-full text-sm">
@@ -497,7 +506,7 @@ function LocationEditor({
             <div key={code} className="p-4 bg-black/30 rounded-lg">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-white font-medium">
-                  🌍 {getCountryName(code)} <span className="text-[#666]">({code})</span>
+                  {getCountryName(code)} <span className="text-[#666]">({code})</span>
                 </span>
                 <button
                   onClick={() => removeCountryBranch(code)}
@@ -533,7 +542,7 @@ function LocationEditor({
 
         {/* Default */}
         <div className="p-4 bg-black/30 rounded-lg border border-dashed border-[#333]">
-          <span className="text-white font-medium">🔄 Default (other countries)</span>
+          <span className="text-white font-medium">Default (other countries)</span>
           <select
             multiple
             value={node.default_node?.type === 'leaf' ? node.default_node.variant_ids : []}
@@ -583,7 +592,7 @@ function TimeEditor({
       </p>
 
       <div className="p-4 bg-black/30 rounded-lg">
-        <span className="text-white font-medium">🔄 Default Variant</span>
+        <span className="text-white font-medium">Default Variant</span>
         <select
           multiple
           value={node.time_default_node?.type === 'leaf' ? node.time_default_node.variant_ids : []}

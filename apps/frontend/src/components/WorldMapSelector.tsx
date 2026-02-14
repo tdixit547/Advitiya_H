@@ -187,14 +187,14 @@ export default function WorldMapSelector({
         <div className="p-4 border-b" style={{ borderColor: 'var(--border)' }}>
           <div className="flex items-center justify-between mb-3">
             <h2 className="text-xl font-bold" style={{ color: 'var(--foreground)' }}>
-              🌍 Select Countries
+              Select Countries
             </h2>
             <button
               onClick={onClose}
               className="p-2 hover:opacity-70 transition-opacity text-xl"
               style={{ color: 'var(--foreground-secondary)' }}
             >
-              ✕
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg>
             </button>
           </div>
           
@@ -315,7 +315,7 @@ export default function WorldMapSelector({
                     color: 'var(--accent)'
                   }}
                 >
-                  🌍 {getCountryName(code)}
+                  {getCountryName(code)}
                   <button
                     onClick={() => toggleCountry(code)}
                     className="hover:opacity-70 ml-1"
@@ -452,6 +452,7 @@ function MapWithGeoJSON({
 
     const layerGroup = geoJsonRef.current;
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const handleClick = (e: any) => {
       const countryCode = e.layer.feature?.properties?.['ISO3166-1-Alpha-2'];
       if (countryCode) {
@@ -474,6 +475,7 @@ function MapWithGeoJSON({
       }
     };
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const handleMouseOver = (e: any) => {
       const countryCode = e.layer.feature?.properties?.['ISO3166-1-Alpha-2'];
       if (!countryCode) return;
@@ -494,6 +496,7 @@ function MapWithGeoJSON({
       target.bringToFront();
     };
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const handleMouseOut = (e: any) => {
       const countryCode = e.layer.feature?.properties?.['ISO3166-1-Alpha-2'];
       if (!countryCode) return;

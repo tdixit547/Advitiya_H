@@ -81,7 +81,9 @@ export function OnboardingModal({ onClose }: OnboardingModalProps) {
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm animate-in fade-in">
       <div className="bg-[#111] border border-[#333] p-8 rounded-2xl max-w-md w-full shadow-2xl relative">
         {/* Close Button */}
-        <button onClick={onClose} className="absolute top-4 right-4 text-[#666] hover:text-white">✕</button>
+        <button onClick={onClose} className="absolute top-4 right-4 text-[#666] hover:text-white">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg>
+        </button>
 
         {/* Progress */}
         <div className="flex gap-2 mb-6">
@@ -97,21 +99,21 @@ export function OnboardingModal({ onClose }: OnboardingModalProps) {
         <div className="min-h-[200px] flex flex-col justify-center text-center">
           {step === 1 && (
             <div className="animate-in slide-in-from-bottom-2">
-              <div className="text-4xl mb-4">🔗</div>
+              <div className="flex justify-center mb-4"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#00C853" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" /><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" /></svg></div>
               <h2 className="text-2xl font-bold text-white mb-2">Add Your Links</h2>
               <p className="text-[#9A9A9A]">Start by adding your important links. You can drag to reorder them later.</p>
             </div>
           )}
           {step === 2 && (
             <div className="animate-in slide-in-from-bottom-2">
-              <div className="text-4xl mb-4">🧠</div>
+              <div className="flex justify-center mb-4"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#00C853" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9.5 2A5.5 5.5 0 0 0 4 7.5c0 1.28.44 2.46 1.18 3.4A4.5 4.5 0 0 0 4 14.5C4 17 6 19 8.5 19h1V9.5A5.5 5.5 0 0 0 9.5 2z" /><path d="M14.5 2A5.5 5.5 0 0 1 20 7.5c0 1.28-.44 2.46-1.18 3.4A4.5 4.5 0 0 1 20 14.5c0 2.5-2 4.5-4.5 4.5h-1V9.5A5.5 5.5 0 0 1 14.5 2z" /><path d="M8 19v3" /><path d="M16 19v3" /></svg></div>
               <h2 className="text-2xl font-bold text-white mb-2">Set Smart Rules</h2>
               <p className="text-[#9A9A9A]">Use rules to show links only on specific devices, locations, or times of day.</p>
             </div>
           )}
           {step === 3 && (
             <div className="animate-in slide-in-from-bottom-2">
-              <div className="text-4xl mb-4">📊</div>
+              <div className="flex justify-center mb-4"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#00C853" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="20" x2="18" y2="10" /><line x1="12" y1="20" x2="12" y2="4" /><line x1="6" y1="20" x2="6" y2="14" /></svg></div>
               <h2 className="text-2xl font-bold text-white mb-2">Track Analytics</h2>
               <p className="text-[#9A9A9A]">See who is visiting your hub with detailed charts and click-through rates.</p>
             </div>

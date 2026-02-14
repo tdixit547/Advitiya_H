@@ -5,6 +5,7 @@ import { variantResolver } from '../services/VariantResolver';
 import { cacheService } from '../services/CacheService';
 import { eventLogger } from '../services/EventLogger';
 import { analyticsEventService } from '../services/AnalyticsEventService';
+import { geoIPService } from '../services/GeoIPService';
 import { v4 as uuidv4 } from 'uuid';
 
 const router = Router();
@@ -25,10 +26,11 @@ router.get('/:code', async (req: Request, res: Response) => {
             return res.status(404).json({ error: 'Short URL not found' });
         }
 
-        // Build request context
+        // Build request context with async geolocation
+        const country = await getCountryFromRequest(req);
         const context: IRequestContext = {
             userAgent: req.headers['user-agent'] || '',
-            country: extractCountry(req),
+            country,
             lat: parseFloat(req.query.lat as string) || 0,
             lon: parseFloat(req.query.lon as string) || 0,
             timestamp: new Date(),
@@ -88,9 +90,10 @@ router.get('/:code', async (req: Request, res: Response) => {
 });
 
 /**
- * Extract country from request headers
+ * Get country from request with IP-based geolocation fallback
  */
-function extractCountry(req: Request): string {
+async function getCountryFromRequest(req: Request): Promise<string> {
+    // Try headers first (Cloudflare, custom)
     const cfCountry = req.headers['cf-ipcountry'];
     if (cfCountry) return cfCountry as string;
 
@@ -99,7 +102,10 @@ function extractCountry(req: Request): string {
 
     if (req.query.country) return req.query.country as string;
 
-    return 'unknown';
+    // Fallback to IP geolocation
+    const ip = getClientIP(req);
+    const geoResult = await geoIPService.lookupIP(ip);
+    return geoResult?.countryCode || 'unknown';
 }
 
 /**

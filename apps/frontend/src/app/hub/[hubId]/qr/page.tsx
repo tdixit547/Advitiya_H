@@ -31,6 +31,7 @@ function QRCodeDisplay({ value, size, fgColor, bgColor }: QRCodeDisplayProps) {
     useEffect(() => {
         if (!value) return;
         
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setLoading(true);
         // Generate QR code locally
         QRCode.toDataURL(value, {
@@ -66,6 +67,7 @@ function QRCodeDisplay({ value, size, fgColor, bgColor }: QRCodeDisplayProps) {
     return (
         <div className="qr-code-container">
             {qrSrc && (
+                // eslint-disable-next-line @next/next/no-img-element
                 <img
                     src={qrSrc}
                     alt="QR Code"
@@ -89,7 +91,7 @@ export default function QRCodePage() {
 
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
-    const [hubData, setHubData] = useState<{ slug: string; short_code: string } | null>(null);
+    const [hubData, setHubData] = useState<{ slug: string; short_code: string; external_short_url?: string } | null>(null);
 
     const [qrSize, setQRSize] = useState<QRSize>('medium');
     const [qrTheme, setQRTheme] = useState<QRTheme>('dark');
@@ -106,9 +108,10 @@ export default function QRCodePage() {
                 const data = await res.json();
                 // Handle both array response and object with hubs property
                 const hubList = Array.isArray(data) ? data : (data.hubs || []);
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 const hub = hubList.find((h: any) => h.hub_id === hubId);
                 if (hub) {
-                    setHubData({ slug: hub.slug, short_code: hub.short_code });
+                    setHubData({ slug: hub.slug, short_code: hub.short_code, external_short_url: hub.external_short_url });
                 } else {
                     setError('Hub not found');
                 }
@@ -137,7 +140,7 @@ export default function QRCodePage() {
     const size = SIZE_MAP[qrSize];
     const fgColor = qrTheme === 'dark' ? '#000000' : '#FFFFFF';
     const bgColor = qrTheme === 'dark' ? '#FFFFFF' : '#000000';
-    const qrValue = shortUrl || fullUrl;
+    const qrValue = hubData?.external_short_url || shortUrl || fullUrl;
 
     // Download as PNG
     const downloadPNG = useCallback(async () => {
@@ -211,7 +214,7 @@ export default function QRCodePage() {
         return (
             <div className="min-h-screen bg-black flex items-center justify-center">
                 <div className="text-center">
-                    <div className="text-4xl mb-4">❌</div>
+                    <div className="mb-4 flex justify-center"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#ef4444" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10" /><line x1="15" y1="9" x2="9" y2="15" /><line x1="9" y1="9" x2="15" y2="15" /></svg></div>
                     <h1 className="text-xl font-bold text-white mb-2">Error</h1>
                     <p className="text-[#888] mb-4">{error}</p>
                     <button
@@ -238,7 +241,7 @@ export default function QRCodePage() {
                             ← Back to Tools
                         </button>
                         <h1 className="text-xl font-bold">
-                            📱 QR Code: <span className="text-[#00C853]">/{hubData?.slug}</span>
+                            QR Code: <span className="text-[#00C853]">/{hubData?.slug}</span>
                         </h1>
                     </div>
                 </div>
@@ -266,13 +269,13 @@ export default function QRCodePage() {
                                 onClick={downloadPNG}
                                 className="px-6 py-3 bg-[#00C853] text-black rounded-xl font-medium hover:bg-[#00E676] transition-colors"
                             >
-                                ⬇️ Download PNG
+                                Download PNG
                             </button>
                             <button
                                 onClick={downloadSVG}
                                 className="px-6 py-3 bg-[#222] text-white rounded-xl font-medium hover:bg-[#333] transition-colors border border-[#444]"
                             >
-                                ⬇️ Download SVG
+                                Download SVG
                             </button>
                         </div>
                     </div>
@@ -347,7 +350,7 @@ export default function QRCodePage() {
                                         : 'bg-[#222] text-[#888] hover:bg-[#333]'
                                         }`}
                                 >
-                                    ⬜ Light Background
+                                    Light Background
                                 </button>
                                 <button
                                     onClick={() => setQRTheme('light')}
@@ -356,7 +359,7 @@ export default function QRCodePage() {
                                         : 'bg-[#222] text-[#888] hover:bg-[#333]'
                                         }`}
                                 >
-                                    ⬛ Dark Background
+                                    Dark Background
                                 </button>
                             </div>
                         </section>
@@ -364,7 +367,7 @@ export default function QRCodePage() {
                         {/* Info */}
                         <section className="bg-[#0a0a0a] border border-[#222] rounded-xl p-4 text-sm text-[#666]">
                             <p className="mb-2">
-                                <strong className="text-[#888]">💡 Tip:</strong> The QR code always points to your hub&apos;s current URL.
+                                <strong className="text-[#888]">Tip:</strong> The QR code always points to your hub&apos;s current URL.
                             </p>
                             <p>
                                 Scanning this QR will redirect visitors through your smart link, preserving all analytics and routing rules.

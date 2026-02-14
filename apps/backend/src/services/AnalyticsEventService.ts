@@ -204,7 +204,7 @@ export class AnalyticsEventService {
     }
 
     /**
-     * Log HUB_IMPRESSION event (enhanced)
+     * Log HUB_IMPRESSION event (enhanced) - Uses sync logging for real-time analytics
      */
     async logHubImpression(
         hubId: string,
@@ -214,7 +214,8 @@ export class AnalyticsEventService {
         ip?: string,
         sourceType: SourceType = SourceType.DIRECT
     ): Promise<void> {
-        await this.logEvent({
+        // Use sync logging for immediate DB write (critical for analytics)
+        await this.logEventSync({
             event_type: AnalyticsEventType.HUB_IMPRESSION,
             hub_id: hubId,
             session_id: sessionId,
@@ -227,6 +228,7 @@ export class AnalyticsEventService {
 
     /**
      * Log LINK_CLICK event (enhanced with rule and position tracking)
+     * Uses sync logging for real-time analytics
      */
     async logLinkClick(
         hubId: string,
@@ -243,7 +245,8 @@ export class AnalyticsEventService {
             source_type?: SourceType;
         }
     ): Promise<void> {
-        await this.logEvent({
+        // Use sync logging for immediate DB write (critical for analytics)
+        await this.logEventSync({
             event_type: AnalyticsEventType.LINK_CLICK,
             hub_id: hubId,
             link_id: linkId,
@@ -260,7 +263,7 @@ export class AnalyticsEventService {
     }
 
     /**
-     * Log REDIRECT event (enhanced)
+     * Log REDIRECT event (enhanced) - Uses sync logging for real-time analytics
      */
     async logRedirect(
         hubId: string,
@@ -275,7 +278,8 @@ export class AnalyticsEventService {
             source_type?: SourceType;
         }
     ): Promise<void> {
-        await this.logEvent({
+        // Use sync logging for immediate DB write
+        await this.logEventSync({
             event_type: AnalyticsEventType.REDIRECT,
             hub_id: hubId,
             variant_id: variantId,

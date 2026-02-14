@@ -1,0 +1,143 @@
+﻿
+> @smart-link-hub/frontend@0.1.0 lint
+> eslint
+
+
+C:\SEM 3\FULL_STACK\Advitiya_H\Advitiya_H\apps\frontend\src\__tests__\integration\backend.test.ts
+   8:29  warning  'cleanupTestDatabase' is defined but never used  @typescript-eslint/no-unused-vars
+  11:10  warning  'Variant' is defined but never used              @typescript-eslint/no-unused-vars
+
+C:\SEM 3\FULL_STACK\Advitiya_H\Advitiya_H\apps\frontend\src\app\dashboard\conversions\page.tsx
+  6:1   warning  Unused eslint-disable directive (no problems were reported from '@typescript-eslint/no-explicit-any')
+  8:44  error    Unexpected any. Specify a different type                                                               @typescript-eslint/no-explicit-any
+
+C:\SEM 3\FULL_STACK\Advitiya_H\Advitiya_H\apps\frontend\src\app\hub\[hubId]\qr\page.tsx
+   3:31  warning  'useRef' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    @typescript-eslint/no-unused-vars
+  34:9   error    Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+C:\SEM 3\FULL_STACK\Advitiya_H\Advitiya_H\apps\frontend\src\app\hub\[hubId]\qr\page.tsx:34:9
+  32 |         if (!value) return;
+  33 |         
+> 34 |         setLoading(true);
+     |         ^^^^^^^^^^ Avoid calling setState() directly within an effect
+  35 |         // Generate QR code locally
+  36 |         QRCode.toDataURL(value, {
+  37 |             width: size,  react-hooks/set-state-in-effect
+  69:17  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               @next/next/no-img-element
+
+C:\SEM 3\FULL_STACK\Advitiya_H\Advitiya_H\apps\frontend\src\app\login\page.tsx
+  115:16  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+
+C:\SEM 3\FULL_STACK\Advitiya_H\Advitiya_H\apps\frontend\src\components\EngagementTracker.tsx
+  10:30  error  Error: Cannot call impure function during render
+
+`Date.now` is an impure function. Calling an impure function can produce unstable results that update unpredictably when the component happens to re-render. (https://react.dev/reference/rules/components-and-hooks-must-be-pure#components-and-hooks-must-be-idempotent).
+
+C:\SEM 3\FULL_STACK\Advitiya_H\Advitiya_H\apps\frontend\src\components\EngagementTracker.tsx:10:30
+   8 |
+   9 | export default function EngagementTracker({ hubId }: EngagementTrackerProps) {
+> 10 |     const startTime = useRef(Date.now());
+     |                              ^^^^^^^^^^ Cannot call impure function
+  11 |     const maxScroll = useRef(0);
+  12 |     const sent = useRef(false);
+  13 |  react-hooks/purity
+
+C:\SEM 3\FULL_STACK\Advitiya_H\Advitiya_H\apps\frontend\src\components\RuleTreeBuilder.tsx
+  337:3  warning  'depth' is defined but never used  @typescript-eslint/no-unused-vars
+  403:3  warning  'depth' is defined but never used  @typescript-eslint/no-unused-vars
+  563:3  warning  'depth' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\SEM 3\FULL_STACK\Advitiya_H\Advitiya_H\apps\frontend\src\components\WorldMapSelector.tsx
+    9:8   warning  'dynamic' is defined but never used                                                                                                                                                                                                                                          @typescript-eslint/no-unused-vars
+   10:34  warning  'Layer' is defined but never used                                                                                                                                                                                                                                            @typescript-eslint/no-unused-vars
+  447:6   warning  React Hook useEffect has missing dependencies: 'geoJsonRef', 'getCountryStyle', and 'mapRef'. Either include them or remove the dependency array. If 'getCountryStyle' changes too often, find the parent component that defines it and wrap that definition in useCallback  react-hooks/exhaustive-deps
+  526:6   warning  React Hook useEffect has a missing dependency: 'geoJsonRef'. Either include it or remove the dependency array                                                                                                                                                                react-hooks/exhaustive-deps
+  545:6   warning  React Hook useEffect has a missing dependency: 'geoJsonRef'. Either include it or remove the dependency array                                                                                                                                                                react-hooks/exhaustive-deps
+
+C:\SEM 3\FULL_STACK\Advitiya_H\Advitiya_H\apps\frontend\src\components\ui\AnimatedCounter.tsx
+  36:13  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+C:\SEM 3\FULL_STACK\Advitiya_H\Advitiya_H\apps\frontend\src\components\ui\AnimatedCounter.tsx:36:13
+  34 |
+  35 |         if (prefersReducedMotion) {
+> 36 |             setDisplayValue(value);
+     |             ^^^^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  37 |             return;
+  38 |         }
+  39 |  react-hooks/set-state-in-effect
+
+C:\SEM 3\FULL_STACK\Advitiya_H\Advitiya_H\apps\frontend\src\contexts\theme-context.tsx
+  28:5  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+C:\SEM 3\FULL_STACK\Advitiya_H\Advitiya_H\apps\frontend\src\contexts\theme-context.tsx:28:5
+  26 |   // Load theme from localStorage on mount
+  27 |   useEffect(() => {
+> 28 |     setMounted(true);
+     |     ^^^^^^^^^^ Avoid calling setState() directly within an effect
+  29 |     const savedTheme = localStorage.getItem(THEME_KEY) as Theme | null;
+  30 |     if (savedTheme && (savedTheme === 'dark' || savedTheme === 'light')) {
+  31 |       setThemeState(savedTheme);  react-hooks/set-state-in-effect
+
+Γ£û 19 problems (6 errors, 13 warnings)
+  0 errors and 1 warning potentially fixable with the `--fix` option.
+
+node.exe : npm error 
+Lifecycle script 
+`lint` failed with 
+error:
+At line:1 char:1
++ & "C:\Program Files
+\nodejs/node.exe" 
+"C:\Program 
+Files\nodejs/node_mo 
+...
++ ~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~
+    + CategoryInfo   
+           : NotSpe  
+  cified: (npm err   
+ or Lifec...led w    
+ith error::Strin    
+g) [], RemoteExc    
+eption
+    + FullyQualified 
+   ErrorId : Native  
+  CommandError
+ 
+npm error code 1
+npm error path 
+C:\SEM 3\FULL_STACK\A
+dvitiya_H\Advitiya_H\
+apps\frontend
+npm error workspace @
+smart-link-hub/fronte
+nd@0.1.0
+npm error location 
+C:\SEM 3\FULL_STACK\A
+dvitiya_H\Advitiya_H\
+apps\frontend
+npm error command 
+failed
+npm error command C:\
+WINDOWS\system32\cmd.
+exe /d /s /c eslint

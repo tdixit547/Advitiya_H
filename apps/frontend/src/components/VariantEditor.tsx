@@ -66,6 +66,7 @@ export default function VariantEditor({
   const [showTimePicker, setShowTimePicker] = useState<'start' | 'end' | null>(null);
   
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [saveSuccess, setSaveSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   // Reset form when variant changes
@@ -161,6 +162,11 @@ export default function VariantEditor({
         
         const updated = await updateVariant(hubId, variantId, input);
         onUpdate(updated);
+        // Show brief success feedback then auto-close
+        setSaveSuccess(true);
+        setTimeout(() => {
+          onCancel();
+        }, 600);
       } else if (onSave) {
         const input: CreateVariantInput = {
           variant_id: variantId,
@@ -307,13 +313,13 @@ export default function VariantEditor({
           {/* Conditions Section */}
           <div className="border-t pt-5" style={{ borderColor: 'var(--border)' }}>
             <h4 className="font-medium mb-4" style={{ color: 'var(--foreground)' }}>
-              🎯 Targeting Conditions
+              Targeting Conditions
             </h4>
             
             {/* Device Types */}
             <div className="mb-4">
               <label className="block text-sm mb-2" style={{ color: 'var(--foreground-secondary)' }}>
-                📱 Device Types <span style={{ color: 'var(--foreground-muted)' }}>(leave empty for all)</span>
+                Device Types <span style={{ color: 'var(--foreground-muted)' }}>(leave empty for all)</span>
               </label>
               <div className="flex gap-2 flex-wrap">
                 {['mobile', 'desktop', 'tablet'].map((device) => (
@@ -328,9 +334,6 @@ export default function VariantEditor({
                     }`}
                     style={!deviceTypes.includes(device) ? { color: 'var(--foreground-secondary)' } : {}}
                   >
-                    {device === 'mobile' && '📱'}
-                    {device === 'desktop' && '💻'}
-                    {device === 'tablet' && '📟'}
                     {' '}{device}
                   </button>
                 ))}
@@ -340,14 +343,14 @@ export default function VariantEditor({
             {/* Countries with Map Selector */}
             <div className="mb-4">
               <label className="block text-sm mb-2" style={{ color: 'var(--foreground-secondary)' }}>
-                🌍 Countries
+                Countries
               </label>
               <button
                 type="button"
                 onClick={() => setShowMapSelector(true)}
                 className="btn btn-secondary px-4 py-2 w-full justify-center"
               >
-                🗺️ Select Countries on Map ({countries.length} selected)
+                Select Countries on Map ({countries.length} selected)
               </button>
               
               {countries.length > 0 && (
@@ -361,7 +364,7 @@ export default function VariantEditor({
                         color: 'var(--accent)'
                       }}
                     >
-                      🌍 {getCountryName(code)} ({code})
+                      {getCountryName(code)} ({code})
                       <button
                         type="button"
                         onClick={() => removeCountry(code)}
@@ -379,7 +382,7 @@ export default function VariantEditor({
             <div className="mb-4">
               <div className="flex items-center justify-between mb-3">
                 <label className="text-sm" style={{ color: 'var(--foreground-secondary)' }}>
-                  ⏰ Time Window
+                  Time Window
                 </label>
                 <button
                   type="button"
@@ -435,7 +438,7 @@ export default function VariantEditor({
                           color: 'var(--foreground)'
                         }}
                       >
-                        🕐 {formatTime(timeWindow.startTime)}
+                        {formatTime(timeWindow.startTime)}
                       </button>
                       {showTimePicker === 'start' && (
                         <div className="mt-3 p-4 rounded-xl" style={{ backgroundColor: 'var(--card-bg)', border: '1px solid var(--border)' }}>
@@ -460,7 +463,7 @@ export default function VariantEditor({
                           color: 'var(--foreground)'
                         }}
                       >
-                        🕐 {formatTime(timeWindow.endTime)}
+                        {formatTime(timeWindow.endTime)}
                       </button>
                       {showTimePicker === 'end' && (
                         <div className="mt-3 p-4 rounded-xl" style={{ backgroundColor: 'var(--card-bg)', border: '1px solid var(--border)' }}>
@@ -493,7 +496,7 @@ export default function VariantEditor({
               disabled={isSubmitting}
               className="flex-1 btn btn-primary py-3 disabled:opacity-50"
             >
-              {isSubmitting ? 'Saving...' : isEditing ? 'Update Variant' : 'Create Variant'}
+              {saveSuccess ? '✓ Saved!' : isSubmitting ? 'Saving...' : isEditing ? 'Update Variant' : 'Create Variant'}
             </button>
           </div>
         </form>

@@ -16,6 +16,7 @@ import CreateHubModal from '@/components/CreateHubModal';
 import AnalyticsPanel from '@/components/AnalyticsPanel';
 import EditHubModal from '@/components/EditHubModal';
 import { OnboardingModal } from '@/components/SettingsPanel';
+import { LinkIcon, GearIcon, WrenchIcon, ChartIcon, ClockIcon, GlobeIcon, DollarIcon, EditIcon } from '@/components/ui/Icons';
 
 export default function DashboardPage() {
   return (
@@ -111,47 +112,75 @@ function DashboardContent() {
 
   return (
     <div className="min-h-screen page-bg">
+      {/* Top Navigation Bar */}
+      <nav
+        className="sticky top-0 z-50 border-b backdrop-blur-md"
+        style={{ background: 'rgba(0,0,0,0.85)', borderColor: '#1a1a1a' }}
+      >
+        <div className="max-w-7xl mx-auto px-6 lg:px-8 h-14 flex items-center justify-between">
+          {/* Brand */}
+          <div className="flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: 'rgba(0,200,83,0.12)' }}>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#00C853" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+              </svg>
+            </div>
+            <span className="font-bold text-white text-base tracking-tight">Smart Link Hub</span>
+          </div>
+
+          {/* User section */}
+          <div className="flex items-center gap-3">
+            <div
+              className="flex items-center gap-2.5 px-3 py-1.5 rounded-lg"
+              style={{ background: '#111', border: '1px solid #222' }}
+            >
+              <div
+                className="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold"
+                style={{ background: 'rgba(0,200,83,0.15)', color: '#00C853' }}
+              >
+                {user?.name?.charAt(0)?.toUpperCase() || user?.email?.charAt(0)?.toUpperCase() || 'U'}
+              </div>
+              <span className="text-sm text-[#ccc] hidden sm:inline max-w-[180px] truncate">{user?.email}</span>
+            </div>
+            <button
+              onClick={logout}
+              className="text-sm px-3 py-1.5 rounded-lg text-[#9A9A9A] hover:text-red-400 hover:bg-red-500/10 transition-all"
+            >
+              Logout
+            </button>
+          </div>
+        </div>
+      </nav>
+
       <div className="max-w-7xl mx-auto p-6 lg:p-8">
 
-        {/* Header */}
-        <header className="flex items-center justify-between mb-8">
-          <div className="flex items-center gap-4">
-            <HubSelector
-              hubs={hubs}
-              selectedHub={selectedHub}
-              onSelect={setSelectedHub}
-              onCreateNew={() => setShowCreateHub(true)}
-              isLoading={isLoadingHubs}
-            />
-          </div>
+        {/* Hub Toolbar */}
+        <header className="flex flex-wrap items-center justify-between gap-4 mb-8">
+          <HubSelector
+            hubs={hubs}
+            selectedHub={selectedHub}
+            onSelect={setSelectedHub}
+            onCreateNew={() => setShowCreateHub(true)}
+            isLoading={isLoadingHubs}
+          />
 
-          <div className="flex items-center gap-4">
-            {selectedHub && (
-              <>
-                <button
-                  onClick={() => setShowEditHub(true)}
-                  className="btn btn-secondary text-sm py-2 px-4 transition-colors hover:bg-[#333]"
-                >
-                  ✎ Edit
-                </button>
-                <button
-                  onClick={() => window.open(`/${selectedHub.slug}`, '_blank')}
-                  className="btn btn-secondary text-sm py-2 px-4"
-                >
-                  View Live →
-                </button>
-              </>
-            )}
-            <div className="flex items-center gap-2 ml-4 border-l pl-4" style={{ borderColor: 'var(--border-secondary)' }}>
-              <span className="text-sm" style={{ color: 'var(--foreground-secondary)' }}>{user?.email}</span>
+          {selectedHub && (
+            <div className="flex items-center gap-2">
               <button
-                onClick={logout}
-                className="text-red-400 hover:text-red-300 text-sm"
+                onClick={() => setShowEditHub(true)}
+                className="text-sm py-2 px-4 rounded-lg border border-[#333] text-[#ccc] bg-transparent transition-all duration-200 ease-out hover:border-[#00C853]/50 hover:bg-[#0a0a0a] hover:text-white hover:scale-[1.02] active:scale-[0.97] flex items-center gap-1.5 cursor-pointer"
               >
-                Logout
+                <EditIcon size={14} /> Edit Hub
+              </button>
+              <button
+                onClick={() => window.open(`/${selectedHub.slug}`, '_blank')}
+                className="text-sm py-2 px-4 rounded-lg bg-[#00C853]/10 text-[#00C853] border border-[#00C853]/25 transition-all duration-200 ease-out hover:bg-[#00C853]/20 hover:border-[#00C853]/50 hover:shadow-[0_0_15px_rgba(0,200,83,0.2)] hover:scale-[1.02] active:scale-[0.97] flex items-center gap-1.5 cursor-pointer"
+              >
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                View Live
               </button>
             </div>
-          </div>
+          )}
         </header>
 
         {/* Error Display */}
@@ -165,8 +194,8 @@ function DashboardContent() {
         {/* No Hub State */}
         {!isLoadingHubs && hubs.length === 0 && (
           <div className="text-center py-20">
-            <div className="w-20 h-20 bg-[#111] rounded-2xl flex items-center justify-center mx-auto mb-6">
-              <span className="text-4xl">🔗</span>
+            <div className="w-20 h-20 bg-[#111] rounded-2xl flex items-center justify-center mx-auto mb-6 border border-[#333]">
+              <LinkIcon size={36} color="#555" />
             </div>
             <h2 className="text-2xl font-bold text-white mb-2">Create Your First Hub</h2>
             <p className="text-[#9A9A9A] mb-6 max-w-md mx-auto">
@@ -191,7 +220,7 @@ function DashboardContent() {
                 className="bg-[#111] rounded-xl border border-[#222] p-6 hover:border-[#00C853]/50 transition-all group"
               >
                 <div className="flex items-center gap-4">
-                  <div className="text-4xl">🔗</div>
+                  <div className="w-10 h-10 rounded-lg bg-[#1a1a1a] flex items-center justify-center"><LinkIcon size={22} color="#00C853" /></div>
                   <div>
                     <h3 className="text-lg font-bold text-white group-hover:text-[#00C853] transition-colors">
                       Manage Links
@@ -209,7 +238,7 @@ function DashboardContent() {
                 className="bg-[#111] rounded-xl border border-[#222] p-6 hover:border-[#00C853]/50 transition-all group"
               >
                 <div className="flex items-center gap-4">
-                  <div className="text-4xl">⚙️</div>
+                  <div className="w-10 h-10 rounded-lg bg-[#1a1a1a] flex items-center justify-center"><GearIcon size={22} color="#9A9A9A" /></div>
                   <div>
                     <h3 className="text-lg font-bold text-white group-hover:text-[#00C853] transition-colors">
                       Configure Rules
@@ -227,7 +256,7 @@ function DashboardContent() {
                 className="bg-gradient-to-br from-[#1a1a2e] to-[#16213e] rounded-xl border border-[#4a4ae8]/30 p-6 hover:border-[#4a4ae8] transition-all group"
               >
                 <div className="flex items-center gap-4">
-                  <div className="text-4xl">🛠️</div>
+                  <div className="w-10 h-10 rounded-lg bg-[#1a1a2e] flex items-center justify-center"><WrenchIcon size={22} color="#7a7aff" /></div>
                   <div>
                     <h3 className="text-lg font-bold text-[#7a7aff] group-hover:text-[#9a9aff] transition-colors">
                       Tools
@@ -245,7 +274,7 @@ function DashboardContent() {
                 className="bg-gradient-to-br from-[#111] to-[#0a2010] rounded-xl border border-[#00C853]/30 p-6 hover:border-[#00C853] transition-all group"
               >
                 <div className="flex items-center gap-4">
-                  <div className="text-4xl">📈</div>
+                  <div className="w-10 h-10 rounded-lg bg-[#0a2010] flex items-center justify-center"><ChartIcon size={22} color="#00C853" /></div>
                   <div>
                     <h3 className="text-lg font-bold text-[#00C853] group-hover:text-[#00FF00] transition-colors">
                       Analytics
@@ -263,7 +292,7 @@ function DashboardContent() {
                 className="bg-[#111] rounded-xl border border-[#222] p-6 hover:border-yellow-500/50 transition-all group"
               >
                 <div className="flex items-center gap-4">
-                  <div className="text-4xl">⏱️</div>
+                  <div className="w-10 h-10 rounded-lg bg-[#1a1a1a] flex items-center justify-center"><ClockIcon size={22} color="#eab308" /></div>
                   <div>
                     <h3 className="text-lg font-bold text-white group-hover:text-yellow-500 transition-colors">
                       Engagement
@@ -281,7 +310,7 @@ function DashboardContent() {
                 className="bg-[#111] rounded-xl border border-[#222] p-6 hover:border-blue-500/50 transition-all group"
               >
                 <div className="flex items-center gap-4">
-                  <div className="text-4xl">🌍</div>
+                  <div className="w-10 h-10 rounded-lg bg-[#1a1a1a] flex items-center justify-center"><GlobeIcon size={22} color="#3b82f6" /></div>
                   <div>
                     <h3 className="text-lg font-bold text-white group-hover:text-blue-500 transition-colors">
                       Sources
@@ -299,7 +328,7 @@ function DashboardContent() {
                 className="bg-[#111] rounded-xl border border-[#222] p-6 hover:border-purple-500/50 transition-all group"
               >
                 <div className="flex items-center gap-4">
-                  <div className="text-4xl">💰</div>
+                  <div className="w-10 h-10 rounded-lg bg-[#1a1a1a] flex items-center justify-center"><DollarIcon size={22} color="#a855f7" /></div>
                   <div>
                     <h3 className="text-lg font-bold text-white group-hover:text-purple-500 transition-colors">
                       Conversions

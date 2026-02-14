@@ -24,7 +24,9 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   const [mounted, setMounted] = useState(false);
 
   // Load theme from localStorage on mount
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setMounted(true);
     const savedTheme = localStorage.getItem(THEME_KEY) as Theme | null;
     if (savedTheme && (savedTheme === 'dark' || savedTheme === 'light')) {

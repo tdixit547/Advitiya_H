@@ -67,14 +67,18 @@ export default function AnalyticsPanel({ hubId, stats }: AnalyticsPanelProps) {
                 Aggregating...
               </span>
             ) : (
-              '🔄 Refresh Stats'
+              <>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="inline mr-1"><polyline points="23 4 23 10 17 10" /><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10" /></svg>
+                Refresh Stats
+              </>
             )}
           </button>
           <a
             href={`/analysis/${hubId}`}
             className="btn btn-primary text-sm py-2 px-4 flex items-center gap-2"
           >
-            📊 View Full Analytics →
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="inline mr-1"><line x1="18" y1="20" x2="18" y2="10" /><line x1="12" y1="20" x2="12" y2="4" /><line x1="6" y1="20" x2="6" y2="14" /></svg>
+            View Full Analytics →
           </a>
         </div>
       </div>
@@ -91,7 +95,9 @@ export default function AnalyticsPanel({ hubId, stats }: AnalyticsPanelProps) {
       {/* No Data State */}
       {!stats && (
         <div className="bg-[#111] rounded-xl border border-[#222] p-12 text-center animate-fade-in-up">
-          <div className="text-5xl mb-4 opacity-30">📊</div>
+          <div className="mb-4 opacity-30 flex justify-center">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="20" x2="18" y2="10" /><line x1="12" y1="20" x2="12" y2="4" /><line x1="6" y1="20" x2="6" y2="14" /></svg>
+          </div>
           <h3 className="text-lg font-bold text-[#E6E6E6] mb-2">No Analytics Yet</h3>
           <p className="text-[#9A9A9A] text-sm max-w-md mx-auto">
             Analytics will appear after visitors access your hub.
@@ -107,26 +113,26 @@ export default function AnalyticsPanel({ hubId, stats }: AnalyticsPanelProps) {
             <KpiCard
               label="Total Impressions"
               value={stats.aggregated.total_impressions}
-              icon="👁️"
+              icon="eye"
               delay={0}
             />
             <KpiCard
               label="Total Clicks"
               value={stats.aggregated.total_clicks}
-              icon="🖱️"
+              icon="cursor"
               delay={1}
             />
             <KpiCard
               label="Average CTR"
-              value={stats.aggregated.average_ctr * 100}
+              value={stats.aggregated.average_ctr}
               isPercentage
-              icon="📈"
+              icon="chart"
               delay={2}
             />
             <KpiCard
               label="Active Variants"
               value={stats.aggregated.variant_count}
-              icon="🎯"
+              icon="target"
               delay={3}
             />
           </div>
@@ -265,6 +271,14 @@ export default function AnalyticsPanel({ hubId, stats }: AnalyticsPanelProps) {
   );
 }
 
+// Icon lookup for KPI cards
+const KPI_ICONS: Record<string, React.ReactNode> = {
+  eye: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#00C853" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" /><circle cx="12" cy="12" r="3" /></svg>,
+  cursor: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#00C853" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 3l7.07 16.97 2.51-7.39 7.39-2.51L3 3z" /><path d="M13 13l6 6" /></svg>,
+  chart: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#00C853" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18" /><polyline points="17 6 23 6 23 12" /></svg>,
+  target: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#00C853" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10" /><circle cx="12" cy="12" r="6" /><circle cx="12" cy="12" r="2" /></svg>,
+};
+
 // Enhanced KPI Card with animated counter
 function KpiCard({
   label,
@@ -282,7 +296,7 @@ function KpiCard({
   return (
     <div className={`stat-card animate-fade-in-up stagger-${delay + 1}`}>
       <div className="flex items-center gap-2 mb-2">
-        <span className="text-xl">{icon}</span>
+        <span className="flex items-center">{KPI_ICONS[icon] || null}</span>
         <p className="text-[#9A9A9A] text-sm">{label}</p>
       </div>
       <div className="text-2xl font-bold text-white">
