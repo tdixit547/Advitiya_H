@@ -1,7 +1,7 @@
 import type { NextConfig } from "next";
 import path from "path";
 
-const backendUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+const backendUrl = process.env.NEXT_PUBLIC_API_URL || 'https://deploying-backend-6kck.onrender.com';
 
 const nextConfig: NextConfig = {
   turbopack: {
