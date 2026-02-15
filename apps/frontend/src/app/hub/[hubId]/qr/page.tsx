@@ -204,7 +204,7 @@ export default function QRCodePage() {
 
     if (loading) {
         return (
-            <div className="min-h-screen bg-black flex items-center justify-center">
+            <div className="min-h-screen flex items-center justify-center" style={{ background: 'var(--background)' }}>
                 <div className="w-8 h-8 border-2 border-[#00C853] border-t-transparent rounded-full animate-spin"></div>
             </div>
         );
@@ -212,7 +212,7 @@ export default function QRCodePage() {
 
     if (error) {
         return (
-            <div className="min-h-screen bg-black flex items-center justify-center">
+            <div className="min-h-screen flex items-center justify-center" style={{ background: 'var(--background)' }}>
                 <div className="text-center">
                     <div className="mb-4 flex justify-center"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#ef4444" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10" /><line x1="15" y1="9" x2="9" y2="15" /><line x1="9" y1="9" x2="15" y2="15" /></svg></div>
                     <h1 className="text-xl font-bold text-white mb-2">Error</h1>
@@ -229,9 +229,9 @@ export default function QRCodePage() {
     }
 
     return (
-        <div className="min-h-screen bg-black text-white">
+        <div className="min-h-screen" style={{ background: 'var(--background)', color: 'var(--foreground)' }}>
             {/* Header */}
-            <header className="sticky top-0 z-10 bg-black/80 backdrop-blur-md border-b border-[#333]">
+            <header className="sticky top-0 z-10 backdrop-blur-md" style={{ background: 'var(--background)', borderBottom: '1px solid var(--border-default)' }}>
                 <div className="max-w-4xl mx-auto px-6 py-4 flex items-center justify-between">
                     <div className="flex items-center gap-4">
                         <button

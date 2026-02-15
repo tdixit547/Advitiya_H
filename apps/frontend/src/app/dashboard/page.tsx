@@ -17,6 +17,7 @@ import AnalyticsPanel from '@/components/AnalyticsPanel';
 import EditHubModal from '@/components/EditHubModal';
 import { OnboardingModal } from '@/components/SettingsPanel';
 import { LinkIcon, GearIcon, WrenchIcon, ChartIcon, ClockIcon, GlobeIcon, DollarIcon, EditIcon } from '@/components/ui/Icons';
+import ThemeToggle from '@/components/ThemeToggle';
 
 export default function DashboardPage() {
   return (
@@ -115,7 +116,7 @@ function DashboardContent() {
       {/* Top Navigation Bar */}
       <nav
         className="sticky top-0 z-50 backdrop-blur-xl"
-        style={{ background: 'rgba(0,0,0,0.7)', borderBottom: '1px solid rgba(255,255,255,0.06)' }}
+        style={{ background: 'color-mix(in srgb, var(--surface-1) 85%, transparent)', borderBottom: '1px solid var(--border-subtle)' }}
       >
         <div className="max-w-7xl mx-auto px-6 lg:px-8 h-16 flex items-center justify-between">
           {/* Brand */}
@@ -125,14 +126,14 @@ function DashboardContent() {
                 <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
               </svg>
             </div>
-            <span className="font-bold text-white text-base tracking-tight">Smart Link Hub</span>
+            <span className="font-bold text-base tracking-tight" style={{ color: 'var(--foreground)' }}>Smart Link Hub</span>
           </div>
 
           {/* User section */}
           <div className="flex items-center gap-3">
             <div
               className="flex items-center gap-2.5 px-3.5 py-2 rounded-xl"
-              style={{ background: 'rgba(17,17,17,0.8)', border: '1px solid rgba(255,255,255,0.06)' }}
+              style={{ background: 'var(--surface-2)', border: '1px solid var(--border-subtle)' }}
             >
               <div
                 className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold"
@@ -140,14 +141,16 @@ function DashboardContent() {
               >
                 {user?.name?.charAt(0)?.toUpperCase() || user?.email?.charAt(0)?.toUpperCase() || 'U'}
               </div>
-              <span className="text-sm text-[#aaa] hidden sm:inline max-w-[180px] truncate">{user?.email}</span>
+              <span className="text-sm hidden sm:inline max-w-[180px] truncate" style={{ color: 'var(--foreground-secondary)' }}>{user?.email}</span>
             </div>
             <button
               onClick={logout}
-              className="text-sm px-3.5 py-2 rounded-xl text-[#888] hover:text-red-400 hover:bg-red-500/10 transition-all"
+              className="text-sm px-3.5 py-2 rounded-xl hover:text-red-400 hover:bg-red-500/10 transition-all"
+              style={{ color: 'var(--foreground-secondary)' }}
             >
               Logout
             </button>
+            <ThemeToggle />
           </div>
         </div>
       </nav>
@@ -168,7 +171,8 @@ function DashboardContent() {
             <div className="flex items-center gap-2">
               <button
                 onClick={() => setShowEditHub(true)}
-                className="text-sm py-2 px-4 rounded-lg border border-[#333] text-[#ccc] bg-transparent transition-all duration-200 ease-out hover:border-[#00C853]/50 hover:bg-[#0a0a0a] hover:text-white hover:scale-[1.02] active:scale-[0.97] flex items-center gap-1.5 cursor-pointer"
+                className="text-sm py-2 px-4 rounded-lg border text-sm transition-all duration-200 ease-out hover:scale-[1.02] active:scale-[0.97] flex items-center gap-1.5 cursor-pointer"
+                style={{ background: 'transparent', border: '1px solid var(--border-default)', color: 'var(--foreground-secondary)' }}
               >
                 <EditIcon size={14} /> Edit Hub
               </button>
@@ -194,11 +198,11 @@ function DashboardContent() {
         {/* No Hub State */}
         {!isLoadingHubs && hubs.length === 0 && (
           <div className="text-center py-20">
-            <div className="w-20 h-20 bg-[#111] rounded-2xl flex items-center justify-center mx-auto mb-6 border border-[#333]">
-              <LinkIcon size={36} color="#555" />
+            <div className="w-20 h-20 rounded-2xl flex items-center justify-center mx-auto mb-6" style={{ background: 'var(--surface-2)', border: '1px solid var(--border-default)' }}>
+              <LinkIcon size={36} color="var(--foreground-secondary)" />
             </div>
-            <h2 className="text-2xl font-bold text-white mb-2">Create Your First Hub</h2>
-            <p className="text-[#9A9A9A] mb-6 max-w-md mx-auto">
+            <h2 className="text-2xl font-bold mb-2" style={{ color: 'var(--foreground)' }}>Create Your First Hub</h2>
+            <p className="mb-6 max-w-md mx-auto" style={{ color: 'var(--foreground-secondary)' }}>
               A hub is a smart link that routes visitors to different URLs based on rules you define.
             </p>
             <button
@@ -218,12 +222,12 @@ function DashboardContent() {
               <Link
                 href="/dashboard/links"
                 className="group rounded-2xl p-6 transition-all duration-300 hover:translate-y-[-2px]"
-                style={{ background: 'linear-gradient(135deg, rgba(17,17,17,0.8), rgba(10,10,10,0.9))', border: '1px solid rgba(255,255,255,0.06)' }}
+                style={{ background: 'var(--surface-1)', border: '1px solid var(--border-subtle)' }}
               >
                 <div className="flex items-center gap-4">
                   <div className="w-11 h-11 rounded-xl flex items-center justify-center" style={{ background: 'rgba(0,200,83,0.08)', border: '1px solid rgba(0,200,83,0.12)' }}><LinkIcon size={22} color="#00C853" /></div>
                   <div>
-                    <h3 className="text-lg font-bold text-white group-hover:text-[#00C853] transition-colors">
+                    <h3 className="text-lg font-bold group-hover:text-[#00C853] transition-colors" style={{ color: 'var(--foreground)' }}>
                       Manage Links
                     </h3>
                     <p className="text-[#888] text-sm">
@@ -237,12 +241,12 @@ function DashboardContent() {
               <Link
                 href="/dashboard/rules"
                 className="group rounded-2xl p-6 transition-all duration-300 hover:translate-y-[-2px]"
-                style={{ background: 'linear-gradient(135deg, rgba(17,17,17,0.8), rgba(10,10,10,0.9))', border: '1px solid rgba(255,255,255,0.06)' }}
+                style={{ background: 'var(--surface-1)', border: '1px solid var(--border-subtle)' }}
               >
                 <div className="flex items-center gap-4">
                   <div className="w-11 h-11 rounded-xl flex items-center justify-center" style={{ background: 'rgba(154,154,154,0.06)', border: '1px solid rgba(154,154,154,0.1)' }}><GearIcon size={22} color="#9A9A9A" /></div>
                   <div>
-                    <h3 className="text-lg font-bold text-white group-hover:text-[#00C853] transition-colors">
+                    <h3 className="text-lg font-bold group-hover:text-[#00C853] transition-colors" style={{ color: 'var(--foreground)' }}>
                       Configure Rules
                     </h3>
                     <p className="text-[#888] text-sm">
@@ -256,7 +260,7 @@ function DashboardContent() {
               <Link
                 href={`/hub/${selectedHub.hub_id}/tools`}
                 className="group rounded-2xl p-6 transition-all duration-300 hover:translate-y-[-2px]"
-                style={{ background: 'linear-gradient(135deg, rgba(26,26,46,0.8), rgba(22,33,62,0.7))', border: '1px solid rgba(74,74,232,0.15)' }}
+                style={{ background: 'var(--surface-1)', border: '1px solid var(--border-subtle)' }}
               >
                 <div className="flex items-center gap-4">
                   <div className="w-11 h-11 rounded-xl flex items-center justify-center" style={{ background: 'rgba(74,74,232,0.08)', border: '1px solid rgba(74,74,232,0.15)' }}><WrenchIcon size={22} color="#7a7aff" /></div>
@@ -275,7 +279,7 @@ function DashboardContent() {
               <Link
                 href={`/analysis/${selectedHub.hub_id}`}
                 className="group rounded-2xl p-6 transition-all duration-300 hover:translate-y-[-2px]"
-                style={{ background: 'linear-gradient(135deg, rgba(17,17,17,0.8), rgba(10,32,16,0.7))', border: '1px solid rgba(0,200,83,0.15)' }}
+                style={{ background: 'var(--surface-1)', border: '1px solid var(--border-subtle)' }}
               >
                 <div className="flex items-center gap-4">
                   <div className="w-11 h-11 rounded-xl flex items-center justify-center" style={{ background: 'rgba(0,200,83,0.08)', border: '1px solid rgba(0,200,83,0.12)' }}><ChartIcon size={22} color="#00C853" /></div>
@@ -294,12 +298,12 @@ function DashboardContent() {
               <Link
                 href="/dashboard/engagement"
                 className="group rounded-2xl p-6 transition-all duration-300 hover:translate-y-[-2px]"
-                style={{ background: 'linear-gradient(135deg, rgba(17,17,17,0.8), rgba(10,10,10,0.9))', border: '1px solid rgba(255,255,255,0.06)' }}
+                style={{ background: 'var(--surface-1)', border: '1px solid var(--border-subtle)' }}
               >
                 <div className="flex items-center gap-4">
                   <div className="w-11 h-11 rounded-xl flex items-center justify-center" style={{ background: 'rgba(234,179,8,0.06)', border: '1px solid rgba(234,179,8,0.1)' }}><ClockIcon size={22} color="#eab308" /></div>
                   <div>
-                    <h3 className="text-lg font-bold text-white group-hover:text-yellow-500 transition-colors">
+                    <h3 className="text-lg font-bold group-hover:text-yellow-500 transition-colors" style={{ color: 'var(--foreground)' }}>
                       Engagement
                     </h3>
                     <p className="text-[#888] text-sm">
@@ -313,12 +317,12 @@ function DashboardContent() {
               <Link
                 href="/dashboard/referrals"
                 className="group rounded-2xl p-6 transition-all duration-300 hover:translate-y-[-2px]"
-                style={{ background: 'linear-gradient(135deg, rgba(17,17,17,0.8), rgba(10,10,10,0.9))', border: '1px solid rgba(255,255,255,0.06)' }}
+                style={{ background: 'var(--surface-1)', border: '1px solid var(--border-subtle)' }}
               >
                 <div className="flex items-center gap-4">
                   <div className="w-11 h-11 rounded-xl flex items-center justify-center" style={{ background: 'rgba(59,130,246,0.06)', border: '1px solid rgba(59,130,246,0.1)' }}><GlobeIcon size={22} color="#3b82f6" /></div>
                   <div>
-                    <h3 className="text-lg font-bold text-white group-hover:text-blue-500 transition-colors">
+                    <h3 className="text-lg font-bold group-hover:text-blue-500 transition-colors" style={{ color: 'var(--foreground)' }}>
                       Sources
                     </h3>
                     <p className="text-[#888] text-sm">
@@ -332,12 +336,12 @@ function DashboardContent() {
               <Link
                 href="/dashboard/conversions"
                 className="group rounded-2xl p-6 transition-all duration-300 hover:translate-y-[-2px]"
-                style={{ background: 'linear-gradient(135deg, rgba(17,17,17,0.8), rgba(10,10,10,0.9))', border: '1px solid rgba(255,255,255,0.06)' }}
+                style={{ background: 'var(--surface-1)', border: '1px solid var(--border-subtle)' }}
               >
                 <div className="flex items-center gap-4">
                   <div className="w-11 h-11 rounded-xl flex items-center justify-center" style={{ background: 'rgba(168,85,247,0.06)', border: '1px solid rgba(168,85,247,0.1)' }}><DollarIcon size={22} color="#a855f7" /></div>
                   <div>
-                    <h3 className="text-lg font-bold text-white group-hover:text-purple-500 transition-colors">
+                    <h3 className="text-lg font-bold group-hover:text-purple-500 transition-colors" style={{ color: 'var(--foreground)' }}>
                       Conversions
                     </h3>
                     <p className="text-[#888] text-sm">

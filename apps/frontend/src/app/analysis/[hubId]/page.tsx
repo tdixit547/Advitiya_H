@@ -74,7 +74,7 @@ function MetricCard({ title, value, subtitle, trend, trendValue, icon }: MetricC
     };
 
     return (
-        <div className="bg-[#111] border border-[#333] rounded-xl p-5 hover:border-[#00C853]/50 transition-colors">
+        <div className="bg-[#111] border border-[#333] rounded-xl p-5 hover:border-[#00C853]/50 transition-colors" style={{ background: 'var(--surface-1, #111)', borderColor: 'var(--border-default, #333)' }}>
             <div className="flex items-start justify-between mb-3">
                 <span className="flex items-center">{iconMap[icon] || icon}</span>
                 {trend && (
@@ -83,8 +83,8 @@ function MetricCard({ title, value, subtitle, trend, trendValue, icon }: MetricC
                     </span>
                 )}
             </div>
-            <div className="text-3xl font-bold text-white mb-1">{value}</div>
-            <div className="text-sm text-[#888]">{title}</div>
+            <div className="text-3xl font-bold mb-1" style={{ color: 'var(--foreground)' }}>{value}</div>
+            <div className="text-sm" style={{ color: 'var(--foreground-secondary)' }}>{title}</div>
             {subtitle && <div className="text-xs text-[#666] mt-1">{subtitle}</div>}
         </div>
     );
@@ -99,15 +99,16 @@ function TimeRangeSelector({ value, onChange }: { value: TimeRange; onChange: (v
     ];
 
     return (
-        <div className="flex gap-2 bg-[#0a0a0a] p-1 rounded-lg">
+        <div className="flex gap-2 p-1 rounded-lg" style={{ background: 'var(--surface-1)' }}>
             {ranges.map((r) => (
                 <button
                     key={r.value}
                     onClick={() => onChange(r.value)}
                     className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${value === r.value
                         ? 'bg-[#00C853] text-black'
-                        : 'text-[#888] hover:text-white hover:bg-[#222]'
+                        : ''
                         }`}
+                    style={value !== r.value ? { color: 'var(--foreground-secondary)' } : {}}
                 >
                     {r.label}
                 </button>
@@ -233,11 +234,11 @@ export default function AnalysisPage() {
 
     if (error) {
         return (
-            <div className="min-h-screen bg-black flex items-center justify-center">
+            <div className="min-h-screen flex items-center justify-center" style={{ background: 'var(--background)' }}>
                 <div className="text-center">
                     <div className="flex justify-center mb-4"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="20" x2="18" y2="10" /><line x1="12" y1="20" x2="12" y2="4" /><line x1="6" y1="20" x2="6" y2="14" /></svg></div>
-                    <h1 className="text-xl font-bold text-white mb-2">Analytics Error</h1>
-                    <p className="text-[#888] mb-4">{error}</p>
+                    <h1 className="text-xl font-bold mb-2" style={{ color: 'var(--foreground)' }}>Analytics Error</h1>
+                    <p className="mb-4" style={{ color: 'var(--foreground-secondary)' }}>{error}</p>
                     <button
                         onClick={() => router.back()}
                         className="px-6 py-2 bg-[#00C853] text-black rounded-lg font-medium hover:bg-[#00E676]"
@@ -272,10 +273,10 @@ export default function AnalysisPage() {
     };
 
     return (
-        <div className="min-h-screen bg-black text-white">
+        <div className="min-h-screen" style={{ background: 'var(--background)', color: 'var(--foreground)' }}>
             <DashboardNav />
             {/* Header */}
-            <header className="sticky top-[49px] z-10 bg-black/80 backdrop-blur-md border-b border-[#333]">
+            <header className="sticky top-[49px] z-10 backdrop-blur-md" style={{ background: 'var(--background)', borderBottom: '1px solid var(--border-default)' }}>
                 <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
                     <div className="flex items-center gap-4">
                         <h1 className="text-xl font-bold">
@@ -290,19 +291,19 @@ export default function AnalysisPage() {
                             Top & Least
                         </button>
                         <div className="relative group">
-                            <button className="px-4 py-2 bg-[#222] text-white rounded-lg font-medium border border-[#444] hover:bg-[#333] transition-colors">
+                            <button className="px-4 py-2 rounded-lg font-medium border transition-colors" style={{ background: 'var(--surface-1)', color: 'var(--foreground)', borderColor: 'var(--border-default)' }}>
                                 Export Report
                             </button>
-                            <div className="absolute right-0 mt-2 w-48 bg-[#111] border border-[#333] rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50">
+                            <div className="absolute right-0 mt-2 w-48 rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50" style={{ background: 'var(--surface-1)', border: '1px solid var(--border-default)' }}>
                                 <button
                                     onClick={() => handleExport('csv')}
-                                    className="w-full px-4 py-3 text-left hover:bg-[#222] rounded-t-lg text-sm"
+                                    className="w-full px-4 py-3 text-left rounded-t-lg text-sm" style={{ color: 'var(--foreground)' }}
                                 >
                                     Export as CSV
                                 </button>
                                 <button
                                     onClick={() => handleExport('pdf')}
-                                    className="w-full px-4 py-3 text-left hover:bg-[#222] rounded-b-lg text-sm border-t border-[#333]"
+                                    className="w-full px-4 py-3 text-left rounded-b-lg text-sm" style={{ color: 'var(--foreground)', borderTop: '1px solid var(--border-default)' }}
                                 >
                                     Export as PDF
                                 </button>
@@ -351,20 +352,20 @@ export default function AnalysisPage() {
                         {/* Time Series Charts */}
                         <section>
                             <h2 className="text-lg font-semibold mb-4 text-[#888]">Traffic Over Time</h2>
-                            <div className="bg-[#111] border border-[#333] rounded-xl p-6">
+                            <div className="rounded-xl p-6" style={{ background: 'var(--surface-1)', border: '1px solid var(--border-default)' }}>
                                 {timeseries?.data && timeseries.data.length > 0 ? (
                                     <ResponsiveContainer width="100%" height={300}>
                                         <LineChart data={timeseries.data}>
-                                            <CartesianGrid strokeDasharray="3 3" stroke="#333" />
+                                            <CartesianGrid strokeDasharray="3 3" stroke="var(--border-subtle, #333)" />
                                             <XAxis
                                                 dataKey="timestamp"
-                                                stroke="#666"
+                                                stroke="var(--foreground-secondary, #666)"
                                                 fontSize={12}
                                                 tickFormatter={(v) => new Date(v).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                                             />
-                                            <YAxis stroke="#666" fontSize={12} />
+                                            <YAxis stroke="var(--foreground-secondary, #666)" fontSize={12} />
                                             <Tooltip
-                                                contentStyle={{ backgroundColor: '#111', border: '1px solid #333', borderRadius: '8px' }}
+                                                contentStyle={{ backgroundColor: 'var(--surface-1, #111)', border: '1px solid var(--border-default, #333)', borderRadius: '8px' }}
                                                 labelStyle={{ color: '#888' }}
                                             />
                                             <Legend />
@@ -383,23 +384,23 @@ export default function AnalysisPage() {
                             <h2 className="text-lg font-semibold mb-4 text-[#888]">Link Performance</h2>
                             <div className="grid md:grid-cols-2 gap-6">
                                 {/* Clicks Bar Chart */}
-                                <div className="bg-[#111] border border-[#333] rounded-xl p-6">
+                                <div className="rounded-xl p-6" style={{ background: 'var(--surface-1)', border: '1px solid var(--border-default)' }}>
                                     <h3 className="text-sm font-medium text-[#888] mb-4">Clicks per Link</h3>
                                     {links?.data && links.data.length > 0 ? (
                                         <ResponsiveContainer width="100%" height={250}>
                                             <BarChart data={links.data.slice(0, 5)} layout="vertical">
-                                                <CartesianGrid strokeDasharray="3 3" stroke="#333" />
-                                                <XAxis type="number" stroke="#666" fontSize={12} />
+                                                <CartesianGrid strokeDasharray="3 3" stroke="var(--border-subtle, #333)" />
+                                                <XAxis type="number" stroke="var(--foreground-secondary, #666)" fontSize={12} />
                                                 <YAxis
                                                     type="category"
                                                     dataKey="name"
-                                                    stroke="#666"
+                                                    stroke="var(--foreground-secondary, #666)"
                                                     fontSize={11}
                                                     width={100}
                                                     tickFormatter={(v) => v.substring(0, 15) + '...'}
                                                 />
                                                 <Tooltip
-                                                    contentStyle={{ backgroundColor: '#111', border: '1px solid #333', borderRadius: '8px' }}
+                                                    contentStyle={{ backgroundColor: 'var(--surface-1, #111)', border: '1px solid var(--border-default, #333)', borderRadius: '8px' }}
                                                 />
                                                 <Bar dataKey="clicks" fill="#00C853" radius={[0, 4, 4, 0]} />
                                             </BarChart>
@@ -410,23 +411,23 @@ export default function AnalysisPage() {
                                 </div>
 
                                 {/* CTR Bar Chart */}
-                                <div className="bg-[#111] border border-[#333] rounded-xl p-6">
+                                <div className="rounded-xl p-6" style={{ background: 'var(--surface-1)', border: '1px solid var(--border-default)' }}>
                                     <h3 className="text-sm font-medium text-[#888] mb-4">CTR per Link (%)</h3>
                                     {links?.data && links.data.length > 0 ? (
                                         <ResponsiveContainer width="100%" height={250}>
                                             <BarChart data={links.data.slice(0, 5)} layout="vertical">
-                                                <CartesianGrid strokeDasharray="3 3" stroke="#333" />
-                                                <XAxis type="number" stroke="#666" fontSize={12} />
+                                                <CartesianGrid strokeDasharray="3 3" stroke="var(--border-subtle, #333)" />
+                                                <XAxis type="number" stroke="var(--foreground-secondary, #666)" fontSize={12} />
                                                 <YAxis
                                                     type="category"
                                                     dataKey="name"
-                                                    stroke="#666"
+                                                    stroke="var(--foreground-secondary, #666)"
                                                     fontSize={11}
                                                     width={100}
                                                     tickFormatter={(v) => v.substring(0, 15) + '...'}
                                                 />
                                                 <Tooltip
-                                                    contentStyle={{ backgroundColor: '#111', border: '1px solid #333', borderRadius: '8px' }}
+                                                    contentStyle={{ backgroundColor: 'var(--surface-1, #111)', border: '1px solid var(--border-default, #333)', borderRadius: '8px' }}
                                                 />
                                                 <Bar dataKey="ctr" fill="#69F0AE" radius={[0, 4, 4, 0]} />
                                             </BarChart>
@@ -438,11 +439,11 @@ export default function AnalysisPage() {
                             </div>
 
                             {/* Performance Table */}
-                            <div className="bg-[#111] border border-[#333] rounded-xl p-6 mt-6 overflow-x-auto">
+                            <div className="rounded-xl p-6 mt-6 overflow-x-auto" style={{ background: 'var(--surface-1)', border: '1px solid var(--border-default)' }}>
                                 <h3 className="text-sm font-medium text-[#888] mb-4">Detailed Performance</h3>
                                 <table className="w-full text-sm">
                                     <thead>
-                                        <tr className="text-left text-[#666] border-b border-[#333]">
+                                        <tr className="text-left" style={{ color: 'var(--foreground-secondary)', borderBottom: '1px solid var(--border-default)' }}>
                                             <th className="pb-3 pr-4">Link</th>
                                             <th className="pb-3 pr-4 text-right">Impressions</th>
                                             <th className="pb-3 pr-4 text-right">Clicks</th>
@@ -452,9 +453,9 @@ export default function AnalysisPage() {
                                     </thead>
                                     <tbody>
                                         {links?.data.map((link) => (
-                                            <tr key={link.link_id} className="border-b border-[#222] hover:bg-[#1a1a1a]">
+                                            <tr key={link.link_id} style={{ borderBottom: '1px solid var(--border-subtle)' }}>
                                                 <td className="py-3 pr-4">
-                                                    <div className="text-white truncate max-w-[200px]" title={link.target_url}>
+                                                    <div className="truncate max-w-[200px]" style={{ color: 'var(--foreground)' }} title={link.target_url}>
                                                         {link.name}
                                                     </div>
                                                 </td>
@@ -483,7 +484,7 @@ export default function AnalysisPage() {
                             <h2 className="text-lg font-semibold mb-4 text-[#888]">Audience Breakdown</h2>
                             <div className="grid md:grid-cols-2 gap-6">
                                 {/* Device Distribution */}
-                                <div className="bg-[#111] border border-[#333] rounded-xl p-6">
+                                <div className="rounded-xl p-6" style={{ background: 'var(--surface-1)', border: '1px solid var(--border-default)' }}>
                                     <h3 className="text-sm font-medium text-[#888] mb-4">Device Distribution</h3>
                                     {segments?.data.devices && segments.data.devices.length > 0 ? (
                                         <ResponsiveContainer width="100%" height={250}>
@@ -502,7 +503,7 @@ export default function AnalysisPage() {
                                                     ))}
                                                 </Pie>
                                                 <Tooltip
-                                                    contentStyle={{ backgroundColor: '#111', border: '1px solid #333', borderRadius: '8px' }}
+                                                    contentStyle={{ backgroundColor: 'var(--surface-1, #111)', border: '1px solid var(--border-default, #333)', borderRadius: '8px' }}
                                                 />
                                             </PieChart>
                                         </ResponsiveContainer>
@@ -512,7 +513,7 @@ export default function AnalysisPage() {
                                 </div>
 
                                 {/* Location Distribution */}
-                                <div className="bg-[#111] border border-[#333] rounded-xl p-6">
+                                <div className="rounded-xl p-6" style={{ background: 'var(--surface-1)', border: '1px solid var(--border-default)' }}>
                                     <h3 className="text-sm font-medium text-[#888] mb-4">Top Locations</h3>
                                     {segments?.data.locations && segments.data.locations.length > 0 ? (
                                         <div className="space-y-3">
@@ -521,10 +522,10 @@ export default function AnalysisPage() {
                                                     <div className="w-6 text-lg text-[#00C853] font-bold">{i + 1}</div>
                                                     <div className="flex-1">
                                                         <div className="flex justify-between mb-1">
-                                                            <span className="text-sm text-white">{loc.location}</span>
+                                                            <span className="text-sm" style={{ color: 'var(--foreground)' }}>{loc.location}</span>
                                                             <span className="text-sm text-[#00C853]">{loc.percentage}%</span>
                                                         </div>
-                                                        <div className="h-2 bg-[#222] rounded-full overflow-hidden">
+                                                        <div className="h-2 rounded-full overflow-hidden" style={{ background: 'var(--surface-2)' }}>
                                                             <div
                                                                 className="h-full bg-gradient-to-r from-[#00C853] to-[#69F0AE] rounded-full"
                                                                 style={{ width: `${loc.percentage}%` }}
@@ -544,7 +545,7 @@ export default function AnalysisPage() {
                         {/* Heatmap */}
                         <section>
                             <h2 className="text-lg font-semibold mb-4 text-[#888]">Engagement Heatmap (7 Days)</h2>
-                            <div className="bg-[#111] border border-[#333] rounded-xl p-6 overflow-x-auto">
+                            <div className="rounded-xl p-6 overflow-x-auto" style={{ background: 'var(--surface-1)', border: '1px solid var(--border-default)' }}>
                                 {heatmap?.data.data && heatmap.data.data.length > 0 ? (
                                     <div>
                                         <div className="flex gap-1 mb-2">
@@ -569,7 +570,7 @@ export default function AnalysisPage() {
                                                                 style={{
                                                                     backgroundColor: intensity > 0
                                                                         ? `rgba(0, 200, 83, ${0.1 + intensity * 0.8})`
-                                                                        : '#1a1a1a',
+                                                                        : 'var(--surface-2, #1a1a1a)',
                                                                 }}
                                                                 title={`${day} ${hour}:00 - ${cell?.value || 0} events`}
                                                             />
@@ -609,7 +610,7 @@ export default function AnalysisPage() {
                             {enhancedKPIs ? (
                                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                                     {enhancedKPIs.metrics.map((metric) => (
-                                        <div key={metric.name} className="bg-[#111] border border-[#333] rounded-xl p-4">
+                                        <div key={metric.name} className="rounded-xl p-4" style={{ background: 'var(--surface-1)', border: '1px solid var(--border-default)' }}>
                                             <div className="flex items-center justify-between mb-2">
                                                 <span className="text-xs text-[#666] uppercase">{metric.name}</span>
                                                 <span className={`text-xs px-2 py-0.5 rounded ${metric.trend === 'up' ? 'bg-green-900/30 text-green-400' :
@@ -620,7 +621,7 @@ export default function AnalysisPage() {
                                                     {metric.delta !== undefined && ` ${metric.delta > 0 ? '+' : ''}${metric.delta.toFixed(1)}%`}
                                                 </span>
                                             </div>
-                                            <div className="text-2xl font-bold text-white">
+                                            <div className="text-2xl font-bold" style={{ color: 'var(--foreground)' }}>
                                                 {typeof metric.value === 'number' ?
                                                     metric.name.includes('CTR') ? `${metric.value.toFixed(2)}%` : metric.value.toLocaleString()
                                                     : metric.value}
@@ -634,7 +635,7 @@ export default function AnalysisPage() {
                                     ))}
                                 </div>
                             ) : (
-                                <div className="bg-[#111] border border-[#333] rounded-xl p-8 text-center text-[#666]">
+                                <div className="rounded-xl p-8 text-center" style={{ background: 'var(--surface-1)', border: '1px solid var(--border-default)', color: 'var(--foreground-secondary)' }}>
                                     {enhancedLoading ? 'Loading enhanced KPIs...' : 'Enhanced KPIs not available'}
                                 </div>
                             )}
@@ -646,7 +647,7 @@ export default function AnalysisPage() {
                             {comparison ? (
                                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                                     {comparison.metrics.map((m) => (
-                                        <div key={m.name} className="bg-[#111] border border-[#333] rounded-xl p-5">
+                                        <div key={m.name} className="rounded-xl p-5" style={{ background: 'var(--surface-1)', border: '1px solid var(--border-default)' }}>
                                             <div className="text-sm text-[#888] mb-3">{m.name}</div>
                                             <div className="flex items-end justify-between mb-2">
                                                 <div>
@@ -658,7 +659,7 @@ export default function AnalysisPage() {
                                                 <div className="text-2xl text-[#444]">→</div>
                                                 <div className="text-right">
                                                     <div className="text-xs text-[#666]">Last 7d</div>
-                                                    <div className="text-lg font-semibold text-white">
+                                                    <div className="text-lg font-semibold" style={{ color: 'var(--foreground)' }}>
                                                         {typeof m.after === 'number' ? m.after.toLocaleString() : m.after}
                                                     </div>
                                                 </div>
@@ -673,7 +674,7 @@ export default function AnalysisPage() {
                                     ))}
                                 </div>
                             ) : (
-                                <div className="bg-[#111] border border-[#333] rounded-xl p-8 text-center text-[#666]">
+                                <div className="rounded-xl p-8 text-center" style={{ background: 'var(--surface-1)', border: '1px solid var(--border-default)', color: 'var(--foreground-secondary)' }}>
                                     {enhancedLoading ? 'Loading comparison...' : 'Comparison data not available'}
                                 </div>
                             )}
@@ -683,12 +684,12 @@ export default function AnalysisPage() {
                         <section>
                             <h2 className="text-lg font-semibold mb-4 text-[#888]">Weekday vs Weekend Engagement</h2>
                             {weekdayWeekend ? (
-                                <div className="bg-[#111] border border-[#333] rounded-xl p-6">
+                                <div className="rounded-xl p-6" style={{ background: 'var(--surface-1)', border: '1px solid var(--border-default)' }}>
                                     <div className="grid grid-cols-2 gap-6 mb-4">
                                         <div className="text-center">
                                             <div className="flex justify-center mb-2"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2" /><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" /></svg></div>
                                             <div className="text-xs text-[#666] uppercase mb-1">Weekday Avg</div>
-                                            <div className="text-2xl font-bold text-white">
+                                            <div className="text-2xl font-bold" style={{ color: 'var(--foreground)' }}>
                                                 {weekdayWeekend.weekdayAvg?.toFixed(1) || 0}
                                             </div>
                                             <div className="text-xs text-[#888]">clicks/day</div>
@@ -696,7 +697,7 @@ export default function AnalysisPage() {
                                         <div className="text-center">
                                             <div className="flex justify-center mb-2"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10" /><path d="M8 14s1.5 2 4 2 4-2 4-2" /><line x1="9" y1="9" x2="9.01" y2="9" /><line x1="15" y1="9" x2="15.01" y2="9" /></svg></div>
                                             <div className="text-xs text-[#666] uppercase mb-1">Weekend Avg</div>
-                                            <div className="text-2xl font-bold text-white">
+                                            <div className="text-2xl font-bold" style={{ color: 'var(--foreground)' }}>
                                                 {weekdayWeekend.weekendAvg?.toFixed(1) || 0}
                                             </div>
                                             <div className="text-xs text-[#888]">clicks/day</div>
@@ -716,7 +717,7 @@ export default function AnalysisPage() {
                                     )}
                                 </div>
                             ) : (
-                                <div className="bg-[#111] border border-[#333] rounded-xl p-8 text-center text-[#666]">
+                                <div className="rounded-xl p-8 text-center" style={{ background: 'var(--surface-1)', border: '1px solid var(--border-default)', color: 'var(--foreground-secondary)' }}>
                                     {enhancedLoading ? 'Loading weekday/weekend data...' : 'Engagement data not available'}
                                 </div>
                             )}
@@ -730,10 +731,11 @@ export default function AnalysisPage() {
                                     {mlInsights.insights.map((insight, i) => (
                                         <div
                                             key={i}
-                                            className={`bg-[#111] border rounded-xl p-4 ${insight.priority === 'high' ? 'border-yellow-500/50' :
+                                            className={`rounded-xl p-4 ${insight.priority === 'high' ? 'border-yellow-500/50' :
                                                     insight.priority === 'medium' ? 'border-blue-500/30' :
-                                                        'border-[#333]'
+                                                        ''
                                                 }`}
+                                            style={{ background: 'var(--surface-1)', border: insight.priority === 'high' ? undefined : insight.priority === 'medium' ? undefined : '1px solid var(--border-default)' }}
                                         >
                                             <div className="flex items-start gap-3">
                                                 <span className="text-2xl">
@@ -742,7 +744,7 @@ export default function AnalysisPage() {
                                                             insight.type === 'success' ? '✓' : 'i'}
                                                 </span>
                                                 <div className="flex-1">
-                                                    <div className="text-white font-medium">{insight.title}</div>
+                                                    <div className="font-medium" style={{ color: 'var(--foreground)' }}>{insight.title}</div>
                                                     <div className="text-sm text-[#888] mt-1">{insight.description}</div>
                                                     {insight.action && (
                                                         <div className="text-xs text-[#00C853] mt-2 flex items-center gap-1">
@@ -760,7 +762,7 @@ export default function AnalysisPage() {
                                             {insight.confidence && (
                                                 <div className="mt-3 flex items-center gap-2">
                                                     <div className="text-xs text-[#666]">Confidence:</div>
-                                                    <div className="flex-1 h-1.5 bg-[#222] rounded-full overflow-hidden">
+                                                    <div className="flex-1 h-1.5 rounded-full overflow-hidden" style={{ background: 'var(--surface-2)' }}>
                                                         <div
                                                             className="h-full bg-gradient-to-r from-[#00C853] to-[#69F0AE] rounded-full"
                                                             style={{ width: `${insight.confidence}%` }}
@@ -773,7 +775,7 @@ export default function AnalysisPage() {
                                     ))}
                                 </div>
                             ) : (
-                                <div className="bg-[#111] border border-[#333] rounded-xl p-8 text-center">
+                                <div className="rounded-xl p-8 text-center" style={{ background: 'var(--surface-1)', border: '1px solid var(--border-default)' }}>
                                     <div className="flex justify-center mb-3"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><rect x="4" y="4" width="16" height="16" rx="2" ry="2" /><rect x="9" y="9" width="6" height="6" /><line x1="9" y1="1" x2="9" y2="4" /><line x1="15" y1="1" x2="15" y2="4" /><line x1="9" y1="20" x2="9" y2="23" /><line x1="15" y1="20" x2="15" y2="23" /><line x1="20" y1="9" x2="23" y2="9" /><line x1="20" y1="14" x2="23" y2="14" /><line x1="1" y1="9" x2="4" y2="9" /><line x1="1" y1="14" x2="4" y2="14" /></svg></div>
                                     <div className="text-[#666]">
                                         {enhancedLoading ? 'Generating AI insights...' : 'No insights available yet. Keep collecting data!'}
@@ -789,11 +791,11 @@ export default function AnalysisPage() {
             {/* Performance Classification Modal */}
             {showPerformanceModal && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm">
-                    <div className="bg-[#111] border border-[#333] rounded-2xl w-full max-w-4xl max-h-[80vh] overflow-hidden shadow-2xl">
+                    <div className="rounded-2xl w-full max-w-4xl max-h-[80vh] overflow-hidden shadow-2xl" style={{ background: 'var(--surface-1)', border: '1px solid var(--border-default)' }}>
                         {/* Modal Header */}
-                        <div className="flex items-center justify-between p-6 border-b border-[#333]">
+                        <div className="flex items-center justify-between p-6" style={{ borderBottom: '1px solid var(--border-default)' }}>
                             <div>
-                                <h2 className="text-xl font-bold text-white flex items-center gap-2">
+                                <h2 className="text-xl font-bold flex items-center gap-2" style={{ color: 'var(--foreground)' }}>
                                     Link Performance Classification
                                 </h2>
                                 <p className="text-sm text-[#888] mt-1">
@@ -833,7 +835,7 @@ export default function AnalysisPage() {
                                                                 <span className="text-lg font-bold text-green-400">
                                                                     #{i + 1}
                                                                 </span>
-                                                                <span className="text-white font-medium truncate max-w-[180px]" title={link.target_url}>
+                                                                <span className="font-medium truncate max-w-[180px]" style={{ color: 'var(--foreground)' }} title={link.target_url}>
                                                                     {link.link_name}
                                                                 </span>
                                                             </div>
@@ -848,18 +850,18 @@ export default function AnalysisPage() {
                                                             </div>
                                                             <div className="text-center">
                                                                 <div className="text-[#888]">Clicks</div>
-                                                                <div className="text-white font-medium">{link.clicks}</div>
+                                                                <div className="font-medium" style={{ color: 'var(--foreground)' }}>{link.clicks}</div>
                                                             </div>
                                                             <div className="text-center">
                                                                 <div className="text-[#888]">Rank Score</div>
-                                                                <div className="text-white font-medium">{link.rank_score.toFixed(1)}</div>
+                                                                <div className="font-medium" style={{ color: 'var(--foreground)' }}>{link.rank_score.toFixed(1)}</div>
                                                             </div>
                                                         </div>
                                                     </div>
                                                 ))}
                                             </div>
                                         ) : (
-                                            <div className="text-center text-[#666] py-8 bg-[#0a0a0a] rounded-xl border border-[#222]">
+                                            <div className="text-center py-8 rounded-xl" style={{ color: 'var(--foreground-secondary)', background: 'var(--surface-2)', border: '1px solid var(--border-default)' }}>
                                                 No top performing links found
                                             </div>
                                         )}
@@ -882,7 +884,7 @@ export default function AnalysisPage() {
                                                                 <span className="text-lg font-bold text-red-400">
                                                                     #{i + 1}
                                                                 </span>
-                                                                <span className="text-white font-medium truncate max-w-[180px]" title={link.target_url}>
+                                                                <span className="font-medium truncate max-w-[180px]" style={{ color: 'var(--foreground)' }} title={link.target_url}>
                                                                     {link.link_name}
                                                                 </span>
                                                             </div>
@@ -897,18 +899,18 @@ export default function AnalysisPage() {
                                                             </div>
                                                             <div className="text-center">
                                                                 <div className="text-[#888]">Clicks</div>
-                                                                <div className="text-white font-medium">{link.clicks}</div>
+                                                                <div className="font-medium" style={{ color: 'var(--foreground)' }}>{link.clicks}</div>
                                                             </div>
                                                             <div className="text-center">
                                                                 <div className="text-[#888]">Rank Score</div>
-                                                                <div className="text-white font-medium">{link.rank_score.toFixed(1)}</div>
+                                                                <div className="font-medium" style={{ color: 'var(--foreground)' }}>{link.rank_score.toFixed(1)}</div>
                                                             </div>
                                                         </div>
                                                     </div>
                                                 ))}
                                             </div>
                                         ) : (
-                                            <div className="text-center text-[#666] py-8 bg-[#0a0a0a] rounded-xl border border-[#222]">
+                                            <div className="text-center py-8 rounded-xl" style={{ color: 'var(--foreground-secondary)', background: 'var(--surface-2)', border: '1px solid var(--border-default)' }}>
                                                 No least performing links found
                                             </div>
                                         )}
@@ -922,7 +924,7 @@ export default function AnalysisPage() {
 
                             {/* Meta Info */}
                             {performanceData?.meta && (
-                                <div className="mt-6 pt-6 border-t border-[#333] text-xs text-[#666] flex justify-between">
+                                <div className="mt-6 pt-6 text-xs flex justify-between" style={{ borderTop: '1px solid var(--border-default)', color: 'var(--foreground-secondary)' }}>
                                     <span>Time Window: {performanceData.meta.time_window}</span>
                                     <span>Min Impressions: {performanceData.meta.min_impressions_threshold}</span>
                                     <span>Links Analyzed: {performanceData.meta.total_links_analyzed}</span>

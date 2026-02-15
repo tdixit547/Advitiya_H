@@ -43,7 +43,8 @@ export default function HubSelector({
       <button
         onClick={() => setIsOpen(!isOpen)}
         disabled={isLoading}
-        className="flex items-center gap-3 bg-[#111] border border-[#333] rounded-xl px-4 py-2 hover:border-[#00C853]/50 transition-colors disabled:opacity-50"
+        className="flex items-center gap-3 rounded-xl px-4 py-2 hover:border-[#00C853]/50 transition-colors disabled:opacity-50"
+        style={{ background: 'var(--surface-2)', border: '1px solid var(--border-default)' }}
       >
         {isLoading ? (
           <div className="w-8 h-8 border-2 border-[#00C853] border-t-transparent rounded-full animate-spin"></div>
@@ -56,7 +57,7 @@ export default function HubSelector({
               {selectedHub.slug.charAt(0).toUpperCase()}
             </div>
             <div className="text-left">
-              <p className="text-white font-medium text-sm">{selectedHub.slug}</p>
+              <p className="font-medium text-sm" style={{ color: 'var(--foreground)' }}>{selectedHub.slug}</p>
               <p className="text-[#666] text-xs truncate max-w-[150px]">{selectedHub.default_url}</p>
             </div>
           </>
@@ -75,7 +76,7 @@ export default function HubSelector({
 
       {/* Dropdown Menu */}
       {isOpen && (
-        <div className="absolute top-full left-0 mt-2 w-64 bg-[#111] border border-[#333] rounded-xl shadow-xl z-50 overflow-hidden">
+        <div className="absolute top-full left-0 mt-2 w-64 rounded-xl shadow-xl z-50 overflow-hidden" style={{ background: 'var(--surface-1)', border: '1px solid var(--border-default)' }}>
           <div className="max-h-60 overflow-y-auto">
             {hubs.length === 0 ? (
               <div className="p-4 text-center text-[#666] text-sm">
@@ -100,7 +101,7 @@ export default function HubSelector({
                     {hub.slug.charAt(0).toUpperCase()}
                   </div>
                   <div className="text-left min-w-0">
-                    <p className="text-white font-medium text-sm">{hub.slug}</p>
+                    <p className="font-medium text-sm" style={{ color: 'var(--foreground)' }}>{hub.slug}</p>
                     <p className="text-[#666] text-xs truncate">{hub.default_url}</p>
                   </div>
                   {selectedHub?.hub_id === hub.hub_id && (
@@ -114,7 +115,7 @@ export default function HubSelector({
           </div>
           
           {/* Create New Hub Button */}
-          <div className="border-t border-[#333]">
+          <div style={{ borderTop: '1px solid var(--border-default)' }}>
             <button
               onClick={() => {
                 onCreateNew();

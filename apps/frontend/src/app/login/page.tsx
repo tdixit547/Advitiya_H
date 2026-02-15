@@ -48,14 +48,14 @@ export default function LoginPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-black flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center" style={{ background: 'var(--background)' }}>
         <div className="w-12 h-12 border-4 border-[#00C853] border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
 
   return (
-    <main className="min-h-screen flex" style={{ background: '#000' }}>
+    <main className="min-h-screen flex" style={{ background: 'var(--background)' }}>
 
       {/* ─── Left Panel: Branding ─── */}
       <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden items-center justify-center">
@@ -74,15 +74,15 @@ export default function LoginPage() {
                 <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
               </svg>
             </div>
-            <span className="font-bold text-white text-xl tracking-tight">Smart Link Hub</span>
+            <span className="font-bold text-xl tracking-tight" style={{ color: 'var(--foreground)' }}>Smart Link Hub</span>
           </div>
 
-          <h2 className="text-4xl font-bold text-white mb-4 leading-tight tracking-tight">
+          <h2 className="text-4xl font-bold mb-4 leading-tight tracking-tight" style={{ color: 'var(--foreground)' }}>
             Route smarter.
             <br />
             <span className="gradient-text">Convert better.</span>
           </h2>
-          <p className="text-[#777] text-base leading-relaxed mb-10">
+          <p className="text-base leading-relaxed mb-10" style={{ color: 'var(--foreground-secondary)' }}>
             Create intelligent links that adapt to your audience. Device detection, geo-targeting, and real-time analytics — all in one platform.
           </p>
 
@@ -120,25 +120,25 @@ export default function LoginPage() {
                   <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
                 </svg>
               </div>
-              <span className="font-bold text-white text-lg">Smart Link Hub</span>
+              <span className="font-bold text-lg" style={{ color: 'var(--foreground)' }}>Smart Link Hub</span>
             </Link>
           </div>
 
           {/* Back to home (desktop) */}
-          <Link href="/" className="hidden lg:inline-flex items-center gap-2 text-sm text-[#666] hover:text-white transition-colors mb-8">
+          <Link href="/" className="hidden lg:inline-flex items-center gap-2 text-sm transition-colors mb-8" style={{ color: 'var(--foreground-secondary)' }}>
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6" /></svg>
             Back to home
           </Link>
 
-          <h1 className="text-3xl font-bold text-white mb-2 tracking-tight">Welcome back</h1>
-          <p className="text-[#888] text-sm mb-8">Sign in to manage your smart links</p>
+          <h1 className="text-3xl font-bold mb-2 tracking-tight" style={{ color: 'var(--foreground)' }}>Welcome back</h1>
+          <p className="text-sm mb-8" style={{ color: 'var(--foreground-secondary)' }}>Sign in to manage your smart links</p>
 
           {/* Form card */}
           <div
             className="rounded-2xl p-8"
             style={{
-              background: 'linear-gradient(135deg, rgba(17,17,17,0.8) 0%, rgba(10,10,10,0.9) 100%)',
-              border: '1px solid rgba(255,255,255,0.06)',
+              background: 'var(--surface-1)',
+              border: '1px solid var(--border-subtle)',
             }}
           >
             {/* Error  */}
@@ -151,7 +151,7 @@ export default function LoginPage() {
 
             <form onSubmit={handleSubmit} className="space-y-5">
               <div>
-                <label htmlFor="email" className="block text-sm font-medium text-[#888] mb-2">
+                <label htmlFor="email" className="block text-sm font-medium mb-2" style={{ color: 'var(--foreground-secondary)' }}>
                   Email
                 </label>
                 <input
@@ -167,7 +167,7 @@ export default function LoginPage() {
               </div>
 
               <div>
-                <label htmlFor="password" className="block text-sm font-medium text-[#888] mb-2">
+                <label htmlFor="password" className="block text-sm font-medium mb-2" style={{ color: 'var(--foreground-secondary)' }}>
                   Password
                 </label>
                 <div className="relative">
@@ -212,8 +212,8 @@ export default function LoginPage() {
               </button>
             </form>
 
-            <div className="mt-6 pt-6 text-center" style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
-              <p className="text-sm text-[#888]">
+            <div className="mt-6 pt-6 text-center" style={{ borderTop: '1px solid var(--border-subtle)' }}>
+              <p className="text-sm" style={{ color: 'var(--foreground-secondary)' }}>
                 Don&apos;t have an account?{' '}
                 <Link href="/register" className="text-[#00C853] hover:text-[#00E676] font-medium transition-colors">
                   Create one

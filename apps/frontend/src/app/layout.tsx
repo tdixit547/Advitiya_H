@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/contexts/auth-context";
+import { ThemeProvider } from "@/contexts/theme-context";
 import KeepAlive from "@/components/KeepAlive";
 import CursorGlow from "@/components/animations/CursorGlow";
 import ParticleField from "@/components/animations/ParticleField";
@@ -28,18 +29,19 @@ export default function RootLayout({
         suppressHydrationWarning
         className={`${inter.variable} antialiased`}
         style={{
-          background: '#000000',
-          color: '#E6E6E6',
           fontFamily: "'Inter', system-ui, -apple-system, sans-serif",
         }}
       >
-        <CursorGlow />
-        <ParticleField count={40} />
-        <KeepAlive />
-        <AuthProvider>
-          {children}
-        </AuthProvider>
+        <ThemeProvider>
+          <CursorGlow />
+          <ParticleField count={40} />
+          <KeepAlive />
+          <AuthProvider>
+            {children}
+          </AuthProvider>
+        </ThemeProvider>
       </body>
     </html>
   );
 }
+

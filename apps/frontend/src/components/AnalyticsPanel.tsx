@@ -54,7 +54,7 @@ export default function AnalyticsPanel({ hubId, stats }: AnalyticsPanelProps) {
     <div className="space-y-6 animate-fade-in-up">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <h2 className="text-xl font-bold text-white">Analytics</h2>
+        <h2 className="text-xl font-bold" style={{ color: 'var(--foreground)' }}>Analytics</h2>
         <div className="flex items-center gap-3">
           <button
             onClick={handleForceAggregate}
@@ -94,12 +94,12 @@ export default function AnalyticsPanel({ hubId, stats }: AnalyticsPanelProps) {
 
       {/* No Data State */}
       {!stats && (
-        <div className="bg-[#111] rounded-xl border border-[#222] p-12 text-center animate-fade-in-up">
+        <div className="rounded-xl p-12 text-center animate-fade-in-up" style={{ background: 'var(--surface-2)', border: '1px solid var(--border-default)' }}>
           <div className="mb-4 opacity-30 flex justify-center">
             <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="20" x2="18" y2="10" /><line x1="12" y1="20" x2="12" y2="4" /><line x1="6" y1="20" x2="6" y2="14" /></svg>
           </div>
-          <h3 className="text-lg font-bold text-[#E6E6E6] mb-2">No Analytics Yet</h3>
-          <p className="text-[#9A9A9A] text-sm max-w-md mx-auto">
+          <h3 className="text-lg font-bold mb-2" style={{ color: 'var(--foreground)' }}>No Analytics Yet</h3>
+          <p className="text-sm max-w-md mx-auto" style={{ color: 'var(--foreground-secondary)' }}>
             Analytics will appear after visitors access your hub.
             Stats are aggregated every 5 minutes.
           </p>
@@ -141,8 +141,8 @@ export default function AnalyticsPanel({ hubId, stats }: AnalyticsPanelProps) {
           {chartData.length > 0 && (
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               {/* Clicks & Impressions Bar Chart */}
-              <div className="bg-[#111] rounded-xl border border-[#222] p-6 card-lift animate-fade-in-up stagger-1">
-                <h3 className="text-lg font-bold text-[#E6E6E6] mb-4">
+              <div className="rounded-xl p-6 card-lift animate-fade-in-up stagger-1" style={{ background: 'var(--surface-2)', border: '1px solid var(--border-default)' }}>
+                <h3 className="text-lg font-bold mb-4" style={{ color: 'var(--foreground)' }}>
                   Performance by Variant
                 </h3>
                 <div className="h-64">
@@ -153,12 +153,12 @@ export default function AnalyticsPanel({ hubId, stats }: AnalyticsPanelProps) {
                       <YAxis stroke="#9A9A9A" fontSize={12} />
                       <Tooltip
                         contentStyle={{
-                          backgroundColor: '#111',
-                          border: '1px solid #333',
+                          backgroundColor: 'var(--surface-1, #111)',
+                          border: '1px solid var(--border-default, #333)',
                           borderRadius: '8px',
-                          boxShadow: '0 4px 20px rgba(0,0,0,0.5)'
+                          boxShadow: '0 4px 20px rgba(0,0,0,0.2)'
                         }}
-                        itemStyle={{ color: '#E6E6E6' }}
+                        itemStyle={{ color: 'var(--foreground, #E6E6E6)' }}
                         cursor={{ fill: 'rgba(0, 200, 83, 0.1)' }}
                       />
                       <Bar
@@ -179,8 +179,8 @@ export default function AnalyticsPanel({ hubId, stats }: AnalyticsPanelProps) {
               </div>
 
               {/* CTR Chart */}
-              <div className="bg-[#111] rounded-xl border border-[#222] p-6 card-lift animate-fade-in-up stagger-2">
-                <h3 className="text-lg font-bold text-[#E6E6E6] mb-4">
+              <div className="rounded-xl p-6 card-lift animate-fade-in-up stagger-2" style={{ background: 'var(--surface-2)', border: '1px solid var(--border-default)' }}>
+                <h3 className="text-lg font-bold mb-4" style={{ color: 'var(--foreground)' }}>
                   CTR by Variant (%)
                 </h3>
                 <div className="h-64">
@@ -191,12 +191,12 @@ export default function AnalyticsPanel({ hubId, stats }: AnalyticsPanelProps) {
                       <YAxis stroke="#9A9A9A" fontSize={12} domain={[0, 100]} />
                       <Tooltip
                         contentStyle={{
-                          backgroundColor: '#111',
-                          border: '1px solid #333',
+                          backgroundColor: 'var(--surface-1, #111)',
+                          border: '1px solid var(--border-default, #333)',
                           borderRadius: '8px',
-                          boxShadow: '0 4px 20px rgba(0,0,0,0.5)'
+                          boxShadow: '0 4px 20px rgba(0,0,0,0.2)'
                         }}
-                        itemStyle={{ color: '#E6E6E6' }}
+                        itemStyle={{ color: 'var(--foreground, #E6E6E6)' }}
                         formatter={(value) => [`${value}%`, 'CTR']}
                       />
                       <Line
@@ -204,8 +204,8 @@ export default function AnalyticsPanel({ hubId, stats }: AnalyticsPanelProps) {
                         dataKey="ctr"
                         stroke="#00C853"
                         strokeWidth={3}
-                        dot={{ r: 6, fill: '#00C853', strokeWidth: 2, stroke: '#000' }}
-                        activeDot={{ r: 8, fill: '#00E676', stroke: '#000', strokeWidth: 2 }}
+                        dot={{ r: 6, fill: '#00C853', strokeWidth: 2, stroke: 'var(--background, #000)' }}
+                        activeDot={{ r: 8, fill: '#00E676', stroke: 'var(--background, #000)', strokeWidth: 2 }}
                       />
                     </LineChart>
                   </ResponsiveContainer>
@@ -215,14 +215,14 @@ export default function AnalyticsPanel({ hubId, stats }: AnalyticsPanelProps) {
           )}
 
           {/* Variant Stats Table */}
-          <div className="bg-[#111] rounded-xl border border-[#222] p-6 card-lift animate-fade-in-up stagger-3">
+          <div className="rounded-xl p-6 card-lift animate-fade-in-up stagger-3" style={{ background: 'var(--surface-2)', border: '1px solid var(--border-default)' }}>
             <div className="flex justify-between items-center mb-4">
-              <h3 className="text-lg font-bold text-[#E6E6E6]">Variant Performance</h3>
+              <h3 className="text-lg font-bold" style={{ color: 'var(--foreground)' }}>Variant Performance</h3>
             </div>
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse">
                 <thead>
-                  <tr className="border-b border-[#333] text-[#9A9A9A] text-sm">
+                  <tr style={{ borderBottom: '1px solid var(--border-default)', color: 'var(--foreground-secondary)' }} className="text-sm">
                     <th className="py-3">Variant ID</th>
                     <th className="py-3 text-right">Impressions</th>
                     <th className="py-3 text-right">Clicks</th>
@@ -231,7 +231,7 @@ export default function AnalyticsPanel({ hubId, stats }: AnalyticsPanelProps) {
                     <th className="py-3 text-right">Recent (1h)</th>
                   </tr>
                 </thead>
-                <tbody className="text-[#E6E6E6]">
+                <tbody style={{ color: 'var(--foreground)' }}>
                   {stats.variants.length === 0 && (
                     <tr>
                       <td colSpan={6} className="py-8 text-center text-[#666]">
@@ -242,8 +242,8 @@ export default function AnalyticsPanel({ hubId, stats }: AnalyticsPanelProps) {
                   {stats.variants.map((variant, index) => (
                     <tr
                       key={variant.variant_id}
-                      className="border-b border-[#222] transition-colors hover:bg-[#1a1a1a]"
-                      style={{ animationDelay: `${index * 50}ms` }}
+                      className="transition-colors"
+                      style={{ borderBottom: '1px solid var(--border-subtle)', animationDelay: `${index * 50}ms` }}
                     >
                       <td className="py-3 font-medium">{variant.variant_id}</td>
                       <td className="py-3 text-right font-mono">{variant.impressions.toLocaleString()}</td>
@@ -255,7 +255,7 @@ export default function AnalyticsPanel({ hubId, stats }: AnalyticsPanelProps) {
                       </td>
                       <td className="py-3 text-right font-mono">{variant.score.toFixed(2)}</td>
                       <td className="py-3 text-right">
-                        <span className="text-xs bg-[#222] px-2 py-1 rounded transition-colors hover:bg-[#333]">
+                        <span className="text-xs px-2 py-1 rounded transition-colors" style={{ background: 'var(--surface-2)', color: 'var(--foreground-secondary)' }}>
                           {variant.recent_clicks_hour} clicks
                         </span>
                       </td>
@@ -297,9 +297,9 @@ function KpiCard({
     <div className={`stat-card animate-fade-in-up stagger-${delay + 1}`}>
       <div className="flex items-center gap-2 mb-2">
         <span className="flex items-center">{KPI_ICONS[icon] || null}</span>
-        <p className="text-[#9A9A9A] text-sm">{label}</p>
+        <p className="text-sm" style={{ color: 'var(--foreground-secondary)' }}>{label}</p>
       </div>
-      <div className="text-2xl font-bold text-white">
+      <div className="text-2xl font-bold" style={{ color: 'var(--foreground)' }}>
         {isPercentage ? (
           <AnimatedPercentage value={value} />
         ) : (

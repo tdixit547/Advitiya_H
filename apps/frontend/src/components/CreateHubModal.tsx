@@ -87,10 +87,10 @@ export default function CreateHubModal({ isOpen, onClose, onCreate }: CreateHubM
       />
       
       {/* Modal */}
-      <div className="relative bg-[#111] border border-[#333] rounded-2xl w-full max-w-md m-4 shadow-2xl">
+      <div className="relative rounded-2xl w-full max-w-md m-4 shadow-2xl" style={{ background: 'var(--surface-1)', border: '1px solid var(--border-default)' }}>
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-[#222]">
-          <h2 className="text-xl font-bold text-white">Create New Hub</h2>
+        <div className="flex items-center justify-between p-6" style={{ borderBottom: '1px solid var(--border-default)' }}>
+          <h2 className="text-xl font-bold" style={{ color: 'var(--foreground)' }}>Create New Hub</h2>
           <button
             onClick={onClose}
             className="text-[#666] hover:text-white transition-colors"
@@ -111,7 +111,7 @@ export default function CreateHubModal({ isOpen, onClose, onCreate }: CreateHubM
 
           {/* Slug */}
           <div>
-            <label className="block text-[#9A9A9A] text-sm mb-2">
+            <label className="block text-sm mb-2" style={{ color: 'var(--foreground-secondary)' }}>
               Slug <span className="text-[#666]">(URL path)</span>
             </label>
             <input
@@ -129,7 +129,7 @@ export default function CreateHubModal({ isOpen, onClose, onCreate }: CreateHubM
 
           {/* Hub ID */}
           <div>
-            <label className="block text-[#9A9A9A] text-sm mb-2">
+            <label className="block text-sm mb-2" style={{ color: 'var(--foreground-secondary)' }}>
               Hub ID <span className="text-[#666]">(unique identifier)</span>
             </label>
             <input
@@ -144,7 +144,7 @@ export default function CreateHubModal({ isOpen, onClose, onCreate }: CreateHubM
 
           {/* Default URL */}
           <div>
-            <label className="block text-[#9A9A9A] text-sm mb-2">
+            <label className="block text-sm mb-2" style={{ color: 'var(--foreground-secondary)' }}>
               Default URL <span className="text-[#666]">(fallback when no rules match)</span>
             </label>
             <input
@@ -160,7 +160,7 @@ export default function CreateHubModal({ isOpen, onClose, onCreate }: CreateHubM
           {/* Theme Colors */}
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-[#9A9A9A] text-sm mb-2">Background</label>
+              <label className="block text-sm mb-2" style={{ color: 'var(--foreground-secondary)' }}>Background</label>
               <div className="flex items-center gap-2">
                 <input
                   type="color"
@@ -177,7 +177,7 @@ export default function CreateHubModal({ isOpen, onClose, onCreate }: CreateHubM
               </div>
             </div>
             <div>
-              <label className="block text-[#9A9A9A] text-sm mb-2">Accent</label>
+              <label className="block text-sm mb-2" style={{ color: 'var(--foreground-secondary)' }}>Accent</label>
               <div className="flex items-center gap-2">
                 <input
                   type="color"
@@ -197,7 +197,7 @@ export default function CreateHubModal({ isOpen, onClose, onCreate }: CreateHubM
 
           {/* Preview */}
           <div>
-            <label className="block text-[#9A9A9A] text-sm mb-2">Preview</label>
+            <label className="block text-sm mb-2" style={{ color: 'var(--foreground-secondary)' }}>Preview</label>
             <div 
               className="p-4 rounded-xl border border-[#333] flex items-center gap-3"
               style={{ backgroundColor: bgColor }}

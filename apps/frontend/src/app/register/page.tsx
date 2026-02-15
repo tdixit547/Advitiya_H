@@ -101,14 +101,14 @@ export default function RegisterPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-black flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center" style={{ background: 'var(--background)' }}>
         <div className="w-12 h-12 border-4 border-[#00C853] border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
 
   return (
-    <main className="min-h-screen flex" style={{ background: '#000' }}>
+    <main className="min-h-screen flex" style={{ background: 'var(--background)' }}>
 
       {/* ─── Left Panel: Branding ─── */}
       <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden items-center justify-center">
@@ -125,15 +125,15 @@ export default function RegisterPage() {
                 <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
               </svg>
             </div>
-            <span className="font-bold text-white text-xl tracking-tight">Smart Link Hub</span>
+            <span className="font-bold text-xl tracking-tight" style={{ color: 'var(--foreground)' }}>Smart Link Hub</span>
           </div>
 
-          <h2 className="text-4xl font-bold text-white mb-4 leading-tight tracking-tight">
+          <h2 className="text-4xl font-bold mb-4 leading-tight tracking-tight" style={{ color: 'var(--foreground)' }}>
             Start building
             <br />
             <span className="gradient-text">smarter links.</span>
           </h2>
-          <p className="text-[#777] text-base leading-relaxed mb-10">
+          <p className="text-base leading-relaxed mb-10" style={{ color: 'var(--foreground-secondary)' }}>
             Join thousands of creators and marketers who use Smart Link Hub to maximize their link performance.
           </p>
 
@@ -169,23 +169,23 @@ export default function RegisterPage() {
                   <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
                 </svg>
               </div>
-              <span className="font-bold text-white text-lg">Smart Link Hub</span>
+              <span className="font-bold text-lg" style={{ color: 'var(--foreground)' }}>Smart Link Hub</span>
             </Link>
           </div>
 
-          <Link href="/" className="hidden lg:inline-flex items-center gap-2 text-sm text-[#666] hover:text-white transition-colors mb-8">
+          <Link href="/" className="hidden lg:inline-flex items-center gap-2 text-sm transition-colors mb-8" style={{ color: 'var(--foreground-secondary)' }}>
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6" /></svg>
             Back to home
           </Link>
 
-          <h1 className="text-3xl font-bold text-white mb-2 tracking-tight">Create your account</h1>
-          <p className="text-[#888] text-sm mb-8">Start building smarter links in seconds</p>
+          <h1 className="text-3xl font-bold mb-2 tracking-tight" style={{ color: 'var(--foreground)' }}>Create your account</h1>
+          <p className="text-sm mb-8" style={{ color: 'var(--foreground-secondary)' }}>Start building smarter links in seconds</p>
 
           <div
             className="rounded-2xl p-8"
             style={{
-              background: 'linear-gradient(135deg, rgba(17,17,17,0.8) 0%, rgba(10,10,10,0.9) 100%)',
-              border: '1px solid rgba(255,255,255,0.06)',
+              background: 'var(--surface-1)',
+              border: '1px solid var(--border-subtle)',
             }}
           >
             {error && (
@@ -197,7 +197,7 @@ export default function RegisterPage() {
 
             <form onSubmit={handleSubmit} className="space-y-5">
               <div>
-                <label htmlFor="name" className="block text-sm font-medium text-[#888] mb-2">
+                <label htmlFor="name" className="block text-sm font-medium mb-2" style={{ color: 'var(--foreground-secondary)' }}>
                   Name <span className="text-[#444]">(optional)</span>
                 </label>
                 <input
@@ -212,7 +212,7 @@ export default function RegisterPage() {
               </div>
 
               <div>
-                <label htmlFor="email" className="block text-sm font-medium text-[#888] mb-2">
+                <label htmlFor="email" className="block text-sm font-medium mb-2" style={{ color: 'var(--foreground-secondary)' }}>
                   Email
                 </label>
                 <input
@@ -228,7 +228,7 @@ export default function RegisterPage() {
               </div>
 
               <div>
-                <label htmlFor="password" className="block text-sm font-medium text-[#888] mb-2">
+                <label htmlFor="password" className="block text-sm font-medium mb-2" style={{ color: 'var(--foreground-secondary)' }}>
                   Password
                 </label>
                 <div className="relative">
@@ -258,7 +258,7 @@ export default function RegisterPage() {
               </div>
 
               <div>
-                <label htmlFor="confirmPassword" className="block text-sm font-medium text-[#888] mb-2">
+                <label htmlFor="confirmPassword" className="block text-sm font-medium mb-2" style={{ color: 'var(--foreground-secondary)' }}>
                   Confirm Password
                 </label>
                 <input
@@ -293,8 +293,8 @@ export default function RegisterPage() {
               </button>
             </form>
 
-            <div className="mt-6 pt-6 text-center" style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
-              <p className="text-sm text-[#888]">
+            <div className="mt-6 pt-6 text-center" style={{ borderTop: '1px solid var(--border-subtle)' }}>
+              <p className="text-sm" style={{ color: 'var(--foreground-secondary)' }}>
                 Already have an account?{' '}
                 <Link href="/login" className="text-[#00C853] hover:text-[#00E676] font-medium transition-colors">
                   Sign in

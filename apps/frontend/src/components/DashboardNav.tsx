@@ -6,14 +6,16 @@
 'use client';
 
 import Link from 'next/link';
+import ThemeToggle from '@/components/ThemeToggle';
 
 export default function DashboardNav() {
   return (
-    <nav className="sticky top-0 z-20 bg-black/80 backdrop-blur-md border-b border-[#222]">
-      <div className="max-w-7xl mx-auto px-6 py-3 flex items-center">
+    <nav className="sticky top-0 z-20 backdrop-blur-md border-b" style={{ background: 'var(--surface-1, #000)', borderColor: 'var(--border-default, #222)' }}>
+      <div className="max-w-7xl mx-auto px-6 py-3 flex items-center justify-between">
         <Link
           href="/dashboard"
-          className="flex items-center gap-2.5 text-white hover:opacity-80 transition-opacity"
+          className="flex items-center gap-2.5 hover:opacity-80 transition-opacity"
+          style={{ color: 'var(--foreground)' }}
         >
           {/* Lightning icon */}
           <span className="flex items-center justify-center w-8 h-8 rounded-lg bg-[#00C853]/15">
@@ -32,7 +34,9 @@ export default function DashboardNav() {
           </span>
           <span className="font-bold text-sm tracking-wide">Smart Link Hub</span>
         </Link>
+        <ThemeToggle />
       </div>
     </nav>
   );
 }
+

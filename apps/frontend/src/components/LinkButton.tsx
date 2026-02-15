@@ -24,6 +24,7 @@ export default function LinkButton({
   icon,
 }: LinkButtonProps) {
   const [isLoading, setIsLoading] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
 
   const handleClick = async (e: React.MouseEvent) => {
     e.preventDefault();
@@ -56,35 +57,25 @@ export default function LinkButton({
     <button
       onClick={handleClick}
       disabled={isLoading}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
       className="link-button group relative w-full"
       style={{
         display: 'block',
         width: '100%',
         padding: '16px 24px',
-        background: '#000000',
-        border: '2px solid #00FF00',
-        borderRadius: '8px',
-        color: '#00FF00',
-        fontFamily: "'Fira Code', 'Courier New', monospace",
+        background: isHovered ? 'var(--accent, #00C853)' : 'var(--surface-1)',
+        border: '2px solid var(--accent, #00C853)',
+        borderRadius: '12px',
+        color: isHovered ? 'var(--background)' : 'var(--foreground)',
+        fontFamily: "'Inter', sans-serif",
         fontWeight: 600,
         textAlign: 'center',
         cursor: isLoading ? 'wait' : 'pointer',
         transition: 'all 0.2s ease',
         opacity: isLoading ? 0.7 : 1,
-      }}
-      onMouseEnter={(e) => {
-        if (!isLoading) {
-          e.currentTarget.style.background = '#00FF00';
-          e.currentTarget.style.color = '#000000';
-          e.currentTarget.style.boxShadow = '0 0 30px rgba(0, 255, 0, 0.6)';
-          e.currentTarget.style.transform = 'translateY(-2px)';
-        }
-      }}
-      onMouseLeave={(e) => {
-        e.currentTarget.style.background = '#000000';
-        e.currentTarget.style.color = '#00FF00';
-        e.currentTarget.style.boxShadow = 'none';
-        e.currentTarget.style.transform = 'translateY(0)';
+        boxShadow: isHovered ? '0 0 20px rgba(0, 200, 83, 0.3)' : 'none',
+        transform: isHovered ? 'translateY(-2px)' : 'translateY(0)',
       }}
     >
       <div className="flex items-center justify-center gap-3">

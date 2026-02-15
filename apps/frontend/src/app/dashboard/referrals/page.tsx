@@ -104,7 +104,7 @@ function ReferralsContent() {
             <Link href="/dashboard" className="text-[#9A9A9A] hover:text-white transition-colors">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 12H5"/><polyline points="12 19 5 12 12 5"/></svg>
             </Link>
-            <h1 className="text-2xl font-bold text-white flex items-center gap-3">
+            <h1 className="text-2xl font-bold flex items-center gap-3" style={{ color: 'var(--foreground)' }}>
               <span className="flex items-center justify-center w-10 h-10 rounded-lg" style={{ background: 'rgba(59,130,246,0.12)' }}>
                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
               </span>
@@ -154,15 +154,15 @@ function ReferralsContent() {
           <>
             {/* KPI Cards */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-              <div className="bg-[#111] rounded-xl border border-[#222] p-6">
+              <div className="rounded-xl p-6" style={{ background: 'var(--surface-2)', border: '1px solid var(--border-default)' }}>
                 <p className="text-xs text-[#9A9A9A] mb-1 uppercase tracking-wider">Total Visits</p>
-                <p className="text-3xl font-bold text-white">{(overview?.data?.total_visits || 0).toLocaleString()}</p>
+                <p className="text-3xl font-bold" style={{ color: 'var(--foreground)' }}>{(overview?.data?.total_visits || 0).toLocaleString()}</p>
               </div>
-              <div className="bg-[#111] rounded-xl border border-[#222] p-6">
+              <div className="rounded-xl p-6" style={{ background: 'var(--surface-2)', border: '1px solid var(--border-default)' }}>
                 <p className="text-xs text-[#9A9A9A] mb-1 uppercase tracking-wider">Unique Users</p>
                 <p className="text-3xl font-bold text-blue-400">{(overview?.data?.unique_users || 0).toLocaleString()}</p>
               </div>
-              <div className="bg-[#111] rounded-xl border border-[#222] p-6">
+              <div className="rounded-xl p-6" style={{ background: 'var(--surface-2)', border: '1px solid var(--border-default)' }}>
                 <p className="text-xs text-[#9A9A9A] mb-1 uppercase tracking-wider">Traffic Trend</p>
                 <p className="text-3xl font-bold" style={{ color: overview?.data?.traffic_trend === 'up' ? '#00C853' : overview?.data?.traffic_trend === 'down' ? '#ef4444' : '#9A9A9A' }}>
                   {overview?.data?.traffic_trend === 'up' ? '↑' : overview?.data?.traffic_trend === 'down' ? '↓' : '→'}{' '}
@@ -173,8 +173,8 @@ function ReferralsContent() {
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
               {/* Devices */}
-              <div className="bg-[#111] rounded-xl border border-[#222] p-6">
-                <h2 className="text-lg font-bold text-white mb-4">Device Breakdown</h2>
+              <div className="rounded-xl p-6" style={{ background: 'var(--surface-2)', border: '1px solid var(--border-default)' }}>
+                <h2 className="text-lg font-bold mb-4" style={{ color: 'var(--foreground)' }}>Device Breakdown</h2>
                 {devices.length > 0 ? (
                   <div className="space-y-3">
                     {devices.map(d => (
@@ -195,8 +195,8 @@ function ReferralsContent() {
               </div>
 
               {/* Locations */}
-              <div className="bg-[#111] rounded-xl border border-[#222] p-6">
-                <h2 className="text-lg font-bold text-white mb-4">Location Breakdown</h2>
+              <div className="rounded-xl p-6" style={{ background: 'var(--surface-2)', border: '1px solid var(--border-default)' }}>
+                <h2 className="text-lg font-bold mb-4" style={{ color: 'var(--foreground)' }}>Location Breakdown</h2>
                 {locations.length > 0 ? (
                   <div className="space-y-3">
                     {locations.slice(0, 8).map(l => (
@@ -218,8 +218,8 @@ function ReferralsContent() {
             </div>
 
             {/* Country Table */}
-            <div className="bg-[#111] rounded-xl border border-[#222] p-6">
-              <h2 className="text-lg font-bold text-white mb-4">Country Breakdown</h2>
+            <div className="rounded-xl p-6" style={{ background: 'var(--surface-2)', border: '1px solid var(--border-default)' }}>
+              <h2 className="text-lg font-bold mb-4" style={{ color: 'var(--foreground)' }}>Country Breakdown</h2>
               {countryList.length > 0 ? (
                 <div className="overflow-x-auto">
                   <table className="w-full text-sm">

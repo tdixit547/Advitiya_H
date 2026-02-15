@@ -147,10 +147,10 @@ export default function RuleTreeBuilder({ hubId, variants }: RuleTreeBuilderProp
 
   if (isLoading) {
     return (
-      <div className="bg-[#111] rounded-xl border border-[#222] p-8">
+      <div className="rounded-xl p-8" style={{ background: 'var(--surface-1)', border: '1px solid var(--border-default)' }}>
         <div className="flex items-center justify-center gap-3">
           <div className="w-6 h-6 border-2 border-[#00C853] border-t-transparent rounded-full animate-spin"></div>
-          <span className="text-[#9A9A9A]">Loading rule tree...</span>
+          <span className="text-sm" style={{ color: 'var(--foreground-secondary)' }}>Loading rule tree...</span>
         </div>
       </div>
     );
@@ -159,10 +159,10 @@ export default function RuleTreeBuilder({ hubId, variants }: RuleTreeBuilderProp
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="bg-[#111] rounded-xl border border-[#222] p-6">
+      <div className="rounded-xl p-6" style={{ background: 'var(--surface-1)', border: '1px solid var(--border-default)' }}>
         <div className="flex items-center justify-between mb-4">
           <div>
-            <h2 className="text-xl font-bold text-white">Rule Tree</h2>
+            <h2 className="text-xl font-bold" style={{ color: 'var(--foreground)' }}>Rule Tree</h2>
             <p className="text-[#666] text-sm">
               Define how visitors are routed to variants
             </p>
@@ -218,7 +218,7 @@ export default function RuleTreeBuilder({ hubId, variants }: RuleTreeBuilderProp
       </div>
 
       {/* Node Type Selector */}
-      <div className="bg-[#111] rounded-xl border border-[#222] p-6">
+      <div className="rounded-xl p-6" style={{ background: 'var(--surface-1)', border: '1px solid var(--border-default)' }}>
         <h3 className="text-white font-medium mb-4">Root Node Type</h3>
         <div className="flex gap-2">
           {(['leaf', 'device', 'location', 'time'] as const).map((type) => (
@@ -242,7 +242,7 @@ export default function RuleTreeBuilder({ hubId, variants }: RuleTreeBuilderProp
 
       {/* Node Editor */}
       {rootNode && (
-        <div className="bg-[#111] rounded-xl border border-[#222] p-6">
+        <div className="rounded-xl p-6" style={{ background: 'var(--surface-1)', border: '1px solid var(--border-default)' }}>
           <NodeEditor
             node={rootNode}
             onChange={setRootNode}
@@ -373,9 +373,9 @@ function DeviceEditor({
           const selectedIds = branch?.type === 'leaf' ? branch.variant_ids : [];
           
           return (
-            <div key={device} className="p-4 bg-black/30 rounded-lg">
+            <div key={device} className="p-4 rounded-lg" style={{ background: 'var(--surface-2)' }}>
               <div className="flex items-center justify-between mb-2">
-                <span className="text-white font-medium capitalize">
+                <span className="font-medium capitalize" style={{ color: 'var(--foreground)' }}>
                   {device === 'default' ? 'Default' : device}
                 </span>
               </div>
@@ -386,7 +386,8 @@ function DeviceEditor({
                   const selected = Array.from(e.target.selectedOptions, o => o.value);
                   setBranchVariants(device, selected);
                 }}
-                className="w-full bg-[#111] border border-[#333] rounded-lg p-2 text-white text-sm"
+                className="w-full rounded-lg p-2 text-sm"
+                style={{ background: 'var(--surface-2)', border: '1px solid var(--border-default)', color: 'var(--foreground)' }}
                 size={Math.min(variants.length, 4)}
               >
                 {variants.map((v) => (
@@ -503,7 +504,7 @@ function LocationEditor({
         {Object.entries(node.country_branches).map(([code, branch]) => {
           const selectedIds = branch.type === 'leaf' ? branch.variant_ids : [];
           return (
-            <div key={code} className="p-4 bg-black/30 rounded-lg">
+            <div key={code} className="p-4 rounded-lg" style={{ background: 'var(--surface-2)' }}>
               <div className="flex items-center justify-between mb-2">
                 <span className="text-white font-medium">
                   {getCountryName(code)} <span className="text-[#666]">({code})</span>
@@ -522,7 +523,8 @@ function LocationEditor({
                   const selected = Array.from(e.target.selectedOptions, o => o.value);
                   setCountryVariants(code, selected);
                 }}
-                className="w-full bg-[#111] border border-[#333] rounded-lg p-2 text-white text-sm"
+                className="w-full rounded-lg p-2 text-sm"
+                style={{ background: 'var(--surface-2)', border: '1px solid var(--border-default)', color: 'var(--foreground)' }}
                 size={Math.min(variants.length, 3)}
               >
                 {variants.map((v) => (
@@ -541,8 +543,8 @@ function LocationEditor({
         )}
 
         {/* Default */}
-        <div className="p-4 bg-black/30 rounded-lg border border-dashed border-[#333]">
-          <span className="text-white font-medium">Default (other countries)</span>
+        <div className="p-4 rounded-lg border border-dashed" style={{ background: 'var(--surface-2)', borderColor: 'var(--border-default)' }}>
+          <span className="font-medium" style={{ color: 'var(--foreground)' }}>Default (other countries)</span>
           <select
             multiple
             value={node.default_node?.type === 'leaf' ? node.default_node.variant_ids : []}
@@ -550,7 +552,8 @@ function LocationEditor({
               const selected = Array.from(e.target.selectedOptions, o => o.value);
               setDefaultVariants(selected);
             }}
-            className="w-full bg-[#111] border border-[#333] rounded-lg p-2 text-white text-sm mt-2"
+            className="w-full rounded-lg p-2 text-sm mt-2"
+            style={{ background: 'var(--surface-2)', border: '1px solid var(--border-default)', color: 'var(--foreground)' }}
             size={Math.min(variants.length, 3)}
           >
             {variants.map((v) => (
@@ -585,14 +588,14 @@ function TimeEditor({
 
   return (
     <div>
-      <h4 className="text-white font-medium mb-3">⏰ Time-Based Routing</h4>
+      <h4 className="font-medium mb-3" style={{ color: 'var(--foreground)' }}>⏰ Time-Based Routing</h4>
       <p className="text-[#666] text-sm mb-4">
         Time-based routing requires more complex configuration. 
         For now, set a default variant.
       </p>
 
-      <div className="p-4 bg-black/30 rounded-lg">
-        <span className="text-white font-medium">Default Variant</span>
+      <div className="p-4 rounded-lg" style={{ background: 'var(--surface-2)' }}>
+        <span className="font-medium" style={{ color: 'var(--foreground)' }}>Default Variant</span>
         <select
           multiple
           value={node.time_default_node?.type === 'leaf' ? node.time_default_node.variant_ids : []}
@@ -600,7 +603,8 @@ function TimeEditor({
             const selected = Array.from(e.target.selectedOptions, o => o.value);
             setDefaultVariants(selected);
           }}
-          className="w-full bg-[#111] border border-[#333] rounded-lg p-2 text-white text-sm mt-2"
+          className="w-full rounded-lg p-2 text-sm mt-2"
+          style={{ background: 'var(--surface-2)', border: '1px solid var(--border-default)', color: 'var(--foreground)' }}
           size={Math.min(variants.length, 4)}
         >
           {variants.map((v) => (

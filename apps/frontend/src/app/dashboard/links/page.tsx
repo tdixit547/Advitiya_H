@@ -168,7 +168,7 @@ function LinksContent() {
         {/* Header */}
         <header className="flex items-center justify-between mb-8">
           <div className="flex items-center gap-4">
-            <h1 className="text-2xl font-bold text-white flex items-center gap-3">
+            <h1 className="text-2xl font-bold flex items-center gap-3" style={{ color: 'var(--foreground)' }}>
               <span className="flex items-center"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#00C853" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" /><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" /></svg></span>
               Link Manager
             </h1>
@@ -210,10 +210,10 @@ function LinksContent() {
         {/* No Hub State */}
         {!isLoadingHubs && hubs.length === 0 && (
           <div className="text-center py-20">
-            <div className="w-20 h-20 bg-[#111] rounded-2xl flex items-center justify-center mx-auto mb-6">
+            <div className="w-20 h-20 rounded-2xl flex items-center justify-center mx-auto mb-6" style={{ background: 'var(--surface-2)' }}>
               <span className="flex items-center"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#00C853" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" /><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" /></svg></span>
             </div>
-            <h2 className="text-2xl font-bold text-white mb-2">Create Your First Hub</h2>
+            <h2 className="text-2xl font-bold mb-2" style={{ color: 'var(--foreground)' }}>Create Your First Hub</h2>
             <p className="text-[#9A9A9A] mb-6 max-w-md mx-auto">
               A hub is a smart link that routes visitors to different URLs based on rules you define.
             </p>
@@ -238,9 +238,10 @@ function LinksContent() {
                     placeholder="Search links..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="input-field pl-10 w-64"
+                    className="input-field w-64"
+                    style={{ paddingLeft: '2.5rem' }}
                   />
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[#9A9A9A] flex items-center"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" /></svg></span>
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 flex items-center pointer-events-none" style={{ color: 'var(--foreground-secondary, #9A9A9A)' }}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" /></svg></span>
                 </div>
                 <span className="text-sm text-[#9A9A9A]">
                   {filteredVariants.length} link{filteredVariants.length !== 1 ? 's' : ''}
@@ -268,7 +269,7 @@ function LinksContent() {
                 />
                 
                 {!isLoadingVariants && filteredVariants.length === 0 && (
-                  <div className="bg-[#111] rounded-xl border border-[#222] p-8 text-center">
+                  <div className="rounded-xl p-8 text-center" style={{ background: 'var(--surface-2)', border: '1px solid var(--border-default)' }}>
                     <div className="mb-4 opacity-30 flex justify-center"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" /><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" /></svg></div>
                     <h3 className="text-lg font-bold text-[#E6E6E6] mb-2">
                       {searchQuery ? 'No links found' : 'No links yet'}
@@ -308,7 +309,7 @@ function LinksContent() {
                     onCancel={() => setSelectedVariant(null)}
                   />
                 ) : (
-                  <div className="bg-[#111] rounded-xl border border-[#222] p-8 text-center">
+                  <div className="rounded-xl p-8 text-center" style={{ background: 'var(--surface-2)', border: '1px solid var(--border-default)' }}>
                     <div className="mb-4 opacity-30 flex justify-center"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" /><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" /></svg></div>
                     <h3 className="text-lg font-bold text-[#E6E6E6] mb-2">
                       Select a link to edit
@@ -322,11 +323,11 @@ function LinksContent() {
             </div>
 
             {/* Quick Stats */}
-            <div className="mt-8 p-4 bg-[#111] rounded-xl border border-[#222]">
+            <div className="mt-8 p-4 rounded-xl" style={{ background: 'var(--surface-2)', border: '1px solid var(--border-default)' }}>
               <h3 className="text-sm font-medium text-[#9A9A9A] mb-3">Quick Stats</h3>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <div>
-                  <p className="text-2xl font-bold text-white">{variants.length}</p>
+                  <p className="text-2xl font-bold" style={{ color: 'var(--foreground)' }}>{variants.length}</p>
                   <p className="text-xs text-[#9A9A9A]">Total Links</p>
                 </div>
                 <div>

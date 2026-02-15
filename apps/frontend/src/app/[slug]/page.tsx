@@ -93,24 +93,23 @@ export default function HubPage() {
       <div
         style={{
           minHeight: '100vh',
-          background: '#000000',
+          background: 'var(--background)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          fontFamily: "'Fira Code', 'Courier New', monospace",
+          fontFamily: "'Inter', sans-serif",
         }}
       >
-        <div style={{ color: '#00FF00', textAlign: 'center' }}>
+        <div style={{ color: 'var(--accent, #00C853)', textAlign: 'center' }}>
           <div
             style={{
               fontSize: '1.5rem',
               marginBottom: '16px',
-              textShadow: '0 0 10px #00FF00',
             }}
           >
-            [ LOADING... ]
+            Loading...
           </div>
-          <div style={{ opacity: 0.7 }}>Initializing connection</div>
+          <div style={{ opacity: 0.7, color: 'var(--foreground-secondary)' }}>Initializing connection</div>
         </div>
       </div>
     );
@@ -121,30 +120,30 @@ export default function HubPage() {
       <div
         style={{
           minHeight: '100vh',
-          background: '#000000',
+          background: 'var(--background)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          fontFamily: "'Fira Code', 'Courier New', monospace",
+          fontFamily: "'Inter', sans-serif",
         }}
       >
-        <div style={{ color: '#FF0000', textAlign: 'center' }}>
+        <div style={{ color: '#ef4444', textAlign: 'center' }}>
           <div
             style={{
               fontSize: '2rem',
               marginBottom: '16px',
-              textShadow: '0 0 10px #FF0000',
+              fontWeight: 700,
             }}
           >
-            [ ERROR ]
+            Error
           </div>
-          <div style={{ opacity: 0.8 }}>{error || 'Unknown error'}</div>
+          <div style={{ opacity: 0.8, color: 'var(--foreground-secondary)' }}>{error || 'Unknown error'}</div>
           <Link
             href="/"
             style={{
               display: 'inline-block',
               marginTop: '24px',
-              color: '#00FF00',
+              color: 'var(--accent, #00C853)',
               textDecoration: 'underline',
             }}
           >
@@ -161,8 +160,8 @@ export default function HubPage() {
     <div
       style={{
         minHeight: '100vh',
-        background: '#000000',
-        fontFamily: "'Fira Code', 'Courier New', monospace",
+        background: 'var(--background)',
+        fontFamily: "'Inter', sans-serif",
         padding: '40px 20px',
       }}
     >
@@ -185,9 +184,9 @@ export default function HubPage() {
               height={120}
               style={{
                 borderRadius: '50%',
-                border: '3px solid #00FF00',
+                border: '3px solid var(--accent, #00C853)',
                 margin: '0 auto 16px',
-                boxShadow: '0 0 30px rgba(0, 255, 0, 0.4)',
+                boxShadow: '0 0 30px rgba(0, 200, 83, 0.2)',
                 objectFit: 'cover',
               }}
             />
@@ -197,15 +196,14 @@ export default function HubPage() {
                 width: '120px',
                 height: '120px',
                 borderRadius: '50%',
-                border: '3px solid #00FF00',
+                border: '3px solid var(--accent, #00C853)',
                 margin: '0 auto 16px',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                background: '#0a0a0a',
+                background: 'var(--surface-2)',
                 fontSize: '3rem',
-                color: '#00FF00',
-                textShadow: '0 0 20px #00FF00',
+                color: 'var(--accent, #00C853)',
               }}
             >
               {profile.username.charAt(0).toUpperCase()}
@@ -217,9 +215,8 @@ export default function HubPage() {
             style={{
               fontSize: '2rem',
               fontWeight: 700,
-              color: '#00FF00',
+              color: 'var(--foreground)',
               margin: '0 0 8px 0',
-              textShadow: '0 0 10px #00FF00, 0 0 20px #00FF00',
             }}
           >
             @{profile.username}
@@ -229,7 +226,7 @@ export default function HubPage() {
           {profile.bio && (
             <p
               style={{
-                color: '#00CC00',
+                color: 'var(--foreground-secondary)',
                 fontSize: '1rem',
                 margin: 0,
                 opacity: 0.9,
@@ -246,14 +243,14 @@ export default function HubPage() {
             <div
               style={{
                 textAlign: 'center',
-                color: '#00FF00',
+                color: 'var(--foreground-secondary)',
                 opacity: 0.7,
                 padding: '40px',
-                border: '2px dashed #00FF00',
-                borderRadius: '8px',
+                border: '2px dashed var(--border-default)',
+                borderRadius: '12px',
               }}
             >
-              [ No links available for your context ]
+              No links available for your context
             </div>
           ) : (
             <div
@@ -283,7 +280,7 @@ export default function HubPage() {
           style={{
             marginTop: '48px',
             textAlign: 'center',
-            color: '#00FF00',
+            color: 'var(--foreground-secondary)',
             opacity: 0.5,
             fontSize: '0.75rem',
           }}

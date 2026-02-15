@@ -116,7 +116,7 @@ function EngagementContent() {
             <Link href="/dashboard" className="text-[#9A9A9A] hover:text-white transition-colors">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 12H5"/><polyline points="12 19 5 12 12 5"/></svg>
             </Link>
-            <h1 className="text-2xl font-bold text-white flex items-center gap-3">
+            <h1 className="text-2xl font-bold flex items-center gap-3" style={{ color: 'var(--foreground)' }}>
               <span className="flex items-center justify-center w-10 h-10 rounded-lg" style={{ background: 'rgba(234,179,8,0.12)' }}>
                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#eab308" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
               </span>
@@ -167,21 +167,21 @@ function EngagementContent() {
           <>
             {/* KPI Cards */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-              <div className="bg-[#111] rounded-xl border border-[#222] p-6">
+              <div className="rounded-xl p-6" style={{ background: 'var(--surface-2)', border: '1px solid var(--border-default)' }}>
                 <p className="text-xs text-[#9A9A9A] mb-1 uppercase tracking-wider">Avg Dwell Time</p>
-                <p className="text-3xl font-bold text-white">
+                <p className="text-3xl font-bold" style={{ color: 'var(--foreground)' }}>
                   {formatDwellTime(engagement?.data?.average_dwell_time)}
                 </p>
                 <p className="text-xs text-[#9A9A9A] mt-1">seconds per session</p>
               </div>
 
-              <div className="bg-[#111] rounded-xl border border-[#222] p-6">
+              <div className="rounded-xl p-6" style={{ background: 'var(--surface-2)', border: '1px solid var(--border-default)' }}>
                 <p className="text-xs text-[#9A9A9A] mb-1 uppercase tracking-wider">Engaged Sessions</p>
                 <p className="text-3xl font-bold text-yellow-400">{totalEngaged.toLocaleString()}</p>
                 <p className="text-xs text-[#9A9A9A] mt-1">total tracked sessions</p>
               </div>
 
-              <div className="bg-[#111] rounded-xl border border-[#222] p-6">
+              <div className="rounded-xl p-6" style={{ background: 'var(--surface-2)', border: '1px solid var(--border-default)' }}>
                 <p className="text-xs text-[#9A9A9A] mb-1 uppercase tracking-wider">Rage Clicks</p>
                 <p className="text-3xl font-bold text-red-400">
                   {rageClicks?.data?.total_incidents ?? '—'}
@@ -191,8 +191,8 @@ function EngagementContent() {
             </div>
 
             {/* Score Distribution */}
-            <div className="bg-[#111] rounded-xl border border-[#222] p-6 mb-8">
-              <h2 className="text-lg font-bold text-white mb-4">Engagement Score Distribution</h2>
+            <div className="rounded-xl p-6 mb-8" style={{ background: 'var(--surface-2)', border: '1px solid var(--border-default)' }}>
+              <h2 className="text-lg font-bold mb-4" style={{ color: 'var(--foreground)' }}>Engagement Score Distribution</h2>
               {dist ? (
                 <div className="space-y-4">
                   {[
@@ -223,8 +223,8 @@ function EngagementContent() {
             </div>
 
             {/* Rage Clicks Table */}
-            <div className="bg-[#111] rounded-xl border border-[#222] p-6">
-              <h2 className="text-lg font-bold text-white mb-4">Rage Click Incidents</h2>
+            <div className="rounded-xl p-6" style={{ background: 'var(--surface-2)', border: '1px solid var(--border-default)' }}>
+              <h2 className="text-lg font-bold mb-4" style={{ color: 'var(--foreground)' }}>Rage Click Incidents</h2>
               {rageClicks?.data?.rage_clicks && rageClicks.data.rage_clicks.length > 0 ? (
                 <div className="overflow-x-auto">
                   <table className="w-full text-sm">

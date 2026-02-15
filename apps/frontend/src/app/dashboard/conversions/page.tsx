@@ -104,7 +104,7 @@ function ConversionsContent() {
             <Link href="/dashboard" className="text-[#9A9A9A] hover:text-white transition-colors">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 12H5"/><polyline points="12 19 5 12 12 5"/></svg>
             </Link>
-            <h1 className="text-2xl font-bold text-white flex items-center gap-3">
+            <h1 className="text-2xl font-bold flex items-center gap-3" style={{ color: 'var(--foreground)' }}>
               <span className="flex items-center justify-center w-10 h-10 rounded-lg" style={{ background: 'rgba(168,85,247,0.12)' }}>
                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#a855f7" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
               </span>
@@ -154,15 +154,15 @@ function ConversionsContent() {
           <>
             {/* KPI Cards */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-              <div className="bg-[#111] rounded-xl border border-[#222] p-6">
+              <div className="rounded-xl p-6" style={{ background: 'var(--surface-2)', border: '1px solid var(--border-default)' }}>
                 <p className="text-xs text-[#9A9A9A] mb-1 uppercase tracking-wider">Total Links Analyzed</p>
-                <p className="text-3xl font-bold text-white">{perf?.meta?.total_links_analyzed ?? linkData.length}</p>
+                <p className="text-3xl font-bold" style={{ color: 'var(--foreground)' }}>{perf?.meta?.total_links_analyzed ?? linkData.length}</p>
               </div>
-              <div className="bg-[#111] rounded-xl border border-[#222] p-6">
+              <div className="rounded-xl p-6" style={{ background: 'var(--surface-2)', border: '1px solid var(--border-default)' }}>
                 <p className="text-xs text-[#9A9A9A] mb-1 uppercase tracking-wider">Top Performers</p>
                 <p className="text-3xl font-bold text-[#00C853]">{topLinks.length}</p>
               </div>
-              <div className="bg-[#111] rounded-xl border border-[#222] p-6">
+              <div className="rounded-xl p-6" style={{ background: 'var(--surface-2)', border: '1px solid var(--border-default)' }}>
                 <p className="text-xs text-[#9A9A9A] mb-1 uppercase tracking-wider">Underperformers</p>
                 <p className="text-3xl font-bold text-red-400">{leastLinks.length}</p>
               </div>
@@ -170,7 +170,7 @@ function ConversionsContent() {
 
             {/* Top Performers & Underperformers */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-              <div className="bg-[#111] rounded-xl border border-[#00C853]/20 p-6">
+              <div className="rounded-xl p-6" style={{ background: 'var(--surface-2)', border: '1px solid rgba(0, 200, 83, 0.2)' }}>
                 <h2 className="text-lg font-bold text-[#00C853] mb-4 flex items-center gap-2">
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#00C853" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
                   Top Performing
@@ -195,7 +195,7 @@ function ConversionsContent() {
                 )}
               </div>
 
-              <div className="bg-[#111] rounded-xl border border-red-500/20 p-6">
+              <div className="rounded-xl p-6" style={{ background: 'var(--surface-2)', border: '1px solid rgba(239, 68, 68, 0.2)' }}>
                 <h2 className="text-lg font-bold text-red-400 mb-4 flex items-center gap-2">
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ef4444" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="23 18 13.5 8.5 8.5 13.5 1 6"/><polyline points="17 18 23 18 23 12"/></svg>
                   Underperforming
@@ -222,8 +222,8 @@ function ConversionsContent() {
             </div>
 
             {/* All Links Performance Table */}
-            <div className="bg-[#111] rounded-xl border border-[#222] p-6 mb-8">
-              <h2 className="text-lg font-bold text-white mb-4">Link Performance Overview</h2>
+            <div className="rounded-xl p-6 mb-8" style={{ background: 'var(--surface-2)', border: '1px solid var(--border-default)' }}>
+              <h2 className="text-lg font-bold mb-4" style={{ color: 'var(--foreground)' }}>Link Performance Overview</h2>
               {linkData.length > 0 ? (
                 <div className="overflow-x-auto">
                   <table className="w-full text-sm">
@@ -261,8 +261,8 @@ function ConversionsContent() {
 
             {/* Before/After Comparison */}
             {comparison?.metrics && comparison.metrics.length > 0 && (
-              <div className="bg-[#111] rounded-xl border border-[#222] p-6">
-                <h2 className="text-lg font-bold text-white mb-4">Before / After Comparison</h2>
+              <div className="rounded-xl p-6" style={{ background: 'var(--surface-2)', border: '1px solid var(--border-default)' }}>
+                <h2 className="text-lg font-bold mb-4" style={{ color: 'var(--foreground)' }}>Before / After Comparison</h2>
                 <div className="overflow-x-auto">
                   <table className="w-full text-sm">
                     <thead>

@@ -41,12 +41,7 @@
   --font-mono: var(--font-geist-mono), monospace;
 }
 
-@media (prefers-color-scheme: light) {
-  :root {
-    --background: #000000;
-    --foreground: #E6E6E6;
-  }
-}
+
 
 body {
   background: var(--background);
@@ -558,4 +553,342 @@ a:not(.btn) {
     animation: none;
     background: #1a1a1a;
   }
+}
+
+/* ============================================
+   LIGHT THEME OVERRIDES
+   Activated via html.light class (ThemeProvider)
+   ============================================ */
+
+html.light {
+  --background: #f8f9fa;
+  --foreground: #1a1a2e;
+  --foreground-secondary: #64748b;
+  --accent: #059669;
+  --accent-light: #10b981;
+  --accent-dim: #047857;
+  --accent-glow: rgba(5, 150, 105, 0.25);
+  --focus-ring: rgba(5, 150, 105, 0.25);
+  --surface-1: #ffffff;
+  --surface-2: #f1f5f9;
+  --surface-3: #e2e8f0;
+  --border-subtle: #e2e8f0;
+  --border-default: #cbd5e1;
+  --border-accent: rgba(5, 150, 105, 0.3);
+}
+
+/* ─── Light: Body ─── */
+html.light body {
+  background: var(--background);
+  color: var(--foreground);
+}
+
+/* ─── Light: Glass Effects ─── */
+html.light .glass {
+  background: rgba(255, 255, 255, 0.75);
+  border-color: rgba(0, 0, 0, 0.08);
+}
+
+html.light .glass-strong {
+  background: rgba(255, 255, 255, 0.9);
+  border-color: rgba(0, 0, 0, 0.1);
+}
+
+html.light .glass-card {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 250, 252, 0.98) 100%);
+  border-color: rgba(0, 0, 0, 0.08);
+}
+
+html.light .glass-card:hover {
+  border-color: rgba(5, 150, 105, 0.3);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08), 0 0 30px rgba(5, 150, 105, 0.06);
+}
+
+/* ─── Light: Gradient Text ─── */
+html.light .gradient-text {
+  background: linear-gradient(135deg, #059669 0%, #10b981 50%, #34d399 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ─── Light: Buttons ─── */
+html.light .btn-primary {
+  background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+  color: #ffffff;
+}
+
+html.light .btn-primary:hover {
+  background: linear-gradient(135deg, #10b981 0%, #34d399 100%);
+  box-shadow: 0 4px 24px rgba(5, 150, 105, 0.25);
+}
+
+html.light .btn-secondary {
+  border-color: rgba(5, 150, 105, 0.4);
+  color: var(--accent);
+}
+
+html.light .btn-secondary:hover {
+  background-color: rgba(5, 150, 105, 0.08);
+  border-color: rgba(5, 150, 105, 0.6);
+}
+
+/* ─── Light: Cards ─── */
+html.light .dashboard-card {
+  background: #ffffff;
+  border-color: var(--border-default);
+}
+
+html.light .dashboard-card:hover {
+  border-color: var(--accent);
+  box-shadow: 0 8px 30px rgba(5, 150, 105, 0.1);
+}
+
+html.light .stat-card {
+  background: #ffffff;
+  border-color: var(--border-default);
+}
+
+html.light .stat-card:hover {
+  border-color: rgba(5, 150, 105, 0.3);
+  background: linear-gradient(135deg, #fff 0%, rgba(5, 150, 105, 0.03) 100%);
+}
+
+/* ─── Light: Input Fields ─── */
+html.light .input-field {
+  background: rgba(255, 255, 255, 0.9);
+  border-color: var(--border-default);
+  color: var(--foreground);
+}
+
+html.light .input-field::placeholder {
+  color: #94a3b8;
+}
+
+html.light .input-field:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 4px var(--focus-ring), 0 0 20px rgba(5, 150, 105, 0.06);
+  background: #ffffff;
+}
+
+/* ─── Light: Skeleton Loaders ─── */
+html.light .skeleton {
+  background: linear-gradient(
+    90deg,
+    #e2e8f0 25%,
+    #f1f5f9 50%,
+    #e2e8f0 75%
+  );
+}
+
+/* ─── Light: Toast ─── */
+html.light .toast {
+  background: rgba(255, 255, 255, 0.96);
+  border-color: var(--border-default);
+  color: var(--foreground);
+}
+
+html.light .toast-success {
+  border-color: var(--accent);
+  background: rgba(5, 150, 105, 0.06);
+}
+
+html.light .toast-error {
+  border-color: #ef4444;
+  background: rgba(239, 68, 68, 0.06);
+}
+
+/* ─── Light: Scrollbar ─── */
+html.light ::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+}
+
+html.light ::-webkit-scrollbar-thumb:hover {
+  background: var(--accent);
+}
+
+/* ─── Light: Noise Overlay off ─── */
+html.light .noise-overlay::after {
+  display: none;
+}
+
+/* ─── Light: Global Tailwind Utility Overrides ─── */
+/* These catch ALL remaining hardcoded dark classes across every component */
+
+/* Backgrounds */
+html.light .bg-black {
+  background-color: var(--background) !important;
+}
+html.light .bg-\[\#111\],
+html.light .bg-\[\#111111\],
+html.light .bg-\[\#0a0a0a\] {
+  background-color: #ffffff !important;
+}
+html.light .bg-\[\#222\],
+html.light .bg-\[\#222222\] {
+  background-color: var(--surface-2) !important;
+}
+html.light .bg-\[\#161616\],
+html.light .bg-\[\#1a1a1a\] {
+  background-color: var(--surface-2) !important;
+}
+html.light .bg-\[\#333\] {
+  background-color: var(--surface-3) !important;
+}
+
+/* bg-black/X opacity variants */
+html.light .bg-black\/80 {
+  background-color: rgba(255, 255, 255, 0.85) !important;
+}
+html.light .bg-black\/30 {
+  background-color: rgba(0, 0, 0, 0.04) !important;
+}
+html.light .bg-black\/50 {
+  background-color: rgba(0, 0, 0, 0.06) !important;
+}
+
+/* Text colors */
+html.light .text-white {
+  color: var(--foreground) !important;
+}
+html.light .text-\[\#9A9A9A\],
+html.light .text-\[\#888\],
+html.light .text-\[\#888888\] {
+  color: var(--foreground-secondary) !important;
+}
+html.light .text-\[\#666\],
+html.light .text-\[\#666666\] {
+  color: #6b7280 !important;
+}
+html.light .text-\[\#555\],
+html.light .text-\[\#444\] {
+  color: #9ca3af !important;
+}
+html.light .text-\[\#ccc\] {
+  color: #374151 !important;
+}
+
+/* Borders */
+html.light .border-\[\#222\],
+html.light .border-\[\#222222\] {
+  border-color: var(--border-subtle) !important;
+}
+html.light .border-\[\#333\],
+html.light .border-\[\#333333\] {
+  border-color: var(--border-default) !important;
+}
+html.light .border-\[\#444\] {
+  border-color: var(--border-default) !important;
+}
+html.light .border-\[\#1a1a1a\] {
+  border-color: var(--border-subtle) !important;
+}
+
+/* Divide */
+html.light .divide-\[\#222\] > :not([hidden]) ~ :not([hidden]) {
+  border-color: var(--border-subtle) !important;
+}
+html.light .divide-\[\#1a1a1a\] > :not([hidden]) ~ :not([hidden]) {
+  border-color: var(--border-subtle) !important;
+}
+
+/* Hover states */
+html.light .hover\:bg-\[\#111\]:hover {
+  background-color: var(--surface-2) !important;
+}
+html.light .hover\:bg-\[\#222\]:hover {
+  background-color: var(--surface-3) !important;
+}
+html.light .hover\:bg-\[\#333\]:hover {
+  background-color: #d1d5db !important;
+}
+html.light .hover\:bg-\[\#1a1a1a\]:hover {
+  background-color: var(--surface-2) !important;
+}
+html.light .hover\:text-white:hover {
+  color: var(--foreground) !important;
+}
+html.light .hover\:border-\[\#555\]:hover {
+  border-color: var(--border-default) !important;
+}
+html.light .hover\:border-\[\#444\]:hover {
+  border-color: var(--border-default) !important;
+}
+
+/* Page-level min-h-screen backgrounds */
+html.light .min-h-screen.bg-black {
+  background-color: var(--background) !important;
+}
+
+/* Recharts tooltip overrides */
+html.light .recharts-tooltip-wrapper .recharts-default-tooltip {
+  background-color: #ffffff !important;
+  border-color: var(--border-default) !important;
+}
+
+/* Gradient card overrides for dashboard */
+html.light [class*="from-\[#1a1a3e\]"],
+html.light [class*="from-\[#0d2818\]"] {
+  background: linear-gradient(135deg, #e0e7ff 0%, #ddd6fe 100%) !important;
+}
+
+/* bg-gray-800 used in trend badges */
+html.light .bg-gray-800 {
+  background-color: #e5e7eb !important;
+}
+html.light .text-gray-400 {
+  color: #6b7280 !important;
+}
+
+/* ============================================
+   Theme Toggle Switch Component
+   ============================================ */
+
+.theme-toggle-btn {
+  background: none;
+  border: none;
+  padding: 4px;
+  cursor: pointer;
+  border-radius: 100px;
+  transition: all var(--transition-base) var(--ease-out);
+}
+
+.theme-toggle-btn:hover {
+  opacity: 0.85;
+}
+
+.theme-toggle-track {
+  width: 52px;
+  height: 28px;
+  background: linear-gradient(135deg, #1a1a2e, #2d2d44);
+  border-radius: 100px;
+  padding: 3px;
+  transition: all var(--transition-base) var(--ease-out);
+  position: relative;
+}
+
+html.light .theme-toggle-track {
+  background: linear-gradient(135deg, #bae6fd, #93c5fd);
+}
+
+.theme-toggle-thumb {
+  width: 22px;
+  height: 22px;
+  background: #1a1a2e;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition-base) var(--ease-out);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+}
+
+html.light .theme-toggle-thumb {
+  background: #ffffff;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+}
+
+/* ─── Light: Page Background ─── */
+html.light .page-bg {
+  background: var(--background);
 }

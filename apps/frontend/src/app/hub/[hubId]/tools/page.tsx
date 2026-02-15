@@ -183,7 +183,7 @@ export default function HubToolsPage() {
 
     if (loading) {
         return (
-            <div className="min-h-screen bg-black flex items-center justify-center">
+            <div className="min-h-screen flex items-center justify-center" style={{ background: 'var(--background)' }}>
                 <div className="w-10 h-10 border-3 border-[#00C853] border-t-transparent rounded-full animate-spin" />
             </div>
         );
@@ -191,7 +191,7 @@ export default function HubToolsPage() {
 
     if (error) {
         return (
-            <div className="min-h-screen bg-black flex items-center justify-center">
+            <div className="min-h-screen flex items-center justify-center" style={{ background: 'var(--background)' }}>
                 <div className="text-center">
                     <div className="w-16 h-16 mx-auto mb-4 bg-red-500/10 rounded-2xl flex items-center justify-center">
                         <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#ef4444" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -214,11 +214,11 @@ export default function HubToolsPage() {
     // ==================== Render ====================
 
     return (
-        <div className="min-h-screen bg-black text-white">
+        <div className="min-h-screen" style={{ background: 'var(--background)', color: 'var(--foreground)' }}>
             <DashboardNav />
 
             {/* Page Header */}
-            <header className="sticky top-[49px] z-10 bg-black/80 backdrop-blur-md border-b border-[#222]">
+            <header className="sticky top-[49px] z-10 backdrop-blur-md" style={{ background: 'var(--background)', borderBottom: '1px solid var(--border-default)' }}>
                 <div className="max-w-4xl mx-auto px-6 py-5 flex items-center justify-between">
                     <div>
                         <h1 className="text-2xl font-bold tracking-tight">
@@ -251,7 +251,7 @@ export default function HubToolsPage() {
                         <h2 className="text-lg font-semibold">Share Your Link</h2>
                     </div>
 
-                    <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-2xl divide-y divide-[#1a1a1a]">
+                    <div className="rounded-2xl divide-y" style={{ background: 'var(--surface-1)', border: '1px solid var(--border-subtle)', '--tw-divide-opacity': 1 } as React.CSSProperties}>
                         {/* Full URL */}
                         <div className="p-5 flex items-center justify-between gap-4">
                             <div className="min-w-0 flex-1">
@@ -262,7 +262,7 @@ export default function HubToolsPage() {
                                 onClick={() => copyToClipboard(fullUrl, 'full')}
                                 className={`shrink-0 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${copied === 'full'
                                     ? 'bg-[#00C853]/20 text-[#00C853]'
-                                    : 'bg-[#161616] text-[#888] hover:text-white hover:bg-[#222] border border-[#222] hover:border-[#444]'
+                                    : ''
                                     }`}
                             >
                                 {copied === 'full' ? '✓ Copied' : 'Copy'}
@@ -293,7 +293,8 @@ export default function HubToolsPage() {
                                     </button>
                                     <button
                                         onClick={() => window.open(externalShortUrl, '_blank')}
-                                        className="px-3 py-2 rounded-lg text-sm text-[#888] hover:text-white bg-[#161616] border border-[#222] hover:border-[#444] transition-colors"
+                                        className="px-3 py-2 rounded-lg text-sm transition-colors"
+                                        style={{ color: 'var(--foreground-secondary)', background: 'var(--surface-2)', border: '1px solid var(--border-default)' }}
                                         title="Open in new tab"
                                     >
                                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -325,7 +326,7 @@ export default function HubToolsPage() {
                         </button>
                     </div>
 
-                    <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-2xl p-6">
+                    <div className="rounded-2xl p-6" style={{ background: 'var(--surface-1)', border: '1px solid var(--border-subtle)' }}>
                         <div className="flex flex-col sm:flex-row items-center gap-6">
                             {/* QR Code Preview */}
                             <div className="shrink-0">
@@ -381,7 +382,8 @@ export default function HubToolsPage() {
                                     </button>
                                     <button
                                         onClick={downloadQRSVG}
-                                        className="px-4 py-2 bg-[#161616] text-[#888] rounded-lg text-sm font-medium hover:text-white hover:bg-[#222] border border-[#222] hover:border-[#444] transition-colors"
+                                        className="px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+                                        style={{ background: 'var(--surface-2)', color: 'var(--foreground-secondary)', border: '1px solid var(--border-default)' }}
                                     >
                                         SVG
                                     </button>
@@ -389,7 +391,7 @@ export default function HubToolsPage() {
                                         onClick={() => copyToClipboard(qrValue, 'qr')}
                                         className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${copied === 'qr'
                                             ? 'bg-[#00C853]/20 text-[#00C853]'
-                                            : 'bg-[#161616] text-[#888] hover:text-white hover:bg-[#222] border border-[#222] hover:border-[#444]'
+                                            : ''
                                             }`}
                                     >
                                         {copied === 'qr' ? '✓ Copied' : 'Copy URL'}
@@ -419,10 +421,10 @@ export default function HubToolsPage() {
                         </div>
                     </div>
 
-                    <div className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-2xl p-6">
+                    <div className="rounded-2xl p-6" style={{ background: 'var(--surface-1)', border: '1px solid var(--border-subtle)' }}>
                         {!shortenerAvailable ? (
                             <div className="text-center py-6">
-                                <div className="w-12 h-12 mx-auto mb-3 bg-[#1a1a1a] rounded-2xl flex items-center justify-center">
+                                <div className="w-12 h-12 mx-auto mb-3 rounded-2xl flex items-center justify-center" style={{ background: 'var(--surface-2)' }}>
                                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#555" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                                         <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
                                     </svg>
@@ -442,7 +444,7 @@ export default function HubToolsPage() {
                                                 onClick={() => setSelectedProvider(p.value)}
                                                 className={`flex-1 py-2.5 px-4 rounded-xl text-sm font-medium transition-all duration-200 ${selectedProvider === p.value
                                                     ? 'bg-[#00C853]/15 text-[#00C853] ring-1 ring-[#00C853]/30'
-                                                    : 'bg-[#111] text-[#666] hover:text-[#999] hover:bg-[#161616]'
+                                                    : ''
                                                     }`}
                                             >
                                                 <span className="mr-2">{p.icon}</span>
@@ -514,11 +516,11 @@ export default function HubToolsPage() {
                                 desc: 'Every click and impression is tracked with detailed analytics and insights.',
                             },
                         ].map((item) => (
-                            <div key={item.step} className="bg-[#0a0a0a] border border-[#1a1a1a] rounded-xl p-5">
+                            <div key={item.step} className="rounded-xl p-5" style={{ background: 'var(--surface-1)', border: '1px solid var(--border-subtle)' }}>
                                 <div className="w-7 h-7 bg-[#00C853]/10 rounded-lg flex items-center justify-center mb-3">
                                     <span className="text-xs font-bold text-[#00C853]">{item.step}</span>
                                 </div>
-                                <h4 className="text-sm font-semibold text-white mb-1.5">{item.title}</h4>
+                                <h4 className="text-sm font-semibold mb-1.5" style={{ color: 'var(--foreground)' }}>{item.title}</h4>
                                 <p className="text-xs text-[#555] leading-relaxed">{item.desc}</p>
                             </div>
                         ))}

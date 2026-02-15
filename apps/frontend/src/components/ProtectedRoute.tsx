@@ -26,10 +26,10 @@ export default function ProtectedRoute({ children }: ProtectedRouteProps) {
   // Show loading state while checking auth
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-black flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center" style={{ background: 'var(--background)' }}>
         <div className="text-center">
           <div className="w-12 h-12 border-4 border-[#00C853] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-[#9A9A9A]">Loading...</p>
+          <p style={{ color: 'var(--foreground-secondary)' }}>Loading...</p>
         </div>
       </div>
     );
