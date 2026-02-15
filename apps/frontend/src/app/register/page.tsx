@@ -9,6 +9,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/contexts/auth-context';
+import GradientMesh from '@/components/animations/GradientMesh';
 
 // ─── Password Strength Meter ───
 function PasswordStrength({ password }: { password: string }) {
@@ -113,8 +114,7 @@ export default function RegisterPage() {
       <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden items-center justify-center">
         <div className="absolute inset-0" style={{ background: 'linear-gradient(135deg, #000 0%, #021a0a 40%, #042b10 100%)' }} />
 
-        <div className="absolute w-[500px] h-[500px] rounded-full animate-glow-pulse" style={{ bottom: '-10%', right: '-15%', background: 'radial-gradient(circle, rgba(0,200,83,0.1) 0%, transparent 60%)' }} />
-        <div className="absolute w-[300px] h-[300px] rounded-full animate-float-slow" style={{ top: '10%', left: '-5%', background: 'radial-gradient(circle, rgba(0,200,83,0.08) 0%, transparent 60%)' }} />
+        <GradientMesh intensity={0.1} />
 
         <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: 'linear-gradient(rgba(255,255,255,.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.1) 1px, transparent 1px)', backgroundSize: '60px 60px' }} />
 
@@ -139,12 +139,12 @@ export default function RegisterPage() {
 
           <div className="space-y-4">
             {[
-              { icon: '🚀', text: 'Set up in under 60 seconds' },
-              { icon: '🎯', text: 'Device & geo-based routing' },
-              { icon: '📈', text: 'AI-powered analytics' },
+              { icon: (<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#00C853" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" /></svg>), text: 'Set up in under 60 seconds' },
+              { icon: (<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#00C853" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10" /><line x1="2" y1="12" x2="22" y2="12" /><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" /></svg>), text: 'Device & geo-based routing' },
+              { icon: (<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#00C853" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18" /><polyline points="17 6 23 6 23 12" /></svg>), text: 'AI-powered analytics' },
             ].map(item => (
               <div key={item.text} className="flex items-center gap-3 text-sm text-[#999]">
-                <span className="text-base">{item.icon}</span>
+                <span className="flex-shrink-0">{item.icon}</span>
                 {item.text}
               </div>
             ))}

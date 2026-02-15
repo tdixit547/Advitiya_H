@@ -9,6 +9,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/contexts/auth-context';
+import GradientMesh from '@/components/animations/GradientMesh';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -58,12 +59,9 @@ export default function LoginPage() {
 
       {/* ─── Left Panel: Branding ─── */}
       <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden items-center justify-center">
-        {/* Gradient background */}
+        {/* Animated gradient mesh */}
         <div className="absolute inset-0" style={{ background: 'linear-gradient(135deg, #000 0%, #021a0a 40%, #042b10 100%)' }} />
-
-        {/* Animated orbs */}
-        <div className="absolute w-[500px] h-[500px] rounded-full animate-glow-pulse" style={{ top: '-10%', left: '-15%', background: 'radial-gradient(circle, rgba(0,200,83,0.1) 0%, transparent 60%)' }} />
-        <div className="absolute w-[300px] h-[300px] rounded-full animate-float-slow" style={{ bottom: '10%', right: '-5%', background: 'radial-gradient(circle, rgba(0,200,83,0.08) 0%, transparent 60%)' }} />
+        <GradientMesh intensity={0.1} />
 
         {/* Grid pattern */}
         <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: 'linear-gradient(rgba(255,255,255,.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.1) 1px, transparent 1px)', backgroundSize: '60px 60px' }} />
@@ -91,12 +89,12 @@ export default function LoginPage() {
           {/* Feature highlights */}
           <div className="space-y-4">
             {[
-              { icon: '⚡', text: 'Smart device-based routing' },
-              { icon: '📊', text: 'Real-time analytics dashboard' },
-              { icon: '🔒', text: 'Enterprise-grade security' },
+              { icon: (<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#00C853" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" /></svg>), text: 'Smart device-based routing' },
+              { icon: (<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#00C853" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="20" x2="18" y2="10" /><line x1="12" y1="20" x2="12" y2="4" /><line x1="6" y1="20" x2="6" y2="14" /></svg>), text: 'Real-time analytics dashboard' },
+              { icon: (<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#00C853" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /></svg>), text: 'Enterprise-grade security' },
             ].map(item => (
               <div key={item.text} className="flex items-center gap-3 text-sm text-[#999]">
-                <span className="text-base">{item.icon}</span>
+                <span className="flex-shrink-0">{item.icon}</span>
                 {item.text}
               </div>
             ))}

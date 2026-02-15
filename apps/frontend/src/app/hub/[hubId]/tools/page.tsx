@@ -1,5 +1,6 @@
 'use client';
 
+import React from 'react';
 import { useState, useEffect, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import DashboardNav from '@/components/DashboardNav';
@@ -19,9 +20,9 @@ interface HubData {
 
 // ==================== Provider Config ====================
 
-const PROVIDER_OPTIONS: { value: ShortenerProvider; label: string; icon: string }[] = [
-    { value: 'tinyurl', label: 'TinyURL', icon: '🔗' },
-    { value: 'dagd', label: 'da.gd', icon: '🚀' },
+const PROVIDER_OPTIONS: { value: ShortenerProvider; label: string; icon: React.ReactNode }[] = [
+    { value: 'tinyurl', label: 'TinyURL', icon: (<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" /><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" /></svg>) },
+    { value: 'dagd', label: 'da.gd', icon: (<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" /></svg>) },
 ];
 
 // ==================== Main Component ====================
@@ -259,11 +260,10 @@ export default function HubToolsPage() {
                             </div>
                             <button
                                 onClick={() => copyToClipboard(fullUrl, 'full')}
-                                className={`shrink-0 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
-                                    copied === 'full'
-                                        ? 'bg-[#00C853]/20 text-[#00C853]'
-                                        : 'bg-[#161616] text-[#888] hover:text-white hover:bg-[#222] border border-[#222] hover:border-[#444]'
-                                }`}
+                                className={`shrink-0 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${copied === 'full'
+                                    ? 'bg-[#00C853]/20 text-[#00C853]'
+                                    : 'bg-[#161616] text-[#888] hover:text-white hover:bg-[#222] border border-[#222] hover:border-[#444]'
+                                    }`}
                             >
                                 {copied === 'full' ? '✓ Copied' : 'Copy'}
                             </button>
@@ -284,11 +284,10 @@ export default function HubToolsPage() {
                                 <div className="shrink-0 flex items-center gap-2">
                                     <button
                                         onClick={() => copyToClipboard(externalShortUrl, 'external')}
-                                        className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
-                                            copied === 'external'
-                                                ? 'bg-[#00C853]/20 text-[#00C853]'
-                                                : 'bg-[#00C853] text-black hover:bg-[#00E676]'
-                                        }`}
+                                        className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${copied === 'external'
+                                            ? 'bg-[#00C853]/20 text-[#00C853]'
+                                            : 'bg-[#00C853] text-black hover:bg-[#00E676]'
+                                            }`}
                                     >
                                         {copied === 'external' ? '✓ Copied' : 'Copy'}
                                     </button>
@@ -346,16 +345,14 @@ export default function HubToolsPage() {
                                 <div className="flex justify-center mt-2 gap-1">
                                     <button
                                         onClick={() => setQrDark(false)}
-                                        className={`w-6 h-6 rounded border-2 transition-all duration-150 ${
-                                            !qrDark ? 'border-[#00C853] bg-white' : 'border-[#333] bg-white/80 opacity-50 hover:opacity-80'
-                                        }`}
+                                        className={`w-6 h-6 rounded border-2 transition-all duration-150 ${!qrDark ? 'border-[#00C853] bg-white' : 'border-[#333] bg-white/80 opacity-50 hover:opacity-80'
+                                            }`}
                                         title="Light background"
                                     />
                                     <button
                                         onClick={() => setQrDark(true)}
-                                        className={`w-6 h-6 rounded border-2 transition-all duration-150 ${
-                                            qrDark ? 'border-[#00C853] bg-[#0a0a0a]' : 'border-[#333] bg-[#0a0a0a] opacity-50 hover:opacity-80'
-                                        }`}
+                                        className={`w-6 h-6 rounded border-2 transition-all duration-150 ${qrDark ? 'border-[#00C853] bg-[#0a0a0a]' : 'border-[#333] bg-[#0a0a0a] opacity-50 hover:opacity-80'
+                                            }`}
                                         title="Dark background"
                                     />
                                 </div>
@@ -390,11 +387,10 @@ export default function HubToolsPage() {
                                     </button>
                                     <button
                                         onClick={() => copyToClipboard(qrValue, 'qr')}
-                                        className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
-                                            copied === 'qr'
-                                                ? 'bg-[#00C853]/20 text-[#00C853]'
-                                                : 'bg-[#161616] text-[#888] hover:text-white hover:bg-[#222] border border-[#222] hover:border-[#444]'
-                                        }`}
+                                        className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${copied === 'qr'
+                                            ? 'bg-[#00C853]/20 text-[#00C853]'
+                                            : 'bg-[#161616] text-[#888] hover:text-white hover:bg-[#222] border border-[#222] hover:border-[#444]'
+                                            }`}
                                     >
                                         {copied === 'qr' ? '✓ Copied' : 'Copy URL'}
                                     </button>
@@ -444,11 +440,10 @@ export default function HubToolsPage() {
                                             <button
                                                 key={p.value}
                                                 onClick={() => setSelectedProvider(p.value)}
-                                                className={`flex-1 py-2.5 px-4 rounded-xl text-sm font-medium transition-all duration-200 ${
-                                                    selectedProvider === p.value
-                                                        ? 'bg-[#00C853]/15 text-[#00C853] ring-1 ring-[#00C853]/30'
-                                                        : 'bg-[#111] text-[#666] hover:text-[#999] hover:bg-[#161616]'
-                                                }`}
+                                                className={`flex-1 py-2.5 px-4 rounded-xl text-sm font-medium transition-all duration-200 ${selectedProvider === p.value
+                                                    ? 'bg-[#00C853]/15 text-[#00C853] ring-1 ring-[#00C853]/30'
+                                                    : 'bg-[#111] text-[#666] hover:text-[#999] hover:bg-[#161616]'
+                                                    }`}
                                             >
                                                 <span className="mr-2">{p.icon}</span>
                                                 {p.label}
@@ -461,11 +456,10 @@ export default function HubToolsPage() {
                                 <button
                                     onClick={handleShortenUrl}
                                     disabled={shortening}
-                                    className={`w-full py-3.5 rounded-xl font-semibold transition-all duration-300 ${
-                                        shortening
-                                            ? 'bg-[#222] text-[#666] cursor-wait'
-                                            : 'bg-gradient-to-r from-[#00C853] to-[#00E676] text-black hover:shadow-[0_0_24px_rgba(0,200,83,0.2)] hover:scale-[1.005] active:scale-[0.995]'
-                                    }`}
+                                    className={`w-full py-3.5 rounded-xl font-semibold transition-all duration-300 ${shortening
+                                        ? 'bg-[#222] text-[#666] cursor-wait'
+                                        : 'bg-gradient-to-r from-[#00C853] to-[#00E676] text-black hover:shadow-[0_0_24px_rgba(0,200,83,0.2)] hover:scale-[1.005] active:scale-[0.995]'
+                                        }`}
                                 >
                                     {shortening ? (
                                         <span className="flex items-center justify-center gap-3">

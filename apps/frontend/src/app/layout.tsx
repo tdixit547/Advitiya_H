@@ -3,6 +3,8 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/contexts/auth-context";
 import KeepAlive from "@/components/KeepAlive";
+import CursorGlow from "@/components/animations/CursorGlow";
+import ParticleField from "@/components/animations/ParticleField";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -31,6 +33,8 @@ export default function RootLayout({
           fontFamily: "'Inter', system-ui, -apple-system, sans-serif",
         }}
       >
+        <CursorGlow />
+        <ParticleField count={40} />
         <KeepAlive />
         <AuthProvider>
           {children}

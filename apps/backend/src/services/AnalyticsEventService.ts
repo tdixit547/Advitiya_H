@@ -1,6 +1,7 @@
 import { AnalyticsEvent, AnalyticsEventType, DeviceType, SourceType, IAnalyticsEvent } from '../models/AnalyticsEvent';
 import { v4 as uuidv4 } from 'uuid';
 import UAParser from 'ua-parser-js';
+import { lookupIP } from './GeoIPService';
 
 /**
  * Enhanced Event Parameters (supports new fields)
@@ -187,16 +188,14 @@ export class AnalyticsEventService {
     }
 
     /**
-     * Get coarse location from IP (simplified)
+     * Get coarse location from IP using GeoIPService
      */
     private async getCoarseLocation(ipAddress: string): Promise<string | null> {
-        // In production, use a geo-IP service like MaxMind or ip-api
         try {
-            // Skip local/private IPs
-            if (ipAddress === '127.0.0.1' || ipAddress === '::1' || ipAddress.startsWith('192.168.')) {
-                return 'local';
+            const result = await lookupIP(ipAddress);
+            if (result) {
+                return result.country;
             }
-            // Would integrate with geo-IP service here
             return null;
         } catch {
             return null;
