@@ -1,9 +1,8 @@
 /**
- * ShortenerService - Calls the Python pyshorteners microservice
- * to get external shortened URLs (TinyURL, is.gd, etc.)
+ * ShortenerService - Native URL shortening using free APIs
+ * Replaces the Python microservice with direct HTTP calls
+ * Supports: TinyURL, is.gd, da.gd, clck.ru
  */
-
-const SHORTENER_SERVICE_URL = process.env.SHORTENER_SERVICE_URL || 'http://localhost:5000';
 
 export type ShortenerProvider = 'tinyurl' | 'isgd' | 'dagd' | 'clckru';
 
@@ -14,34 +13,70 @@ export interface ShortenResult {
     note?: string;
 }
 
+// Provider API configurations
+const PROVIDER_APIS: Record<ShortenerProvider, (url: string) => { apiUrl: string; method: string; body?: string; headers?: Record<string, string>; parseResponse: (text: string) => string }> = {
+    tinyurl: (url: string) => ({
+        apiUrl: `https://tinyurl.com/api-create.php?url=${encodeURIComponent(url)}`,
+        method: 'GET',
+        parseResponse: (text: string) => text.trim(),
+    }),
+    isgd: (url: string) => ({
+        apiUrl: `https://is.gd/create.php?format=simple&url=${encodeURIComponent(url)}`,
+        method: 'GET',
+        parseResponse: (text: string) => text.trim(),
+    }),
+    dagd: (url: string) => ({
+        apiUrl: `https://da.gd/s?url=${encodeURIComponent(url)}`,
+        method: 'GET',
+        parseResponse: (text: string) => text.trim(),
+    }),
+    clckru: (url: string) => ({
+        apiUrl: `https://clck.ru/--?url=${encodeURIComponent(url)}`,
+        method: 'GET',
+        parseResponse: (text: string) => text.trim(),
+    }),
+};
+
 class ShortenerService {
-    private baseUrl: string;
-
-    constructor() {
-        this.baseUrl = SHORTENER_SERVICE_URL;
-    }
-
     /**
-     * Shorten a URL using the Python microservice
+     * Shorten a URL using a free URL shortening API
      */
     async shortenUrl(url: string, provider: ShortenerProvider = 'tinyurl'): Promise<ShortenResult> {
+        const config = PROVIDER_APIS[provider];
+        if (!config) {
+            throw new Error(`Unsupported provider: ${provider}`);
+        }
+
+        const { apiUrl, method, body, headers, parseResponse } = config(url);
+
         try {
-            const response = await fetch(`${this.baseUrl}/shorten`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ url, provider }),
+            const response = await fetch(apiUrl, {
+                method,
+                headers: headers || {},
+                body,
+                signal: AbortSignal.timeout(10000), // 10s timeout
             });
 
             if (!response.ok) {
-                const errorData = await response.json().catch(() => ({ error: 'Unknown error' })) as { error?: string };
-                throw new Error(errorData.error || `Shortener service returned ${response.status}`);
+                const errorText = await response.text().catch(() => 'Unknown error');
+                throw new Error(`${provider} returned ${response.status}: ${errorText}`);
             }
 
-            return await response.json() as ShortenResult;
+            const responseText = await response.text();
+            const shortUrl = parseResponse(responseText);
+
+            if (!shortUrl || !shortUrl.startsWith('http')) {
+                throw new Error(`Invalid response from ${provider}: ${responseText}`);
+            }
+
+            return {
+                short_url: shortUrl,
+                original_url: url,
+                provider,
+            };
         } catch (error: any) {
-            // Check if the service is unreachable
-            if (error.code === 'ECONNREFUSED' || error.cause?.code === 'ECONNREFUSED') {
-                throw new Error('URL shortener service is not running. Start it with: cd apps/shortener && python app.py');
+            if (error.name === 'TimeoutError' || error.name === 'AbortError') {
+                throw new Error(`${provider} timed out after 10 seconds`);
             }
             throw error;
         }
@@ -49,11 +84,12 @@ class ShortenerService {
 
     /**
      * Check if the shortener service is available
+     * Since we use public APIs directly, we just verify TinyURL is reachable
      */
     async isAvailable(): Promise<boolean> {
         try {
-            const response = await fetch(`${this.baseUrl}/health`, {
-                signal: AbortSignal.timeout(2000),
+            const response = await fetch('https://tinyurl.com/api-create.php?url=https://example.com', {
+                signal: AbortSignal.timeout(5000),
             });
             return response.ok;
         } catch {
@@ -62,21 +98,23 @@ class ShortenerService {
     }
 
     /**
-     * Expand a shortened URL
+     * Expand a shortened URL by following redirects
      */
     async expandUrl(url: string): Promise<{ original_url: string; short_url: string }> {
-        const response = await fetch(`${this.baseUrl}/expand`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ url }),
-        });
+        try {
+            const response = await fetch(url, {
+                method: 'HEAD',
+                redirect: 'follow',
+                signal: AbortSignal.timeout(10000),
+            });
 
-        if (!response.ok) {
-            const errorData = await response.json().catch(() => ({ error: 'Unknown error' })) as { error?: string };
-            throw new Error(errorData.error || `Expand failed with status ${response.status}`);
+            return {
+                original_url: response.url,
+                short_url: url,
+            };
+        } catch (error: any) {
+            throw new Error(`Failed to expand URL: ${error.message}`);
         }
-
-        return await response.json() as { original_url: string; short_url: string };
     }
 }
 

@@ -5,7 +5,12 @@
 
 // ==================== API Configuration ====================
 
-export const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+// In the browser, use same-origin rewrites to avoid cross-origin issues (Safari ITP)
+// Next.js rewrites in next.config.ts proxy /api/* to the backend
+// On the server (SSR), use the full backend URL directly
+export const API_BASE_URL = typeof window !== 'undefined'
+  ? ''  // Browser: use same-origin Next.js rewrites
+  : (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001');
 
 // ==================== User Model ====================
 

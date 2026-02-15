@@ -1,12 +1,13 @@
 import type { Metadata } from "next";
-import { Fira_Code } from "next/font/google";
+import { Inter } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/contexts/auth-context";
+import KeepAlive from "@/components/KeepAlive";
 
-const firaCode = Fira_Code({
-  variable: "--font-fira-code",
+const inter = Inter({
+  variable: "--font-inter",
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
+  weight: ["400", "500", "600", "700", "800"],
 });
 
 export const metadata: Metadata = {
@@ -23,13 +24,14 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body
         suppressHydrationWarning
-        className={`${firaCode.variable} antialiased`}
+        className={`${inter.variable} antialiased`}
         style={{
           background: '#000000',
-          color: '#00FF00',
-          fontFamily: "'Fira Code', 'Courier New', monospace",
+          color: '#E6E6E6',
+          fontFamily: "'Inter', system-ui, -apple-system, sans-serif",
         }}
       >
+        <KeepAlive />
         <AuthProvider>
           {children}
         </AuthProvider>

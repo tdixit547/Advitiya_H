@@ -416,12 +416,12 @@ router.post('/hubs/:hub_id/stats/aggregate', requireAuth, requireOwnership, asyn
     }
 });
 
-// ============== URL SHORTENING (Python pyshorteners) ==============
+// ============== URL SHORTENING ==============
 
 import { shortenerService, ShortenerProvider } from '../services/ShortenerService';
 
 /**
- * Shorten a hub's URL using the Python pyshorteners microservice
+ * Shorten a hub's URL using free URL shortening APIs
  * POST /hubs/:hub_id/shorten
  * Requires authentication and ownership
  */
@@ -452,8 +452,8 @@ router.post('/hubs/:hub_id/shorten', requireAuth, requireOwnership, async (req: 
         const available = await shortenerService.isAvailable();
         if (!available) {
             return res.status(503).json({
-                error: 'URL shortener service is not running',
-                hint: 'Start with: cd apps/shortener && python app.py'
+                error: 'URL shortener APIs are unreachable',
+                hint: 'Check your internet connection or try again later'
             });
         }
 
@@ -477,7 +477,7 @@ router.post('/hubs/:hub_id/shorten', requireAuth, requireOwnership, async (req: 
 });
 
 /**
- * Check if the Python shortener service is available
+ * Check if URL shortening APIs are available
  * GET /shortener/status
  */
 router.get('/shortener/status', requireAuth, async (_req: IAuthenticatedRequest, res: Response) => {
